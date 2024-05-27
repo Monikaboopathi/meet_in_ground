@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'Screens/onboarding/splashScreen.dart';
+
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meet_in_ground/Screens/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
+
 
 void main() {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,11 +22,10 @@ class MyApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Poppins',
-        primaryColor: ThemeService.background,
+        primaryColor: ThemeService.primary,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ScreenUtilInit(
-          designSize: Size(375, 812), child: const BottomNavigationScreen()),
+      home: const SplashScreen(),
     );
   }
 }
