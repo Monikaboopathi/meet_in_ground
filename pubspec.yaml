@@ -41,7 +41,11 @@ dependencies:
   flutter_screenutil: ^5.9.1
   cached_network_image: ^3.3.1
   date_format: ^2.0.7
-  image_picker: ^1.0.8
+
+  image_picker: ^1.1.1
+  http: ^1.2.1
+  lottie: ^3.1.2
+
 
 dev_dependencies:
   flutter_test:
@@ -81,6 +85,7 @@ flutter:
     - assets/empty-img.jpg
     - assets/galleryImage.png
     - assets/noData.png
+    - assets/loader.json
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

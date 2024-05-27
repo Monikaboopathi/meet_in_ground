@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'Screens/onboarding/splashScreen.dart';
 
@@ -23,7 +25,9 @@ class MyApp extends StatelessWidget {
         primaryColor: ThemeService.primary,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+
       home: const SplashScreen(),
+
     );
   }
 }
