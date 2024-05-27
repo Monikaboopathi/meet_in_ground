@@ -5,14 +5,32 @@ import 'package:meet_in_ground/Screens/widgets/OutlinedText_widget.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 
 class Post_Widget extends StatelessWidget {
-  final String username;
-  final String location;
+  final String id;
+  final String image;
+  final String userName;
+  final String phoneNumber;
+  final String sport;
+  final String matchDetails;
+  final String matchDate;
+  final int betAmount;
+  final String placeOfMatch;
+  final String status;
+  final String postOwnerImage;
   final int likes;
   final int comments;
 
   const Post_Widget({
-    required this.username,
-    required this.location,
+    required this.id,
+    required this.image,
+    required this.userName,
+    required this.phoneNumber,
+    required this.sport,
+    required this.matchDetails,
+    required this.matchDate,
+    required this.betAmount,
+    required this.placeOfMatch,
+    required this.status,
+    required this.postOwnerImage,
     required this.likes,
     required this.comments,
     Key? key,
@@ -31,7 +49,7 @@ class Post_Widget extends StatelessWidget {
               backgroundImage: AssetImage('assets/galleryImage.png'),
             ),
             title: Text(
-              username,
+              userName,
               style: TextStyle(
                 fontWeight: FontWeight.bold,
                 color: ThemeService.textColor,
@@ -46,11 +64,10 @@ class Post_Widget extends StatelessWidget {
                 ),
                 SizedBox(width: 4),
                 Expanded(
-                  // Wrap the Text widget with Expanded
                   child: Text(
-                    location,
+                    placeOfMatch,
                     style: TextStyle(color: Colors.grey, fontSize: 10),
-                    overflow: TextOverflow.ellipsis, // Handle overflow
+                    overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
@@ -73,11 +90,11 @@ class Post_Widget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 OutlinedText_widget(
-                    iconData: Icons.emoji_events, text: "50000"),
+                    iconData: Icons.emoji_events, text: '$betAmount'),
                 OutlinedText_widget(
-                    iconData: Icons.sports_esports, text: "Cricket"),
+                    iconData: Icons.sports_esports, text: '$sport'),
                 OutlinedText_widget(
-                    iconData: Icons.calendar_today, text: "Sep 1 2024")
+                    iconData: Icons.calendar_today, text: "$matchDate")
               ],
             ),
           ),
