@@ -1,9 +1,14 @@
 import 'package:flutter/material.dart';
-import 'package:meet_in_ground/constant/themes_service.dart';
-
 import 'Screens/onboarding/splashScreen.dart';
 
+import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:meet_in_ground/Screens/widgets/BottomNavigationScreen.dart';
+import 'package:meet_in_ground/constant/themes_service.dart';
+
+
 void main() {
+  WidgetsFlutterBinding.ensureInitialized();
+
   runApp(const MyApp());
 }
 
