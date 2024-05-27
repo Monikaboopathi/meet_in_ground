@@ -1,7 +1,9 @@
 // ignore_for_file: camel_case_types, prefer_const_literals_to_create_immutables, prefer_const_constructors
 
 import 'package:flutter/material.dart';
+import 'package:meet_in_ground/Screens/Home/home.dart';
 import 'package:meet_in_ground/Screens/widgets/OutlinedText_widget.dart';
+import 'package:meet_in_ground/Screens/widgets/ShareMethods.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 
 class Post_Widget extends StatelessWidget {
@@ -48,12 +50,38 @@ class Post_Widget extends StatelessWidget {
               radius: 20.0,
               backgroundImage: AssetImage('assets/galleryImage.png'),
             ),
-            title: Text(
-              userName,
-              style: TextStyle(
-                fontWeight: FontWeight.bold,
-                color: ThemeService.textColor,
-              ),
+            title: Row(
+              children: [
+                Text(
+                  userName,
+                  style: TextStyle(
+                    fontWeight: FontWeight.bold,
+                    color: ThemeService.textColor,
+                  ),
+                ),
+                SizedBox(
+                  width: 5,
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: ThemeService.textColor,
+                      width: 1.0,
+                    ),
+                    borderRadius: BorderRadius.circular(4.0),
+                  ),
+                  padding: EdgeInsets.symmetric(vertical: 1, horizontal: 6),
+                  child: Row(
+                    children: [
+                      Text(
+                        "Request",
+                        style: TextStyle(
+                            fontSize: 10.0, color: ThemeService.textColor),
+                      ),
+                    ],
+                  ),
+                )
+              ],
             ),
             subtitle: Row(
               children: [
@@ -112,7 +140,25 @@ class Post_Widget extends StatelessWidget {
               ),
               IconButton(
                 icon: Icon(Icons.share, color: ThemeService.textColor),
-                onPressed: () {},
+                onPressed: () {
+                  sharePost(Post(
+                    id: id,
+                    image: image,
+                    userName: userName,
+                    phoneNumber: phoneNumber,
+                    sport: sport,
+                    matchDetails: matchDetails,
+                    matchDate: matchDate,
+                    betAmount: betAmount,
+                    placeOfMatch: placeOfMatch,
+                    status: status,
+                    postOwnerImage: postOwnerImage,
+                    likes: likes,
+                    comments: comments,
+                    favorites: [],
+                    requests: [],
+                  ));
+                },
               ),
               // Spacer(),
               // IconButton(
