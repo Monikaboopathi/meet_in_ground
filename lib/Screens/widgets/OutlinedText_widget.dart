@@ -1,4 +1,4 @@
-// ignore_for_file: prefer_const_constructors
+// ignore_for_file: prefer_const_constructors, file_names, camel_case_types
 
 import 'package:flutter/material.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';

@@ -1,3 +1,6 @@
+
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:meet_in_ground/Screens/Favorites/Favorites.dart';
 import 'package:meet_in_ground/Screens/Home/home.dart';
@@ -13,10 +16,9 @@ class BottomNavigationScreen extends StatefulWidget {
   State<BottomNavigationScreen> createState() => _BottomNavigationScreenState();
 }
 
-int _currentIndex = 0;
-
 class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
   late PageController pageController;
+  int _currentIndex = 0;
 
   @override
   void initState() {
@@ -30,13 +32,13 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
     pageController.dispose();
   }
 
-  onPageChanged(int page) {
+  void onPageChanged(int page) {
     setState(() {
       _currentIndex = page;
     });
   }
 
-  navigationTapped(int page) {
+  void navigationTapped(int page) {
     pageController.jumpToPage(page);
   }
 
@@ -44,35 +46,53 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: Container(
-        child: BottomNavigationBar(
-          type: BottomNavigationBarType.fixed,
-          selectedItemColor: ThemeService.textColor,
-          unselectedItemColor: Colors.grey,
-          currentIndex: _currentIndex,
-          onTap: navigationTapped,
-          backgroundColor: ThemeService.background,
-          items: const [
-            BottomNavigationBarItem(
-              icon: Icon(Icons.home),
-              label: '',
+        height: 60,
+        child: BottomAppBar(
+          color: ThemeService.background,
+          shape: CircularNotchedRectangle(),
+          child: Container(
+            height: kBottomNavigationBarHeight,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                IconButton(
+                  icon: _currentIndex == 0
+                      ? Icon(
+                          Icons.home,
+                          color: ThemeService.textColor,
+                        )
+                      : Icon(Icons.home_outlined, color: Colors.grey),
+                  onPressed: () => navigationTapped(0),
+                ),
+                IconButton(
+                  icon: _currentIndex == 1
+                      ? Icon(Icons.message_sharp, color: ThemeService.textColor)
+                      : Icon(Icons.message_outlined, color: Colors.grey),
+                  onPressed: () => navigationTapped(1),
+                ),
+                IconButton(
+                  icon: _currentIndex == 2
+                      ? Icon(Icons.add_circle_rounded,
+                          color: ThemeService.textColor)
+                      : Icon(Icons.add_circle_outline_rounded,
+                          color: Colors.grey),
+                  onPressed: () => navigationTapped(2),
+                ),
+                IconButton(
+                  icon: _currentIndex == 3
+                      ? Icon(Icons.favorite, color: ThemeService.textColor)
+                      : Icon(Icons.favorite_border, color: Colors.grey),
+                  onPressed: () => navigationTapped(3),
+                ),
+                IconButton(
+                  icon: _currentIndex == 4
+                      ? Icon(Icons.person, color: ThemeService.textColor)
+                      : Icon(Icons.person_outline, color: Colors.grey),
+                  onPressed: () => navigationTapped(4),
+                ),
+              ],
             ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.message_sharp),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.add_circle_rounded),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.favorite),
-              label: '',
-            ),
-            BottomNavigationBarItem(
-              icon: Icon(Icons.person),
-              label: '',
-            ),
-          ],
+          ),
         ),
       ),
       body: PageView(
@@ -83,7 +103,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
           Messages(),
           Addposts(),
           Favorites(),
-          Profile()
+          Profile(),
         ],
       ),
     );
