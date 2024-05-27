@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:meet_in_ground/Screens/widgets/BottomNavigationScreen.dart';
@@ -22,8 +24,7 @@ class MyApp extends StatelessWidget {
         primaryColor: ThemeService.background,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: ScreenUtilInit(
-          designSize: Size(375, 812), child: const BottomNavigationScreen()),
+      home: const BottomNavigationScreen(),
     );
   }
 }

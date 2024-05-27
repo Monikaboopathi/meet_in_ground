@@ -1,4 +1,4 @@
-// ignore_for_file: avoid_unnecessary_containers, library_private_types_in_public_api
+// ignore_for_file: avoid_unnecessary_containers, library_private_types_in_public_api, unused_import
 
 import 'package:flutter/material.dart';
 import 'package:cached_network_image/cached_network_image.dart';
