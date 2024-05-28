@@ -1,4 +1,5 @@
-import 'package:meet_in_ground/Screens/Home/home.dart';
+
+import 'package:meet_in_ground/Models/Post.dart';
 import 'package:share_plus/share_plus.dart';
 
 Future<void> shareMessage(String message) async {
