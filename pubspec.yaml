@@ -47,6 +47,7 @@ dependencies:
   share_plus: ^9.0.0
   intl_phone_field: ^3.2.0
   fluttertoast: ^8.2.4
+  clipboard: ^0.1.3
 
 
 

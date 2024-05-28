@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meet_in_ground/constant/themes_service.dart';
 
 class SportSelectDialog extends StatelessWidget {
   final List<String> sportNames;
@@ -14,28 +15,49 @@ class SportSelectDialog extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return AlertDialog(
-      title: Text('Select a Sport'),
-      content: SingleChildScrollView(
+    return Dialog(
+      backgroundColor: ThemeService.background,
+      child: Container(
+        width: double.infinity,
+        padding: EdgeInsets.all(16.0),
         child: Column(
-          children: <Widget>[
-            for (String sportName in sportNames)
-              ListTile(
-                title: Text(
-                  sportName,
-                  style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.normal,
-                    color: sportName == selectedSport
-                        ? Colors.blue // Highlight selected sport
-                        : Colors.black,
-                  ),
-                ),
-                onTap: () {
-                  Navigator.pop(context);
-                  onSportSelected(sportName);
-                },
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              'Select a Sport',
+              style: TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                  color: ThemeService.textColor),
+            ),
+            SizedBox(height: 16.0),
+            SingleChildScrollView(
+              child: Wrap(
+                spacing: 8.0,
+                runSpacing: 4.0,
+                children: <Widget>[
+                  for (String sport in sportNames)
+                    ChoiceChip(
+                      label: Text(
+                        sport,
+                        style: TextStyle(
+                          fontSize: 16,
+                          color: Colors.white,
+                        ),
+                      ),
+                      selectedColor: ThemeService.buttonBg,
+                      backgroundColor: ThemeService.placeHolder,
+                      selected: selectedSport == sport,
+                      onSelected: (selected) {
+                        if (selected) {
+                          Navigator.pop(context);
+                          onSportSelected(sport);
+                        }
+                      },
+                    ),
+                ],
               ),
+            ),
           ],
         ),
       ),
