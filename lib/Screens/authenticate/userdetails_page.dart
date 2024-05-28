@@ -8,8 +8,8 @@ import 'package:location/location.dart';
 import 'package:lottie/lottie.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
+import 'package:meet_in_ground/widgets/Loader.dart';
 import '../../constant/themes_service.dart';
-
 import '../util/Services/refferral_service.dart';
 
 
@@ -152,6 +152,13 @@ Future<void> pickImage() async {
       return;
     }
     if (index == 2) {
+       showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return Loader();
+                              },
+                            );
       handleProfile();
     }
     setState(() {

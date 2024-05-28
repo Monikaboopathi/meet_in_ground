@@ -7,6 +7,7 @@ import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:meet_in_ground/widgets/Loader.dart';
 import '../util/Services/refferral_service.dart';
 
 String referralId = "";
@@ -193,8 +194,17 @@ class _PasswordPageState extends State<PasswordPage> {
                             onPressed: () async {
                               if (_formKey.currentState?.validate() ?? false) {
                                 String mobileNO = widget.mobile;
-                                String password = passwordController.text.trim();
-                                verifyPassword(mobileNO, password, context);
+                                String password =
+                                    passwordController.text.trim();
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (BuildContext context) {
+                                    return Loader();
+                                  },
+                                );
+                                await verifyPassword(
+                                    mobileNO, password, context);
                               }
                             },
                             style: ElevatedButton.styleFrom(
@@ -216,11 +226,23 @@ class _PasswordPageState extends State<PasswordPage> {
                       const SizedBox(height: 6),
                       Center(
                         child: TextButton(
-                            onPressed: () {
+                            onPressed: () async {
+                              // Show loader
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext context) {
+                                  return Loader();
+                                },
+                              );
+
+                              await Future.delayed(Duration(seconds: 2));
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => FavouritePage(mobile: widget.mobile , status: 200)),
+                                  builder: (context) => FavouritePage(
+                                      mobile: widget.mobile, status: 200),
+                                ),
                               );
                             },
                             child: Text(

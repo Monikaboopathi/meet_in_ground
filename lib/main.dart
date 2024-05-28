@@ -1,7 +1,6 @@
 // ignore_for_file: prefer_const_constructors, unused_import
 
 import 'package:flutter/material.dart';
-import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'Screens/onboarding/splashScreen.dart';
 
 import 'package:meet_in_ground/constant/themes_service.dart';
@@ -24,7 +23,7 @@ class MyApp extends StatelessWidget {
         primaryColor: ThemeService.primary,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
-      home: BottomNavigationScreen(),
+      home: SplashScreen(),
     );
   }
 }

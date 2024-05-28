@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:meet_in_ground/widgets/Loader.dart';
 
 import 'setPassword_page.dart';
 
@@ -214,6 +215,13 @@ class _FavouritePageState extends State<FavouritePage> {
                               if (_formKey.currentState?.validate() ?? false) {
                                 String hero = heroController.text;
                                 String color = colorController.text;
+                                 showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return Loader();
+                              },
+                            );
                                 if (widget.status == 200) {
                                   submitUserData(widget.mobile, hero, color);
                                 } else {

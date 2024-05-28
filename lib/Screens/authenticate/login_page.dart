@@ -8,8 +8,8 @@ import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:http/http.dart' as http;
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/widgets/Loader.dart';
 import '../util/Services/refferral_service.dart';
-
 
 void main() {
   runApp(LoginPage());
@@ -52,7 +52,6 @@ class _LoginPageState extends State<LoginPage> {
 
         await MobileNo.clearMobilenumber();
       } else {
-        
         Fluttertoast.showToast(
           msg: responseData['message'] ?? "New User",
           toastLength: Toast.LENGTH_SHORT,
@@ -61,7 +60,7 @@ class _LoginPageState extends State<LoginPage> {
           backgroundColor: Colors.green,
           textColor: Colors.white,
         );
-         Navigator.of(context).pushReplacement(
+        Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => FavouritePage(
               mobile: phoneNumber,
@@ -146,10 +145,17 @@ class _LoginPageState extends State<LoginPage> {
                     Container(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_formKey.currentState!.validate()) {
                             String phonenumber = mobileController.text;
-                            loginUser(phonenumber);
+                            showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return Loader();
+                              },
+                            );
+                            await loginUser(phonenumber);
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -326,11 +332,18 @@ class _LoginPageState extends State<LoginPage> {
                     Container(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () {
+                        onPressed: () async {
                           if (_referralFormKey.currentState!.validate()) {
                             // Handle referral code submission
                             String refferal = referralController.text;
-                            referralPost(refferal);
+                             showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return Loader();
+                              },
+                            );
+                            await referralPost(refferal);
                           }
                         },
                         style: ElevatedButton.styleFrom(
