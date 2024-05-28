@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Models/Post.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
@@ -19,12 +20,15 @@ class _HomeScreenState extends State<HomeScreen> {
   final TextEditingController _searchController = TextEditingController();
   bool isAscending = true;
   String selectedSport = '';
+  Map<String, bool> showMoreMap = {};
+  String currentMobileNumber = "";
 
   @override
   void initState() {
     super.initState();
     futurePosts = fetchPosts();
     _searchController.addListener(_onSearchChanged);
+    currentMobileNumber = "8072974576";
   }
 
   void _onSearchChanged() {
@@ -70,10 +74,180 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  Future<void> deleteFav(String postId) async {
+    final String apiUrl = 'https://bet-x-new.onrender.com/user/removeFavorites';
+
+    final Map<String, dynamic> requestData = {
+      'id': postId,
+      'phoneNumber': currentMobileNumber,
+    };
+
+    final response = await http.delete(
+      Uri.parse(apiUrl),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(requestData),
+    );
+
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    if (response.statusCode == 200) {
+      setState(() {
+        futurePosts = fetchPosts();
+      });
+      Fluttertoast.showToast(
+        msg: responseData['message'] ?? "",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: responseData['error'] ?? "",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
+  Future<void> toggleFavorite(String postId) async {
+    final String apiUrl = 'https://bet-x-new.onrender.com/user/addFavorites';
+    print(postId);
+
+    final Map<String, dynamic> requestData = {
+      'id': postId,
+      'phoneNumber': currentMobileNumber,
+    };
+
+    final response = await http.post(
+      Uri.parse(apiUrl),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(requestData),
+    );
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    if (response.statusCode == 200) {
+      setState(() {
+        futurePosts = fetchPosts();
+      });
+      Fluttertoast.showToast(
+        msg: responseData['message'] ?? "",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: responseData['error'] ?? "",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
+  Future<void> deleteRequest(String postId) async {
+    final String apiUrl =
+        'https://bet-x-new.onrender.com/post/removeRequest/$currentMobileNumber';
+
+    final Map<String, dynamic> requestData = {
+      'postId': postId,
+    };
+
+    final response = await http.delete(
+      Uri.parse(apiUrl),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(requestData),
+    );
+
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    if (response.statusCode == 200) {
+      setState(() {
+        futurePosts = fetchPosts();
+      });
+      Fluttertoast.showToast(
+        msg: responseData['message'] ?? "",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: responseData['error'] ?? "",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
+  Future<void> toggleRequest(String postId) async {
+    final String apiUrl =
+        'https://bet-x-new.onrender.com/post/makeRequestPost/$currentMobileNumber';
+    print(postId);
+
+    final Map<String, dynamic> requestData = {
+      'postId': postId,
+    };
+
+    final response = await http.patch(
+      Uri.parse(apiUrl),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+      body: jsonEncode(requestData),
+    );
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    if (response.statusCode == 200) {
+      setState(() {
+        futurePosts = fetchPosts();
+      });
+      Fluttertoast.showToast(
+        msg: responseData['message'] ?? "",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: responseData['error'] ?? "",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
   void _toggleSortOrder() {
     setState(() {
       isAscending = !isAscending;
       futurePosts = fetchPosts(query: _searchController.text);
+    });
+  }
+
+  void _toggleShowMore(String postId) {
+    setState(() {
+      showMoreMap[postId] = !(showMoreMap[postId] ?? false);
     });
   }
 
@@ -249,40 +423,61 @@ class _HomeScreenState extends State<HomeScreen> {
           ),
         ),
       ),
-      body: FutureBuilder<List<Post>>(
-        future: futurePosts,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: Loader());
-          } else if (snapshot.hasError ||
-              !snapshot.hasData ||
-              snapshot.data!.isEmpty) {
-            return Center(child: NoDataFoundWidget());
-          } else {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                Post post = snapshot.data![index];
-                return Post_Widget(
-                  userName: post.userName,
-                  placeOfMatch: post.placeOfMatch,
-                  likes: post.likes,
-                  comments: post.comments,
-                  betAmount: post.betAmount,
-                  id: post.id,
-                  image: post.image,
-                  postOwnerImage: post.postOwnerImage,
-                  matchDate: post.matchDate,
-                  matchDetails: post.matchDetails,
-                  phoneNumber: post.phoneNumber,
-                  sport: post.sport,
-                  status: post.status,
-                  createdAt: post.createdAt,
-                );
-              },
-            );
-          }
+      body: RefreshIndicator(
+        onRefresh: () async {
+          setState(() {
+            futurePosts = fetchPosts();
+            _searchController.text = "";
+          });
         },
+        child: FutureBuilder<List<Post>>(
+          future: futurePosts,
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return Center(child: Loader());
+            } else if (snapshot.hasError ||
+                !snapshot.hasData ||
+                snapshot.data!.isEmpty) {
+              return Center(child: NoDataFoundWidget());
+            } else {
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  Post post = snapshot.data![index];
+                  bool isShowMore = showMoreMap[post.id] ?? false;
+
+                  return Post_Widget(
+                    userName: post.userName,
+                    placeOfMatch: post.placeOfMatch,
+                    likes: post.likes,
+                    comments: post.comments,
+                    betAmount: post.betAmount,
+                    id: post.id,
+                    image: post.image,
+                    postOwnerImage: post.postOwnerImage,
+                    matchDate: post.matchDate,
+                    matchDetails: post.matchDetails,
+                    phoneNumber: post.phoneNumber,
+                    sport: post.sport,
+                    status: post.status,
+                    createdAt: post.createdAt,
+                    isShowMore: isShowMore,
+                    onToggleShowMore: _toggleShowMore,
+                    isFavorite: post.favorites.any((favorite) =>
+                        favorite['phoneNumber'] == "+91" + currentMobileNumber),
+                    onDeleteFav: () => deleteFav(post.id),
+                    onFavoriteToggle: () => toggleFavorite(post.id),
+                    isRequest: post.requests.any((requuest) =>
+                        requuest['phoneNumber'] == "+91" + currentMobileNumber),
+                    onDeleteRequest: () => deleteRequest(post.id),
+                    onRequestToggle: () => toggleRequest(post.id),
+                    currentMobileNumber: "+91" + currentMobileNumber,
+                  );
+                },
+              );
+            }
+          },
+        ),
       ),
     );
   }
