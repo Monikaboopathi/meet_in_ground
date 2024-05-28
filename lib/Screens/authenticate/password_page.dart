@@ -3,11 +3,10 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Screens/authenticate/favourite_page.dart';
-import 'package:meet_in_ground/Screens/widgets/BottomNavigationScreen.dart';
+import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
-
-import '../util/Services/mobileNo_service.dart';
 import '../util/Services/refferral_service.dart';
 
 String referralId = "";
