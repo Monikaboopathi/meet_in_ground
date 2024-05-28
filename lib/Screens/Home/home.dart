@@ -26,9 +26,10 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
+    currentMobileNumber = "8072974576";
     futurePosts = fetchPosts();
     _searchController.addListener(_onSearchChanged);
-    currentMobileNumber = "8072974576";
+    
   }
 
   void _onSearchChanged() {

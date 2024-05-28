@@ -6,7 +6,7 @@ import 'package:meet_in_ground/widgets/OutlinedText_widget.dart';
 import 'package:meet_in_ground/widgets/ShareMethods.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 
-class Post_Widget extends StatelessWidget {
+class Post_Widget extends StatefulWidget {
   final String id;
   final String image;
   final String userName;
@@ -58,6 +58,13 @@ class Post_Widget extends StatelessWidget {
   }) : super(key: key);
 
   @override
+  _Post_WidgetState createState() => _Post_WidgetState();
+}
+
+class _Post_WidgetState extends State<Post_Widget> {
+  bool isAnimating = false;
+
+  @override
   Widget build(BuildContext context) {
     return Container(
       color: ThemeService.background,
@@ -67,14 +74,13 @@ class Post_Widget extends StatelessWidget {
           ListTile(
             leading: CircleAvatar(
               radius: 20.0,
-              backgroundImage: NetworkImage(postOwnerImage),
+              backgroundImage: NetworkImage(widget.postOwnerImage),
               foregroundColor: Colors.amber,
             ),
-
             title: Row(
               children: [
                 Text(
-                  userName,
+                  widget.userName,
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: ThemeService.textColor,
@@ -83,9 +89,11 @@ class Post_Widget extends StatelessWidget {
                 SizedBox(
                   width: 8,
                 ),
-                if (phoneNumber != currentMobileNumber)
+                if (widget.phoneNumber != widget.currentMobileNumber)
                   GestureDetector(
-                    onTap: !isRequest ? onRequestToggle : onDeleteRequest,
+                    onTap: !widget.isRequest
+                        ? widget.onRequestToggle
+                        : widget.onDeleteRequest,
                     child: Container(
                       decoration: BoxDecoration(
                         border: Border.all(
@@ -98,7 +106,7 @@ class Post_Widget extends StatelessWidget {
                       child: Row(
                         children: [
                           Text(
-                            isRequest ? "Requested" : "Request",
+                            widget.isRequest ? "Requested" : "Request",
                             style: TextStyle(
                                 fontSize: 10.0, color: ThemeService.textColor),
                           ),
@@ -118,22 +126,53 @@ class Post_Widget extends StatelessWidget {
                 SizedBox(width: 4),
                 Expanded(
                   child: Text(
-                    placeOfMatch,
+                    widget.placeOfMatch,
                     style: TextStyle(color: Colors.grey, fontSize: 10),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
               ],
             ),
-            // trailing: Icon(Icons.more_horiz, color: ThemeService.textColor),
           ),
-          Container(
-            height: 300.0,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                image: NetworkImage(image),
-                fit: BoxFit.fill,
-              ),
+          GestureDetector(
+            onDoubleTap: () {
+              setState(() {
+                if (widget.phoneNumber != widget.currentMobileNumber)
+                  isAnimating = true;
+              });
+              if (widget.phoneNumber != widget.currentMobileNumber)
+                !widget.isFavorite
+                    ? widget.onFavoriteToggle()
+                    : widget.onDeleteFav();
+            },
+            child: Stack(
+              alignment: Alignment.center,
+              children: [
+                Container(
+                  height: 300.0,
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: NetworkImage(widget.image),
+                      fit: BoxFit.fill,
+                    ),
+                  ),
+                ),
+                if (widget.phoneNumber != widget.currentMobileNumber)
+                  AnimatedOpacity(
+                    duration: Duration(milliseconds: 200),
+                    opacity: isAnimating ? 1 : 0,
+                    child: Icon(
+                      Icons.favorite,
+                      size: 100,
+                      color: !widget.isFavorite ? Colors.red : Colors.white,
+                    ),
+                    onEnd: () {
+                      setState(() {
+                        isAnimating = false;
+                      });
+                    },
+                  ),
+              ],
             ),
           ),
           SizedBox(height: 8.0),
@@ -143,30 +182,29 @@ class Post_Widget extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 OutlinedText_widget(
-                    iconData: Icons.emoji_events, text: '$betAmount'),
+                    iconData: Icons.emoji_events, text: '${widget.betAmount}'),
                 OutlinedText_widget(
-                    iconData: Icons.sports_esports, text: '$sport'),
+                    iconData: Icons.sports_esports, text: '${widget.sport}'),
                 OutlinedText_widget(
-                    iconData: Icons.calendar_today, text: "$matchDate")
+                    iconData: Icons.calendar_today, text: "${widget.matchDate}")
               ],
             ),
           ),
           SizedBox(height: 8.0),
           Row(
             children: [
-              if (phoneNumber != currentMobileNumber)
+              if (widget.phoneNumber != widget.currentMobileNumber)
                 IconButton(
                   icon: Icon(
-                    isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color: isFavorite ? Colors.red : ThemeService.textColor,
+                    widget.isFavorite ? Icons.favorite : Icons.favorite_border,
+                    color:
+                        widget.isFavorite ? Colors.red : ThemeService.textColor,
                   ),
-                  onPressed: !isFavorite ? onFavoriteToggle : onDeleteFav,
+                  onPressed: !widget.isFavorite
+                      ? widget.onFavoriteToggle
+                      : widget.onDeleteFav,
                 ),
-              // IconButton(
-              //   icon: Icon(Icons.delete),
-              //   onPressed: onDeleteFav,
-              // ),
-              if (phoneNumber != currentMobileNumber)
+              if (widget.phoneNumber != widget.currentMobileNumber)
                 IconButton(
                   icon: Icon(Icons.comment, color: ThemeService.textColor),
                   onPressed: () {},
@@ -175,37 +213,31 @@ class Post_Widget extends StatelessWidget {
                 icon: Icon(Icons.share, color: ThemeService.textColor),
                 onPressed: () {
                   sharePost(Post(
-                    id: id,
-                    image: image,
-                    userName: userName,
-                    phoneNumber: phoneNumber,
-                    sport: sport,
-                    matchDetails: matchDetails,
-                    matchDate: matchDate,
-                    betAmount: betAmount,
-                    placeOfMatch: placeOfMatch,
-                    status: status,
-                    postOwnerImage: postOwnerImage,
-                    likes: likes,
-                    comments: comments,
+                    id: widget.id,
+                    image: widget.image,
+                    userName: widget.userName,
+                    phoneNumber: widget.phoneNumber,
+                    sport: widget.sport,
+                    matchDetails: widget.matchDetails,
+                    matchDate: widget.matchDate,
+                    betAmount: widget.betAmount,
+                    placeOfMatch: widget.placeOfMatch,
+                    status: widget.status,
+                    postOwnerImage: widget.postOwnerImage,
+                    likes: widget.likes,
+                    comments: widget.comments,
                     favorites: [],
                     requests: [],
                   ));
                 },
               ),
-              // Spacer(),
-              // IconButton(
-              //   icon:
-              //       Icon(Icons.bookmark_border, color: ThemeService.textColor),
-              //   onPressed: () {},
-              // ),
             ],
           ),
-          if (phoneNumber != currentMobileNumber)
+          if (widget.phoneNumber != widget.currentMobileNumber)
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 12.0),
               child: Text(
-                '$likes like${likes > 1 ? "s" : ""}',
+                '${widget.likes} like${widget.likes > 1 ? "s" : ""}',
                 style: TextStyle(
                   fontWeight: FontWeight.bold,
                   color: ThemeService.textColor,
@@ -216,22 +248,22 @@ class Post_Widget extends StatelessWidget {
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 12.0),
             child: Text(
-              isShowMore
-                  ? '${matchDetails}'
-                  : matchDetails.length > 80
-                      ? '${matchDetails.substring(0, 80)}... '
-                      : '${matchDetails}',
+              widget.isShowMore
+                  ? '${widget.matchDetails}'
+                  : widget.matchDetails.length > 80
+                      ? '${widget.matchDetails.substring(0, 80)}... '
+                      : '${widget.matchDetails}',
               style: TextStyle(color: Colors.grey),
             ),
           ),
           SizedBox(height: 8.0),
-          matchDetails.length > 80
+          widget.matchDetails.length > 80
               ? Padding(
                   padding: EdgeInsets.symmetric(horizontal: 12.0),
                   child: GestureDetector(
-                    onTap: () => onToggleShowMore(id),
+                    onTap: () => widget.onToggleShowMore(widget.id),
                     child: Text(
-                      isShowMore ? 'Show less' : 'Show more',
+                      widget.isShowMore ? 'Show less' : 'Show more',
                       style: TextStyle(color: Colors.blue),
                     ),
                   ),

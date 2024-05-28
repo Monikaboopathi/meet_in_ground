@@ -1,4 +1,3 @@
-
 // ignore_for_file: prefer_const_constructors
 
 import 'package:flutter/material.dart';
@@ -103,7 +102,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
           Messages(),
           Addposts(),
           Favorites(),
-          Profile(),
+          ProfileScreen(),
         ],
       ),
     );
