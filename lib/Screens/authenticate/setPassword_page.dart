@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 
-import '../widgets/BottomNavigationScreen.dart';
+import '../../widgets/BottomNavigationScreen.dart';
 
 class SetPasswordPage extends StatefulWidget {
   @override
