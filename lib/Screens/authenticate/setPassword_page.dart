@@ -6,6 +6,7 @@ import 'package:meet_in_ground/Screens/authenticate/login_page.dart';
 import 'package:meet_in_ground/Screens/util/Services/refferral_service.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:meet_in_ground/widgets/Loader.dart';
 
 import '../../util/Services/mobileNo_service.dart';
 import 'userdetails_page.dart';
@@ -267,6 +268,13 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                                 String password = passwordController.text;
                                 String confirmPassword =
                                     confirmpasswordController.text;
+                                     showDialog(
+                              context: context,
+                              barrierDismissible: false,
+                              builder: (BuildContext context) {
+                                return Loader();
+                              },
+                            );
                                 if (widget.status == 200) {
                                   _submitpatchform();
                                   ;
