@@ -4,6 +4,9 @@ import 'package:meet_in_ground/constant/themes_service.dart';
 import 'setPassword_page.dart';
 
 class FavouritePage extends StatefulWidget {
+  final String mobile;
+  
+  const FavouritePage({Key? key, required this.mobile}) : super(key: key);
   @override
   State<FavouritePage> createState() => _FavouritePageState();
 }
@@ -82,7 +85,7 @@ class _FavouritePageState extends State<FavouritePage> {
                           return null;
                         },
                       ),
-                SizedBox(height: 20),
+                      SizedBox(height: 20),
                       Row(
                         children: [
                           Text(
@@ -112,10 +115,9 @@ class _FavouritePageState extends State<FavouritePage> {
                           prefixIcon:
                               Icon(Icons.color_lens), // Icon for password input
                           hintText: 'Enter Favourite Color',
-                          ),
+                        ),
                         validator: (color) {
-                          if (color == null ||
-                              color.isEmpty) {
+                          if (color == null || color.isEmpty) {
                             return 'Please enter Favourite Color';
                           } else if (color.length < 3) {
                             return 'Password must be at least 3 characters long';
@@ -132,13 +134,12 @@ class _FavouritePageState extends State<FavouritePage> {
                           child: ElevatedButton(
                             onPressed: () async {
                               if (_formKey.currentState?.validate() ?? false) {
-                                 Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                    builder: (context) => SetPasswordPage()),
-                              );
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                      builder: (context) => SetPasswordPage()),
+                                );
                               }
-                              
                             },
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(
@@ -156,7 +157,7 @@ class _FavouritePageState extends State<FavouritePage> {
                           ),
                         ),
                       ),
-                     ],
+                    ],
                   ),
                 ),
               ],
