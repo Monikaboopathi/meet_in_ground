@@ -1,9 +1,25 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Screens/authenticate/favourite_page.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
+import 'package:http/http.dart' as http;
+
+import '../util/Services/mobileNo_service.dart';
+import '../util/Services/refferral_service.dart';
+
+String referralId = "";
 
 class PasswordPage extends StatefulWidget {
+  const PasswordPage({
+    Key? key,
+    required this.mobile,
+  }) : super(key: key);
+
+  final String mobile;
+
   @override
   State<PasswordPage> createState() => _PasswordPageState();
 }
@@ -12,8 +28,79 @@ class _PasswordPageState extends State<PasswordPage> {
   final _formKey = GlobalKey<FormState>();
 
   final TextEditingController passwordController = TextEditingController();
-
+  bool isLoading = false;
   bool _isPasswordVisible = false;
+
+  @override
+  void initState() {
+    super.initState();
+  }
+
+  Future<void> verifyPassword(
+      String phoneNumber, String password, BuildContext context) async {
+    setState(() {
+      isLoading = true;
+    });
+    print(referralId);
+
+    final String apiUrl = 'https://bet-x-new.onrender.com/user/verifyPassword';
+
+    // Create a map containing the request body parameters
+    final Map<String, dynamic> requestBody = {
+      'phoneNumber': phoneNumber,
+      'password': password,
+    };
+
+    try {
+      // Make the POST request to the API endpoint
+      final http.Response response = await http.post(
+        Uri.parse(apiUrl),
+        headers: <String, String>{
+          'Content-Type': 'application/json; charset=UTF-8',
+        },
+        body: jsonEncode(requestBody),
+      );
+
+      // Parse the response body
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+      // Check if the request was successful (status code 200)
+      if (response.statusCode == 200) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => BottomNavigationScreen(),
+          ),
+        );
+        Fluttertoast.showToast(
+          msg: 'SUCCESS',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+        // String email = responseData['phoneNumber'];
+        await MobileNo.saveMobilenumber(phoneNumber);
+        await RefferalService.clearRefferal();
+        await RefferalService.saveRefferal("${responseData['referralId']}");
+      } else {
+        Fluttertoast.showToast(
+          msg: responseData['message'],
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+        await MobileNo.clearMobilenumber();
+      }
+    } catch (exception) {
+      print(exception);
+    }
+    setState(() {
+      isLoading = false;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -106,12 +193,9 @@ class _PasswordPageState extends State<PasswordPage> {
                           child: ElevatedButton(
                             onPressed: () async {
                               if (_formKey.currentState?.validate() ?? false) {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                      builder: (context) =>
-                                          BottomNavigationScreen()),
-                                );
+                                String mobileNO = widget.mobile;
+                                String password = passwordController.text.trim();
+                                verifyPassword(mobileNO, password, context);
                               }
                             },
                             style: ElevatedButton.styleFrom(
@@ -137,7 +221,7 @@ class _PasswordPageState extends State<PasswordPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => FavouritePage()),
+                                    builder: (context) => FavouritePage(mobile: widget.mobile)),
                               );
                             },
                             child: Text(

@@ -1,15 +1,74 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Screens/authenticate/password_page.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
+import 'package:http/http.dart' as http;
+import '../util/Services/refferral_service.dart';
+
+import '../util/Services/mobileNo_service.dart';
 
 void main() {
   runApp(LoginPage());
 }
 
-class LoginPage extends StatelessWidget {
+class LoginPage extends StatefulWidget {
+  @override
+  State<LoginPage> createState() => _LoginPageState();
+}
+
+class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
+
   final TextEditingController mobileController = TextEditingController();
+  bool isLoading = false;
+
+  Future<void> loginUser(String phoneNumber) async {
+    setState(() {
+      isLoading = true;
+    });
+    try {
+      final response = await http.post(
+        Uri.parse('https://bet-x-new.onrender.com/user/login'),
+        body: jsonEncode({'phoneNumber': phoneNumber}),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => PasswordPage(
+              mobile: phoneNumber,
+            ),
+          ),
+        );
+
+        await MobileNo.clearMobilenumber();
+      } else {
+        Fluttertoast.showToast(
+          msg: responseData['message'] ?? "",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+        await MobileNo.clearMobilenumber();
+      }
+    } catch (exception) {
+      print(exception);
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -79,11 +138,8 @@ class LoginPage extends StatelessWidget {
                       child: ElevatedButton(
                         onPressed: () {
                           if (_formKey.currentState!.validate()) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                  builder: (context) => PasswordPage()),
-                            );
+                            String phonenumber = mobileController.text;
+                            loginUser(phonenumber);
                           }
                         },
                         style: ElevatedButton.styleFrom(
@@ -102,19 +158,24 @@ class LoginPage extends StatelessWidget {
                       ),
                     ),
                     SizedBox(height: 30),
-                    GestureDetector(
-                      onTap: () {
-                        _showDialogReferrel(context);
-                      },
-                      child: Text(
-                        "Have a referral?",
-                        style: TextStyle(
-                          fontSize: 20,
-                          color: Colors.blue,
-                          decoration: TextDecoration.underline,
-                        ),
-                      ),
-                    ),
+                    // ignore: unnecessary_null_comparison
+                    RefferalService.getRefferal() != null
+                        ? Center(
+                            child: GestureDetector(
+                              onTap: () {
+                                _showDialogReferrel(context);
+                              },
+                              child: Text(
+                                "Have a referral?",
+                                style: TextStyle(
+                                  fontSize: 20,
+                                  color: Colors.blue,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          )
+                        : Container(),
                   ],
                 ),
               ),
@@ -123,6 +184,62 @@ class LoginPage extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  Future<void> referralPost(String referralId) async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      final response = await http.post(
+        Uri.parse(
+            'https://bet-x-new.onrender.com/user/verifyReferralID/$referralId'),
+        body: jsonEncode({
+          "referralId": referralId,
+        }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      );
+
+      final Map<String, dynamic> responseData = json.decode(response.body);
+
+      if (response.statusCode == 200) {
+        String referralId = responseData['referralId'];
+
+        await RefferalService.saveRefferal(referralId);
+
+        Fluttertoast.showToast(
+          msg: responseData['message'],
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+        Navigator.pop(context);
+      } else {
+        Fluttertoast.showToast(
+          msg: responseData['error'] ??
+              'Login failed. Please check your mobile number.',
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+        setState(() {
+          Navigator.pop(context);
+          _showDialogReferrel(context);
+        });
+      }
+    } catch (exception) {
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
+    }
   }
 
   void _showDialogReferrel(BuildContext context) {
@@ -202,6 +319,8 @@ class LoginPage extends StatelessWidget {
                         onPressed: () {
                           if (_referralFormKey.currentState!.validate()) {
                             // Handle referral code submission
+                            String refferal = referralController.text;
+                            referralPost(refferal);
                           }
                         },
                         style: ElevatedButton.styleFrom(
