@@ -1,9 +1,9 @@
 // ignore_for_file: camel_case_types, prefer_const_literals_to_create_immutables, prefer_const_constructors
 
 import 'package:flutter/material.dart';
-import 'package:meet_in_ground/Screens/Home/home.dart';
-import 'package:meet_in_ground/Screens/widgets/OutlinedText_widget.dart';
-import 'package:meet_in_ground/Screens/widgets/ShareMethods.dart';
+import 'package:meet_in_ground/Models/Post.dart';
+import 'package:meet_in_ground/widgets/OutlinedText_widget.dart';
+import 'package:meet_in_ground/widgets/ShareMethods.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 
 class Post_Widget extends StatelessWidget {
@@ -36,6 +36,7 @@ class Post_Widget extends StatelessWidget {
     required this.likes,
     required this.comments,
     Key? key,
+    required createdAt,
   }) : super(key: key);
 
   @override
@@ -48,8 +49,10 @@ class Post_Widget extends StatelessWidget {
           ListTile(
             leading: CircleAvatar(
               radius: 20.0,
-              backgroundImage: AssetImage('assets/galleryImage.png'),
+              backgroundImage: NetworkImage(postOwnerImage),
+              foregroundColor: Colors.amber,
             ),
+
             title: Row(
               children: [
                 Text(
@@ -106,8 +109,8 @@ class Post_Widget extends StatelessWidget {
             height: 300.0,
             decoration: BoxDecoration(
               image: DecorationImage(
-                image: AssetImage('assets/empty-img.jpg'),
-                fit: BoxFit.cover,
+                image: NetworkImage(image),
+                fit: BoxFit.fill,
               ),
             ),
           ),

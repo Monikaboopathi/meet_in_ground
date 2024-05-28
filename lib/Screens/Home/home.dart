@@ -1,11 +1,11 @@
-// ignore_for_file: use_key_in_widget_constructors, library_private_types_in_public_api, prefer_const_constructors, sized_box_for_whitespace
-
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
-import 'package:meet_in_ground/Screens/widgets/Loader.dart';
-import 'package:meet_in_ground/Screens/widgets/NoDataFoundWidget.dart';
-import 'package:meet_in_ground/Screens/widgets/post_widget.dart';
+import 'package:meet_in_ground/Models/Post.dart';
+import 'package:meet_in_ground/widgets/Loader.dart';
+import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
+import 'package:meet_in_ground/widgets/SportSelectDialog.dart';
+import 'package:meet_in_ground/widgets/post_widget.dart';
+import 'package:meet_in_ground/constant/sports_names.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
 
@@ -16,23 +16,65 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   late Future<List<Post>> futurePosts;
+  final TextEditingController _searchController = TextEditingController();
+  bool isAscending = true;
+  String selectedSport = '';
 
   @override
   void initState() {
     super.initState();
     futurePosts = fetchPosts();
+    _searchController.addListener(_onSearchChanged);
   }
 
-  Future<List<Post>> fetchPosts() async {
-    final response = await http.get(
-        Uri.parse('https://bet-x-new.onrender.com/post/viewPostsDashboard'));
+  void _onSearchChanged() {
+    setState(() {
+      futurePosts = fetchPosts(query: _searchController.text);
+    });
+  }
+
+  @override
+  void dispose() {
+    _searchController.dispose();
+    super.dispose();
+  }
+
+  Future<List<Post>> fetchPosts({String? query}) async {
+    final url = query != null && query.isNotEmpty
+        ? 'https://bet-x-new.onrender.com/post/viewPostsDashboard?search=$query'
+        : 'https://bet-x-new.onrender.com/post/viewPostsDashboard';
+
+    final response = await http.get(Uri.parse(url));
 
     if (response.statusCode == 200) {
       List jsonResponse = json.decode(response.body)['data'];
-      return jsonResponse.map((post) => Post.fromJson(post)).toList();
+      List<Post> posts =
+          jsonResponse.map((post) => Post.fromJson(post)).toList();
+
+      if (selectedSport.isNotEmpty) {
+        posts = posts.where((post) => post.sport == selectedSport).toList();
+      }
+      posts.sort((a, b) {
+        DateTime dateA = a.createdAt != null
+            ? DateTime.parse(a.createdAt!)
+            : DateTime.fromMillisecondsSinceEpoch(0);
+        DateTime dateB = b.createdAt != null
+            ? DateTime.parse(b.createdAt!)
+            : DateTime.fromMillisecondsSinceEpoch(0);
+        return isAscending ? dateA.compareTo(dateB) : dateB.compareTo(dateA);
+      });
+
+      return posts;
     } else {
       throw Exception('Failed to load posts');
     }
+  }
+
+  void _toggleSortOrder() {
+    setState(() {
+      isAscending = !isAscending;
+      futurePosts = fetchPosts(query: _searchController.text);
+    });
   }
 
   @override
@@ -50,76 +92,172 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
         centerTitle: true,
         bottom: PreferredSize(
-          preferredSize: Size(double.infinity, 35),
-          child: Row(
+          preferredSize: Size(double.infinity, 70),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 10),
-                  child: Container(
-                    height: 40,
-                    child: TextField(
-                      style: TextStyle(color: ThemeService.textColor),
-                      decoration: InputDecoration(
-                        hintText: 'Search...',
-                        hintStyle: TextStyle(color: ThemeService.textColor),
-                        suffixIcon: IconButton(
-                          icon: Icon(Icons.search),
-                          color: ThemeService.textColor,
-                          onPressed: () {
-                            // Handle search functionality
-                          },
+              FutureBuilder<List<Post>>(
+                future: futurePosts,
+                builder: (context, snapshot) {
+                  return Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      Expanded(
+                        child: Padding(
+                          padding: const EdgeInsets.only(left: 10),
+                          child: Container(
+                            height: 40,
+                            child: TextField(
+                              controller: _searchController,
+                              style: TextStyle(color: ThemeService.textColor),
+                              decoration: InputDecoration(
+                                hintText: 'Search...',
+                                hintStyle:
+                                    TextStyle(color: ThemeService.textColor),
+                                suffixIcon: _searchController.text.isEmpty
+                                    ? IconButton(
+                                        icon: Icon(Icons.search),
+                                        color: ThemeService.textColor,
+                                        onPressed: _onSearchChanged,
+                                      )
+                                    : IconButton(
+                                        icon: Icon(Icons.cancel),
+                                        color: ThemeService.textColor,
+                                        onPressed: () {
+                                          _searchController.text = "";
+                                          setState(() {
+                                            futurePosts = fetchPosts();
+                                          });
+                                        },
+                                      ),
+                                focusColor: ThemeService.primary,
+                                border: OutlineInputBorder(
+                                  borderSide:
+                                      BorderSide(color: ThemeService.primary),
+                                ),
+                                contentPadding:
+                                    EdgeInsets.symmetric(horizontal: 8.0),
+                              ),
+                              onSubmitted: (value) => _onSearchChanged(),
+                            ),
+                          ),
                         ),
-                        border: OutlineInputBorder(
-                          borderSide: BorderSide(color: ThemeService.primary),
-                        ),
-                        contentPadding: EdgeInsets.symmetric(horizontal: 8.0),
                       ),
-                    ),
-                  ),
-                ),
-              ),
-              IconButton(
-                icon: Icon(Icons.filter_alt),
-                color: ThemeService.textColor,
-                onPressed: () {
-                  // Handle filter functionality
+                      Column(
+                        mainAxisSize: MainAxisSize.min,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Row(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                isAscending ? "asc" : "desc",
+                                style: TextStyle(
+                                  fontSize: 6,
+                                  color: ThemeService.primary,
+                                ),
+                              ),
+                            ],
+                          ),
+                          IconButton(
+                            icon: Icon(Icons.swap_vert),
+                            color: ThemeService.primary,
+                            onPressed: _toggleSortOrder,
+                            iconSize: 30,
+                          ),
+                        ],
+                      ),
+                      selectedSport.isEmpty
+                          ? IconButton(
+                              icon: Icon(Icons.filter_alt),
+                              color: ThemeService.primary,
+                              onPressed: () {
+                                showDialog(
+                                  context: context,
+                                  builder: (BuildContext context) {
+                                    return SportSelectDialog(
+                                      sportNames: sportNames,
+                                      selectedSport: selectedSport,
+                                      onSportSelected: (selectedSport) {
+                                        if (selectedSport.isNotEmpty) {
+                                          setState(() {
+                                            this.selectedSport = selectedSport;
+                                            futurePosts = fetchPosts();
+                                          });
+                                        }
+                                      },
+                                    );
+                                  },
+                                );
+                              },
+                            )
+                          : IconButton(
+                              onPressed: () {
+                                selectedSport = "";
+                                setState(() {
+                                  selectedSport = "";
+                                  futurePosts = fetchPosts();
+                                });
+                              },
+                              color: ThemeService.primary,
+                              icon: Icon(Icons.filter_alt_off))
+                    ],
+                  );
                 },
               ),
-              IconButton(
-                icon: Icon(Icons.sort),
-                color: ThemeService.textColor,
-                onPressed: () {
-                  // Handle sort functionality
+              FutureBuilder<List<Post>>(
+                future: futurePosts,
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Container();
+                  } else if (snapshot.hasError ||
+                      !snapshot.hasData ||
+                      snapshot.data!.isEmpty) {
+                    return Container();
+                  } else {
+                    return Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 10),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.start,
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          Text(
+                            "${snapshot.data!.length}",
+                            style: TextStyle(
+                              color: ThemeService.primary,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                          SizedBox(width: 5),
+                          Text(
+                            "result${snapshot.data!.length > 1 ? "s" : ""} found",
+                            style: TextStyle(
+                              color: ThemeService.placeHolder,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
                 },
               ),
             ],
           ),
         ),
-        // leading: IconButton(
-        //   icon: Icon(Icons.camera_alt),
-        //   color: ThemeService.textColor,
-        //   onPressed: () {},
-        // ),
-        // actions: [
-        //   IconButton(
-        //     icon: Icon(Icons.send),
-        //     color: ThemeService.textColor,
-        //     onPressed: () {},
-        //   ),
-        // ],
       ),
       body: FutureBuilder<List<Post>>(
         future: futurePosts,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: Loader());
-          } else if (snapshot.hasError) {
-            return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return Center(
-              child: NoDataFoundWidget(),
-            );
+          } else if (snapshot.hasError ||
+              !snapshot.hasData ||
+              snapshot.data!.isEmpty) {
+            return Center(child: NoDataFoundWidget());
           } else {
             return ListView.builder(
               itemCount: snapshot.data!.length,
@@ -139,69 +277,13 @@ class _HomeScreenState extends State<HomeScreen> {
                   phoneNumber: post.phoneNumber,
                   sport: post.sport,
                   status: post.status,
+                  createdAt: post.createdAt,
                 );
               },
             );
           }
         },
       ),
-    );
-  }
-}
-
-// models/post.dart
-class Post {
-  final String id;
-  final String image;
-  final String userName;
-  final String phoneNumber;
-  final String sport;
-  final String matchDetails;
-  final String matchDate;
-  final int betAmount;
-  final String placeOfMatch;
-  final String status;
-  final String postOwnerImage;
-  final int likes;
-  final int comments;
-  final List<dynamic> favorites;
-  final List<dynamic> requests;
-
-  Post({
-    required this.id,
-    required this.image,
-    required this.userName,
-    required this.phoneNumber,
-    required this.sport,
-    required this.matchDetails,
-    required this.matchDate,
-    required this.betAmount,
-    required this.placeOfMatch,
-    required this.status,
-    required this.postOwnerImage,
-    required this.likes,
-    required this.comments,
-    required this.favorites,
-    required this.requests,
-  });
-
-  factory Post.fromJson(Map<String, dynamic> json) {
-    return Post(
-      id: json['_id'],
-      image: json['image'],
-      userName: json['userName'],
-      phoneNumber: json['phoneNumber'],
-      sport: json['sport'],
-      matchDetails: json['matchDetails'],
-      matchDate: json['matchDate'],
-      betAmount: json['betAmount'],
-      placeOfMatch: json['placeOfMatch'],
-      status: json['status'],
-      postOwnerImage: json['postOwnerImage'],
-      likes: json['favorites'].length,
-      comments: json['requests'].length,
-      favorites: json['favorites'],
-      requests: json['requests'],
     );
   }
 }
