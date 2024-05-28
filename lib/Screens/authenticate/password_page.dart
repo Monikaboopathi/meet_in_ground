@@ -194,15 +194,17 @@ class _PasswordPageState extends State<PasswordPage> {
                             onPressed: () async {
                               if (_formKey.currentState?.validate() ?? false) {
                                 String mobileNO = widget.mobile;
-                                String password = passwordController.text.trim();
-                                 showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext context) {
-                                return Loader();
-                              },
-                            );
-                              await  verifyPassword(mobileNO, password, context);
+                                String password =
+                                    passwordController.text.trim();
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (BuildContext context) {
+                                    return Loader();
+                                  },
+                                );
+                                await verifyPassword(
+                                    mobileNO, password, context);
                               }
                             },
                             style: ElevatedButton.styleFrom(
@@ -225,18 +227,22 @@ class _PasswordPageState extends State<PasswordPage> {
                       Center(
                         child: TextButton(
                             onPressed: () async {
-                              
-                               showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext context) {
-                                return Loader();
-                              },
-                            );
+                              // Show loader
+                              showDialog(
+                                context: context,
+                                barrierDismissible: false,
+                                builder: (BuildContext context) {
+                                  return Loader();
+                                },
+                              );
+
+                              await Future.delayed(Duration(seconds: 2));
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => FavouritePage(mobile: widget.mobile , status: 200)),
+                                  builder: (context) => FavouritePage(
+                                      mobile: widget.mobile, status: 200),
+                                ),
                               );
                             },
                             child: Text(
