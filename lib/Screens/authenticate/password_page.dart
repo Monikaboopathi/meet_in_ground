@@ -220,7 +220,7 @@ class _PasswordPageState extends State<PasswordPage> {
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                    builder: (context) => FavouritePage(mobile: widget.mobile)),
+                                    builder: (context) => FavouritePage(mobile: widget.mobile , status: 200)),
                               );
                             },
                             child: Text(

@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:meet_in_ground/Screens/authenticate/favourite_page.dart';
 import 'package:meet_in_ground/Screens/authenticate/password_page.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
@@ -51,13 +52,22 @@ class _LoginPageState extends State<LoginPage> {
 
         await MobileNo.clearMobilenumber();
       } else {
+        
         Fluttertoast.showToast(
-          msg: responseData['message'] ?? "",
+          msg: responseData['message'] ?? "New User",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 2,
           backgroundColor: Colors.green,
           textColor: Colors.white,
+        );
+         Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => FavouritePage(
+              mobile: phoneNumber,
+              status: 0,
+            ),
+          ),
         );
         await MobileNo.clearMobilenumber();
       }

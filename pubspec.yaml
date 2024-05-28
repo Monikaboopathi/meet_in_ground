@@ -49,6 +49,7 @@ dependencies:
   fluttertoast: ^8.2.4
   clipboard: ^0.1.3
   geocoding: ^3.0.0
+  location: ^6.0.2
 
 
 
@@ -91,6 +92,8 @@ flutter:
     - assets/galleryImage.png
     - assets/noData.png
     - assets/loader.json
+    - assets/location.json
+
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
