@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:meet_in_ground/Screens/onboarding/Onboarding.dart';
 
-import '../util/Services/Auth_service.dart';
-import '../widgets/BottomNavigationScreen.dart';
+import '../../util/Services/Auth_service.dart';
+import '../../widgets/BottomNavigationScreen.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({Key? key}) : super(key: key);
