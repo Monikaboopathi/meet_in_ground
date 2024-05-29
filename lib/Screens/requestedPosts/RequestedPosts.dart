@@ -1,6 +1,5 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
@@ -77,170 +76,6 @@ class _RequestedPostsState extends State<RequestedPosts> {
     }
   }
 
-  Future<void> deleteFav(String postId) async {
-    final String apiUrl = 'https://bet-x-new.onrender.com/user/removeFavorites';
-
-    final Map<String, dynamic> requestData = {
-      'id': postId,
-      'phoneNumber': currentMobileNumber,
-    };
-
-    final response = await http.delete(
-      Uri.parse(apiUrl),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(requestData),
-    );
-
-    final Map<String, dynamic> responseData = json.decode(response.body);
-    if (response.statusCode == 200) {
-      setState(() {
-        futurePosts = fetchPosts();
-      });
-      Fluttertoast.showToast(
-        msg: responseData['message'] ?? "",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: 2,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-      );
-    } else {
-      Fluttertoast.showToast(
-        msg: responseData['error'] ?? "",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: 2,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-    }
-  }
-
-  Future<void> toggleFavorite(String postId) async {
-    final String apiUrl = 'https://bet-x-new.onrender.com/user/addFavorites';
-    print(postId);
-
-    final Map<String, dynamic> requestData = {
-      'id': postId,
-      'phoneNumber': currentMobileNumber,
-    };
-
-    final response = await http.post(
-      Uri.parse(apiUrl),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(requestData),
-    );
-    final Map<String, dynamic> responseData = json.decode(response.body);
-    if (response.statusCode == 200) {
-      setState(() {
-        futurePosts = fetchPosts();
-      });
-      Fluttertoast.showToast(
-        msg: responseData['message'] ?? "",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: 2,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-      );
-    } else {
-      Fluttertoast.showToast(
-        msg: responseData['error'] ?? "",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: 2,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-    }
-  }
-
-  Future<void> deleteRequest(String postId) async {
-    final String apiUrl =
-        'https://bet-x-new.onrender.com/post/removeRequest/$currentMobileNumber';
-
-    final Map<String, dynamic> requestData = {
-      'postId': postId,
-    };
-
-    final response = await http.delete(
-      Uri.parse(apiUrl),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(requestData),
-    );
-
-    final Map<String, dynamic> responseData = json.decode(response.body);
-    if (response.statusCode == 200) {
-      setState(() {
-        futurePosts = fetchPosts();
-      });
-      Fluttertoast.showToast(
-        msg: responseData['message'] ?? "",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: 2,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-      );
-    } else {
-      Fluttertoast.showToast(
-        msg: responseData['error'] ?? "",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: 2,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-    }
-  }
-
-  Future<void> toggleRequest(String postId) async {
-    final String apiUrl =
-        'https://bet-x-new.onrender.com/post/makeRequestPost/$currentMobileNumber';
-    print(postId);
-
-    final Map<String, dynamic> requestData = {
-      'postId': postId,
-    };
-
-    final response = await http.patch(
-      Uri.parse(apiUrl),
-      headers: <String, String>{
-        'Content-Type': 'application/json; charset=UTF-8',
-      },
-      body: jsonEncode(requestData),
-    );
-    final Map<String, dynamic> responseData = json.decode(response.body);
-    if (response.statusCode == 200) {
-      setState(() {
-        futurePosts = fetchPosts();
-      });
-      Fluttertoast.showToast(
-        msg: responseData['message'] ?? "",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: 2,
-        backgroundColor: Colors.green,
-        textColor: Colors.white,
-      );
-    } else {
-      Fluttertoast.showToast(
-        msg: responseData['error'] ?? "",
-        toastLength: Toast.LENGTH_SHORT,
-        gravity: ToastGravity.TOP,
-        timeInSecForIosWeb: 2,
-        backgroundColor: Colors.red,
-        textColor: Colors.white,
-      );
-    }
-  }
-
   void _toggleSortOrder() {
     setState(() {
       isAscending = !isAscending;
@@ -257,6 +92,7 @@ class _RequestedPostsState extends State<RequestedPosts> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ThemeService.background,
       appBar: AppBar(
         backgroundColor: ThemeService.background,
         leading: IconButton(
@@ -456,18 +292,17 @@ class _RequestedPostsState extends State<RequestedPosts> {
               return ListView.builder(
                 itemCount: postData!.length,
                 itemBuilder: (context, index) {
-                  var post = postData[index]; // Get the post data
+                  var post = postData[index];
 
-                  bool isShowMore =
-                      showMoreMap[post['_id']] ?? false; // Access the post ID
+                  bool isShowMore = showMoreMap[post['_id']] ?? false;
 
                   return Post_Widget(
-                    userName: post['userName'], // Access the userName property
+                    userName: post['userName'],
                     placeOfMatch: post['placeOfMatch'],
-                    likes: 0, // Access the length of favorites
-                    comments: 0, // Access the length of requests
+                    likes: 0,
+                    comments: 0,
                     betAmount: post['betAmount'],
-                    id: post['_id'], // Access the post ID
+                    id: post['_id'],
                     image: post['image'],
                     postOwnerImage: post['postOwnerImage'],
                     matchDate: post['matchDate'],
@@ -475,15 +310,16 @@ class _RequestedPostsState extends State<RequestedPosts> {
                     phoneNumber: post['phoneNumber'],
                     sport: post['sport'],
                     status: post['status'],
+                    result: post['result'],
                     createdAt: post['createdAt'],
                     isShowMore: isShowMore,
                     onToggleShowMore: _toggleShowMore,
                     isFavorite: false,
-                    onDeleteFav: () => {}, // Pass the post ID
-                    onFavoriteToggle: () => {}, // Pass the post ID
+                    onDeleteFav: () => {},
+                    onFavoriteToggle: () => {},
                     isRequest: false,
-                    onDeleteRequest: () => {}, // Pass the post ID
-                    onRequestToggle: () => {}, // Pass the post ID
+                    onDeleteRequest: () => {},
+                    onRequestToggle: () => {},
                     currentMobileNumber: "+91" + currentMobileNumber,
                     showLMSSection: false,
                     showStatus: true,

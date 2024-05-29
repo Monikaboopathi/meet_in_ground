@@ -29,7 +29,6 @@ class _HomeScreenState extends State<HomeScreen> {
     currentMobileNumber = "8072974576";
     futurePosts = fetchPosts();
     _searchController.addListener(_onSearchChanged);
-    
   }
 
   void _onSearchChanged() {
@@ -255,6 +254,7 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ThemeService.background,
       appBar: AppBar(
         backgroundColor: ThemeService.background,
         title: Text(
