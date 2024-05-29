@@ -400,9 +400,7 @@ Future<void> pickImage() async {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Center(
-              child: loadingLocation
-                  ? CircularProgressIndicator()
-                  : Lottie.asset(
+              child: Lottie.asset(
                       'assets/location.json',
                       width: 350,
                       height: 350,
@@ -410,7 +408,9 @@ Future<void> pickImage() async {
             ),
             SizedBox(height: 30),
             if (userLocation != null)
-              Align(
+             loadingLocation
+                  ? CircularProgressIndicator()
+                  :  Align(
                   alignment: Alignment.center,
                   child: Text(
                     userCity,
