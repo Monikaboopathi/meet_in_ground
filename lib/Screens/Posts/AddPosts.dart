@@ -236,7 +236,7 @@ class _AddpostsState extends State<Addposts> {
                     children: <Widget>[
                       Text('Sport*',
                           style: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.w800)),
+                              fontSize: 15, fontWeight: FontWeight.w800,color: ThemeService.textColor)),
                       SizedBox(height: 5),
                       Container(
                         decoration: BoxDecoration(
@@ -253,7 +253,7 @@ class _AddpostsState extends State<Addposts> {
                               child: Padding(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 15),
-                                child: Text(sport),
+                                child: Text(sport,style: TextStyle(color: ThemeService.textColor),),
                               ),
                             );
                           }).toList(),
@@ -265,7 +265,7 @@ class _AddpostsState extends State<Addposts> {
                           },
                           hint: Padding(
                             padding: EdgeInsets.symmetric(horizontal: 10),
-                            child: Text('Select Sport'),
+                            child: Text('Select Sport',style: TextStyle(color: ThemeService.textColor),),
                           ),
                         ),
                       ),
@@ -281,7 +281,7 @@ class _AddpostsState extends State<Addposts> {
                     children: <Widget>[
                       Text('Date*',
                           style: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.w800)),
+                              fontSize: 15, fontWeight: FontWeight.w800,color: ThemeService.textColor)),
                       SizedBox(height: 5),
                       GestureDetector(
                         onTap: () {
@@ -297,8 +297,8 @@ class _AddpostsState extends State<Addposts> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              Text(_formatDate(date)),
-                              Icon(Icons.calendar_today),
+                              Text(_formatDate(date),style: TextStyle(color: ThemeService.textColor),),
+                              Icon(Icons.calendar_today,color:ThemeService.textColor),
                             ],
                           ),
                         ),
@@ -312,12 +312,13 @@ class _AddpostsState extends State<Addposts> {
             ),
             SizedBox(height: 20),
             Text('Location*',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800,color: ThemeService.textColor)),
             SizedBox(height: 5),
             TextField(
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 hintText: 'Type your Location here',
+                hintStyle: TextStyle(color: ThemeService.textColor),
               ),
               onChanged: (text) {
                 setState(() {
@@ -330,13 +331,14 @@ class _AddpostsState extends State<Addposts> {
               Text(locationError!, style: TextStyle(color: Colors.red)),
             SizedBox(height: 20),
             Text('Bet Amount*',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800,color: ThemeService.textColor)),
             SizedBox(height: 5),
             TextField(
               keyboardType: TextInputType.number,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 hintText: 'Type your Bet Amount here',
+                hintStyle: TextStyle(color: ThemeService.textColor),
               ),
               onChanged: (text) {
                 setState(() {
@@ -349,13 +351,14 @@ class _AddpostsState extends State<Addposts> {
               Text(priceError!, style: TextStyle(color: Colors.red)),
             SizedBox(height: 20),
             Text('Match details*',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800)),
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800,color: ThemeService.textColor)),
             SizedBox(height: 5),
             TextField(
               maxLines: 5,
               decoration: InputDecoration(
                 border: OutlineInputBorder(),
                 hintText: 'Write your post here...',
+                hintStyle: TextStyle(color: ThemeService.textColor),
               ),
               onChanged: (text) {
                 setState(() {

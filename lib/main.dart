@@ -29,12 +29,14 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Poppins',
         primaryColor: ThemeService.primary,
         visualDensity: VisualDensity.adaptivePlatformDensity,
       ),
+      color: Colors.transparent,
       home: SplashScreen(),
     );
   }
