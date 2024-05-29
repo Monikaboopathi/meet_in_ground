@@ -5,7 +5,11 @@ import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 
 class ChatScreen extends StatefulWidget {
-  const ChatScreen({Key? key}) : super(key: key);
+  String recieverName;
+  String recieverImage;
+  ChatScreen(
+      {Key? key, required this.recieverName, required this.recieverImage})
+      : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -37,24 +41,23 @@ class _ChatScreenState extends State<ChatScreen> {
         title: Row(
           children: [
             CircleAvatar(
-              backgroundImage: AssetImage('assets/galleryImage.png'),
+              backgroundImage: NetworkImage(widget.recieverImage),
             ),
             SizedBox(width: 10),
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'User Name',
+                  widget.recieverName,
                   style: TextStyle(
-                    fontSize: 16,
-                    fontWeight: FontWeight.bold,
-                  ),
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: ThemeService.textColor),
                 ),
                 Text(
                   'Online',
-                  style: TextStyle(
-                    fontSize: 12,
-                  ),
+                  style:
+                      TextStyle(fontSize: 12, color: ThemeService.placeHolder),
                 ),
               ],
             ),
@@ -208,7 +211,8 @@ class _ChatScreenState extends State<ChatScreen> {
               child: Container(
                 decoration: BoxDecoration(
                   border: Border.all(
-                    color: Colors.grey, // Specify the border color here
+                    color:
+                        ThemeService.primary, // Specify the border color here
                     width: 1.0, // Specify the border width here
                   ),
                   borderRadius: BorderRadius.circular(
@@ -223,7 +227,10 @@ class _ChatScreenState extends State<ChatScreen> {
                           print('Emoji Picker Visibility: $showEmojiPicker');
                         });
                       },
-                      icon: Icon(Icons.emoji_emotions),
+                      icon: Icon(
+                        Icons.emoji_emotions,
+                        color: ThemeService.textColor,
+                      ),
                     ),
                     Expanded(
                       child: Padding(
@@ -233,11 +240,15 @@ class _ChatScreenState extends State<ChatScreen> {
                           controller: messageController,
                           decoration: InputDecoration.collapsed(
                             hintText: 'Type a message...',
+                            hintStyle:
+                                TextStyle(color: ThemeService.placeHolder),
                           ),
                           textInputAction: TextInputAction.send,
                           keyboardType: TextInputType.multiline,
                           maxLines: null,
                           autocorrect: true,
+                          cursorColor: ThemeService.primary,
+                          style: TextStyle(color: ThemeService.textColor),
                         ),
                       ),
                     ),
@@ -245,7 +256,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       onPressed: () {
                         // Implement send message functionality
                       },
-                      icon: Icon(Icons.send),
+                      icon: Icon(Icons.send, color: ThemeService.primary),
                     ),
                   ],
                 ),

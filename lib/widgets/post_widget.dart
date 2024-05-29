@@ -2,6 +2,7 @@
 
 import 'package:flutter/material.dart';
 import 'package:meet_in_ground/Models/Post.dart';
+import 'package:meet_in_ground/Screens/chat/ChatScreen.dart';
 import 'package:meet_in_ground/widgets/OutlinedText_widget.dart';
 import 'package:meet_in_ground/widgets/ShareMethods.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
@@ -257,7 +258,15 @@ class _Post_WidgetState extends State<Post_Widget> {
                 if (widget.phoneNumber != widget.currentMobileNumber)
                   IconButton(
                     icon: Icon(Icons.comment, color: ThemeService.textColor),
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(
+                          builder: (context) => ChatScreen(
+                              recieverName: widget.userName,
+                              recieverImage: widget.postOwnerImage),
+                        ),
+                      );
+                    },
                   ),
                 IconButton(
                   icon: Icon(Icons.share, color: ThemeService.textColor),
