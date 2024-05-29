@@ -9,7 +9,10 @@ import 'package:meet_in_ground/Screens/Profile/Profile.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 
 class BottomNavigationScreen extends StatefulWidget {
-  const BottomNavigationScreen({Key? key}) : super(key: key);
+  final int currentIndex;
+
+  BottomNavigationScreen({Key? key, required this.currentIndex})
+      : super(key: key);
 
   @override
   State<BottomNavigationScreen> createState() => _BottomNavigationScreenState();
@@ -17,18 +20,19 @@ class BottomNavigationScreen extends StatefulWidget {
 
 class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
   late PageController pageController;
-  int _currentIndex = 0;
+  late int _currentIndex;
 
   @override
   void initState() {
     super.initState();
-    pageController = PageController();
+    _currentIndex = widget.currentIndex;
+    pageController = PageController(initialPage: _currentIndex);
   }
 
   @override
   void dispose() {
-    super.dispose();
     pageController.dispose();
+    super.dispose();
   }
 
   void onPageChanged(int page) {
@@ -56,10 +60,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
               children: [
                 IconButton(
                   icon: _currentIndex == 0
-                      ? Icon(
-                          Icons.home,
-                          color: ThemeService.textColor,
-                        )
+                      ? Icon(Icons.home, color: ThemeService.textColor)
                       : Icon(Icons.home_outlined, color: Colors.grey),
                   onPressed: () => navigationTapped(0),
                 ),

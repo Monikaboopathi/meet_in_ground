@@ -12,7 +12,6 @@ import 'package:meet_in_ground/widgets/Loader.dart';
 import '../../constant/themes_service.dart';
 import '../util/Services/refferral_service.dart';
 
-
 String fcmToken = "";
 String referralId = "";
 
@@ -106,23 +105,21 @@ class _UserOnBoardState extends State<UserOnBoard> {
     });
   }
 
-Future<void> pickImage() async {
-  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  Future<void> pickImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-  if (pickedFile != null) {
-    setState(() {
-      selectedImage = File(pickedFile.path);
-    });
+    if (pickedFile != null) {
+      setState(() {
+        selectedImage = File(pickedFile.path);
+      });
 
-    // Convert image path to a File object
-    String filePath = pickedFile.path;
+      // Convert image path to a File object
+      String filePath = pickedFile.path;
 
-    // Call handleProfile with the File object
-    handleProfile(File(filePath));
+      // Call handleProfile with the File object
+      handleProfile(File(filePath));
+    }
   }
-}
-
-
 
   Future<void> fetchLocationInfo(double latitude, double longitude) async {
     final response = await http.get(Uri.parse(
@@ -152,13 +149,13 @@ Future<void> pickImage() async {
       return;
     }
     if (index == 2) {
-       showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext context) {
-                                return Loader();
-                              },
-                            );
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Loader();
+        },
+      );
       handleProfile();
     }
     setState(() {
@@ -173,7 +170,6 @@ Future<void> pickImage() async {
   }
 
   Future<void> handleProfile([File? file]) async {
-
     String apiUrl =
         'https://bet-x-new.onrender.com/user/addUser/${widget.mobile}';
     Map<String, dynamic> body = {
@@ -209,15 +205,17 @@ Future<void> pickImage() async {
         },
         body: jsonEncode(body),
       );
- // Parse the response body
+      // Parse the response body
       final Map<String, dynamic> responseData = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
         // Handle success
         print('User registration successful');
-            Navigator.of(context).pushReplacement(
+        Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => BottomNavigationScreen(),
+            builder: (context) => BottomNavigationScreen(
+              currentIndex: 0,
+            ),
           ),
         );
         Fluttertoast.showToast(
@@ -232,9 +230,8 @@ Future<void> pickImage() async {
         await MobileNo.saveMobilenumber(widget.mobile);
         await RefferalService.clearRefferal();
         await RefferalService.saveRefferal("${responseData['referralId']}");
-    
       } else {
-         Fluttertoast.showToast(
+        Fluttertoast.showToast(
           msg: responseData['message'],
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,

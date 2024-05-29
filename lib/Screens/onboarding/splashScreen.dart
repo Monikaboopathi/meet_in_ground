@@ -13,7 +13,6 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-
   @override
   void initState() {
     super.initState();
@@ -31,7 +30,9 @@ class _SplashScreenState extends State<SplashScreen> {
       if (token != null) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => BottomNavigationScreen(),
+            builder: (context) => BottomNavigationScreen(
+              currentIndex: 0,
+            ),
           ),
         );
       } else {
