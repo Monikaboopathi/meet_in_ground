@@ -68,7 +68,9 @@ class _PasswordPageState extends State<PasswordPage> {
       if (response.statusCode == 200) {
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => BottomNavigationScreen(),
+            builder: (context) => BottomNavigationScreen(
+              currentIndex: 0,
+            ),
           ),
         );
         Fluttertoast.showToast(
