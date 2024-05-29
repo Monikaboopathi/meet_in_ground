@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meet_in_ground/Screens/requestedPosts/RequestedPosts.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 
 class FeaturesSection extends StatelessWidget {
@@ -32,35 +33,35 @@ class FeaturesSection extends StatelessWidget {
         'icon': Icons.notifications_active,
         'featureName': 'Notifications',
         'leadText': '$notificationCount',
-        'navigate': '/notifications',
+        'navigate': 'notifications',
         'onPress': null,
       },
       {
         'icon': Icons.note,
         'featureName': 'Requested Posts',
         'leadText': referredPost,
-        'navigate': '/requestedPosts',
+        'navigate': RequestedPosts(),
         'onPress': null,
       },
       {
         'icon': Icons.feedback,
         'featureName': 'Feedback',
         'leadText': '',
-        'navigate': '/feedback',
+        'navigate': 'feedback',
         'onPress': null,
       },
       {
         'icon': Icons.flag,
         'featureName': 'Raise Issue',
         'leadText': '',
-        'navigate': '/issues',
+        'navigate': 'issues',
         'onPress': null,
       },
       {
         'icon': Icons.group,
         'featureName': 'Referred Users',
         'leadText': referralDetails['registeredUserCount'].toString(),
-        'navigate': '/referredUsers',
+        'navigate': 'referredUsers',
         'onPress': null,
       },
       {
@@ -110,7 +111,11 @@ class FeaturesSection extends StatelessWidget {
               ),
               onTap: () {
                 if (feature['navigate'] != "") {
-                  Navigator.pushNamed(context, feature['navigate']);
+                  Navigator.of(context).pushReplacement(
+                    MaterialPageRoute(
+                      builder: (context) => feature['navigate'],
+                    ),
+                  );
                 } else if (feature['onPress'] != null) {
                   feature['onPress']();
                 }
