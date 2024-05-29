@@ -235,7 +235,9 @@ class _UserOnBoardState extends State<UserOnBoard> {
         print('User registration successful');
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
-            builder: (context) => BottomNavigationScreen(),
+            builder: (context) => BottomNavigationScreen(
+              currentIndex: 0,
+            ),
           ),
         );
         Fluttertoast.showToast(

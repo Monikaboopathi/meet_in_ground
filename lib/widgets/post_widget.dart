@@ -29,33 +29,39 @@ class Post_Widget extends StatefulWidget {
   final VoidCallback onDeleteRequest;
   final VoidCallback onRequestToggle;
   final currentMobileNumber;
+  final showLMSSection;
+  final result;
+  final showStatus;
 
-  const Post_Widget({
-    required this.id,
-    required this.image,
-    required this.userName,
-    required this.phoneNumber,
-    required this.sport,
-    required this.matchDetails,
-    required this.matchDate,
-    required this.betAmount,
-    required this.placeOfMatch,
-    required this.status,
-    required this.postOwnerImage,
-    required this.likes,
-    required this.comments,
-    Key? key,
-    required createdAt,
-    required this.isShowMore,
-    required this.onToggleShowMore,
-    required this.isFavorite,
-    required this.onDeleteFav,
-    required this.onFavoriteToggle,
-    required this.isRequest,
-    required this.onDeleteRequest,
-    required this.onRequestToggle,
-    this.currentMobileNumber,
-  }) : super(key: key);
+  const Post_Widget(
+      {required this.id,
+      required this.image,
+      required this.userName,
+      required this.phoneNumber,
+      required this.sport,
+      required this.matchDetails,
+      required this.matchDate,
+      required this.betAmount,
+      required this.placeOfMatch,
+      required this.status,
+      required this.postOwnerImage,
+      required this.likes,
+      required this.comments,
+      Key? key,
+      required createdAt,
+      required this.isShowMore,
+      required this.onToggleShowMore,
+      required this.isFavorite,
+      required this.onDeleteFav,
+      required this.onFavoriteToggle,
+      required this.isRequest,
+      required this.onDeleteRequest,
+      required this.onRequestToggle,
+      this.currentMobileNumber,
+      this.showLMSSection,
+      this.result,
+      this.showStatus})
+      : super(key: key);
 
   @override
   _Post_WidgetState createState() => _Post_WidgetState();
@@ -157,6 +163,46 @@ class _Post_WidgetState extends State<Post_Widget> {
                     ),
                   ),
                 ),
+                if (widget.showStatus == true)
+                  Positioned(
+                    top: 0,
+                    left: 0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        color: ThemeService.transparent,
+                        padding: EdgeInsets.all(8),
+                        child: Text(
+                          widget.result ?? "----",
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                if (widget.showStatus == true)
+                  Positioned(
+                    top: 0,
+                    right: 0,
+                    child: Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child: Container(
+                        color: ThemeService.transparent,
+                        padding: EdgeInsets.all(8),
+                        child: Text(
+                          widget.status,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 10,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
                 if (widget.phoneNumber != widget.currentMobileNumber)
                   AnimatedOpacity(
                     duration: Duration(milliseconds: 200),
@@ -191,48 +237,52 @@ class _Post_WidgetState extends State<Post_Widget> {
             ),
           ),
           SizedBox(height: 8.0),
-          Row(
-            children: [
-              if (widget.phoneNumber != widget.currentMobileNumber)
-                IconButton(
-                  icon: Icon(
-                    widget.isFavorite ? Icons.favorite : Icons.favorite_border,
-                    color:
-                        widget.isFavorite ? Colors.red : ThemeService.textColor,
+          if (widget.showLMSSection != false)
+            Row(
+              children: [
+                if (widget.phoneNumber != widget.currentMobileNumber)
+                  IconButton(
+                    icon: Icon(
+                      widget.isFavorite
+                          ? Icons.favorite
+                          : Icons.favorite_border,
+                      color: widget.isFavorite
+                          ? Colors.red
+                          : ThemeService.textColor,
+                    ),
+                    onPressed: !widget.isFavorite
+                        ? widget.onFavoriteToggle
+                        : widget.onDeleteFav,
                   ),
-                  onPressed: !widget.isFavorite
-                      ? widget.onFavoriteToggle
-                      : widget.onDeleteFav,
-                ),
-              if (widget.phoneNumber != widget.currentMobileNumber)
+                if (widget.phoneNumber != widget.currentMobileNumber)
+                  IconButton(
+                    icon: Icon(Icons.comment, color: ThemeService.textColor),
+                    onPressed: () {},
+                  ),
                 IconButton(
-                  icon: Icon(Icons.comment, color: ThemeService.textColor),
-                  onPressed: () {},
+                  icon: Icon(Icons.share, color: ThemeService.textColor),
+                  onPressed: () {
+                    sharePost(Post(
+                      id: widget.id,
+                      image: widget.image,
+                      userName: widget.userName,
+                      phoneNumber: widget.phoneNumber,
+                      sport: widget.sport,
+                      matchDetails: widget.matchDetails,
+                      matchDate: widget.matchDate,
+                      betAmount: widget.betAmount,
+                      placeOfMatch: widget.placeOfMatch,
+                      status: widget.status,
+                      postOwnerImage: widget.postOwnerImage,
+                      likes: widget.likes,
+                      comments: widget.comments,
+                      favorites: [],
+                      requests: [],
+                    ));
+                  },
                 ),
-              IconButton(
-                icon: Icon(Icons.share, color: ThemeService.textColor),
-                onPressed: () {
-                  sharePost(Post(
-                    id: widget.id,
-                    image: widget.image,
-                    userName: widget.userName,
-                    phoneNumber: widget.phoneNumber,
-                    sport: widget.sport,
-                    matchDetails: widget.matchDetails,
-                    matchDate: widget.matchDate,
-                    betAmount: widget.betAmount,
-                    placeOfMatch: widget.placeOfMatch,
-                    status: widget.status,
-                    postOwnerImage: widget.postOwnerImage,
-                    likes: widget.likes,
-                    comments: widget.comments,
-                    favorites: [],
-                    requests: [],
-                  ));
-                },
-              ),
-            ],
-          ),
+              ],
+            ),
           if (widget.phoneNumber != widget.currentMobileNumber)
             Padding(
               padding: EdgeInsets.symmetric(horizontal: 12.0),
