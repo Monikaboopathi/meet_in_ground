@@ -139,13 +139,16 @@ class _LoginPageState extends State<LoginPage> {
                       width: double.infinity,
                       child: IntlPhoneField(
                         controller: mobileController,
+                        disableLengthCheck: false,
                         decoration: InputDecoration(
                           labelText: 'Mobile Number',
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
+                          counterText: "",
                         ),
                         initialCountryCode: 'IN',
+                        
                         validator: (phone) {
                           if (phone == null || phone.number.isEmpty) {
                             return 'Please enter a valid mobile number';
