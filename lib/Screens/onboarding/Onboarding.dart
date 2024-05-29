@@ -87,7 +87,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(height: 10),
+          SizedBox(height: 40),
           buildImage(image),
           SizedBox(height: 20),
           body,
@@ -151,12 +151,15 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         skip: const Text('Skip',
             style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600,color:  Colors.white)),
         next: const Icon(Icons.arrow_forward, size: 30,color:  Colors.white,),
-        done: Text(
-          'Get Started',
-          style: TextStyle(
-            fontWeight: FontWeight.w800,
-            fontSize: 18,
-            color:  Colors.white, // Color based on your theme
+        done: Padding(
+          padding: const EdgeInsets.only(bottom:8.0),
+          child: Text(
+            'Get Started',
+            style: TextStyle(
+              fontWeight: FontWeight.w800,
+              fontSize: 18,
+              color:  Colors.white, // Color based on your theme
+            ),
           ),
         ),
         globalBackgroundColor:pageColors[_currentPage] ,
