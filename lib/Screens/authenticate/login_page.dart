@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Screens/authenticate/favourite_page.dart';
@@ -8,12 +9,11 @@ import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:intl_phone_field/intl_phone_field.dart';
 import 'package:http/http.dart' as http;
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/util/Services/refferral_service.dart';
+import 'package:meet_in_ground/util/api/Firebase_service.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
-import '../util/Services/refferral_service.dart';
 
-void main() {
-  runApp(LoginPage());
-}
+String fcmToken = "";
 
 class LoginPage extends StatefulWidget {
   @override
@@ -25,6 +25,22 @@ class _LoginPageState extends State<LoginPage> {
 
   final TextEditingController mobileController = TextEditingController();
   bool isLoading = false;
+
+  @override
+  void initState() {
+    super.initState();
+    getToken();
+  }
+
+  void getToken() async {
+    await Firebase.initializeApp();
+
+    setState(() async {
+      fcmToken = await FirebaseApi().getFcmToken();
+    });
+
+    print('FCM Token: $fcmToken');
+  }
 
   Future<void> loginUser(String phoneNumber) async {
     setState(() {
@@ -336,7 +352,7 @@ class _LoginPageState extends State<LoginPage> {
                           if (_referralFormKey.currentState!.validate()) {
                             // Handle referral code submission
                             String refferal = referralController.text;
-                             showDialog(
+                            showDialog(
                               context: context,
                               barrierDismissible: false,
                               builder: (BuildContext context) {
