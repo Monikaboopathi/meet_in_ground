@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,10 +8,11 @@ import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:lottie/lottie.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/util/api/Firebase_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import '../../constant/themes_service.dart';
-import '../util/Services/refferral_service.dart';
+import 'package:meet_in_ground/util/Services/refferral_service.dart';
 
 String fcmToken = "";
 String referralId = "";
@@ -58,6 +60,26 @@ class _UserOnBoardState extends State<UserOnBoard> {
   List<String> selectedItems = [];
   bool loadingLocation = false;
   final location = Location();
+
+  @override
+  void initState() {
+    super.initState();
+    getToken();
+  }
+
+  void getToken() async {
+    // Initialize Firebase
+    await Firebase.initializeApp();
+
+    // Get FCM token
+    setState(() async {
+      fcmToken = await FirebaseApi().getFcmToken();
+      referralId = (await RefferalService.getRefferal()) ?? "";
+    });
+
+    // Use fcmToken here
+    print('FCM Token: $fcmToken');
+  }
 
   void handleAddLocation() async {
     final hasPermission = await location.hasPermission();
@@ -398,21 +420,22 @@ class _UserOnBoardState extends State<UserOnBoard> {
           children: [
             Center(
               child: Lottie.asset(
-                      'assets/location.json',
-                      width: 350,
-                      height: 350,
-                    ),
+                'assets/location.json',
+                width: 350,
+                height: 350,
+              ),
             ),
             SizedBox(height: 30),
             if (userLocation != null)
-             loadingLocation
+              loadingLocation
                   ? CircularProgressIndicator()
-                  :  Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    userCity,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                  )),
+                  : Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        userCity,
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w600),
+                      )),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
