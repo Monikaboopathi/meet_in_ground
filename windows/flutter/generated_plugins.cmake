@@ -3,9 +3,11 @@
 #
 
 list(APPEND FLUTTER_PLUGIN_LIST
+  connectivity_plus
   emoji_picker_flutter
   file_selector_windows
   firebase_core
+  sentry_flutter
   share_plus
   url_launcher_windows
 )

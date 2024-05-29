@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meet_in_ground/Screens/requestedPosts/RequestedPosts.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
+import 'package:meet_in_ground/widgets/RateUs.dart';
 
 class FeaturesSection extends StatelessWidget {
   final String balance;
@@ -21,6 +22,10 @@ class FeaturesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    void RateUs() {
+      showDialogRateUs(context);
+    }
+
     List<Map<String, dynamic>> features = [
       {
         'icon': Icons.account_balance_wallet,
@@ -69,7 +74,7 @@ class FeaturesSection extends StatelessWidget {
         'featureName': 'Rate Us',
         'leadText': '',
         'navigate': '',
-        'onPress': onRateUs,
+        'onPress': RateUs,
       },
       {
         'icon': Icons.share,

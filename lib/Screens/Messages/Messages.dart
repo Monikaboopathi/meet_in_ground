@@ -12,7 +12,7 @@ class Messages extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: ThemeService.background,
         title: Text(
-          'Requested Posts',
+          'Messages',
           style: TextStyle(
             color: ThemeService.textColor,
             fontFamily: 'Billabong',
@@ -35,12 +35,16 @@ class Messages extends StatelessWidget {
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('User $index'),
+                Text('User $index',
+                    style: TextStyle(
+                      fontSize: 15,
+                      color: ThemeService.textColor,
+                    )),
                 Text(
                   "7-8-2024",
                   style: TextStyle(
                     fontSize: 13,
-                    color: Colors.grey,
+                    color: ThemeService.placeHolder,
                   ),
                 ),
               ],
@@ -51,7 +55,7 @@ class Messages extends StatelessWidget {
                 'Last message $index',
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: TextStyle(color: Colors.grey),
+                style: TextStyle(color: ThemeService.placeHolder),
               ),
             ),
             leading: CircleAvatar(
