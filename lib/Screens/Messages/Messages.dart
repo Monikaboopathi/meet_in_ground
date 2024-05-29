@@ -28,7 +28,10 @@ class Messages extends StatelessWidget {
             onTap: () {
               Navigator.of(context).pushReplacement(
                 MaterialPageRoute(
-                  builder: (context) => ChatScreen(),
+                  builder: (context) => ChatScreen(
+                    recieverName: "User Name",
+                    recieverImage: "",
+                  ),
                 ),
               );
             },
