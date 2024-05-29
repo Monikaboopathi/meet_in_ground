@@ -52,6 +52,7 @@ dependencies:
   location: ^6.0.2
   firebase_messaging: ^14.9.4
   firebase_core: ^2.25.4
+  intl: 0.18.1
 
 
 
