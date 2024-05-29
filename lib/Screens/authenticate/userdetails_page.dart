@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -7,11 +8,11 @@ import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:lottie/lottie.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/util/api/Firebase_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import '../../constant/themes_service.dart';
-import '../util/Services/refferral_service.dart';
-
+import 'package:meet_in_ground/util/Services/refferral_service.dart';
 
 String fcmToken = "";
 String referralId = "";
@@ -60,6 +61,26 @@ class _UserOnBoardState extends State<UserOnBoard> {
   bool loadingLocation = false;
   final location = Location();
 
+  @override
+  void initState() {
+    super.initState();
+    getToken();
+  }
+
+  void getToken() async {
+    // Initialize Firebase
+    await Firebase.initializeApp();
+
+    // Get FCM token
+    setState(() async {
+      fcmToken = await FirebaseApi().getFcmToken();
+      referralId = (await RefferalService.getRefferal()) ?? "";
+    });
+
+    // Use fcmToken here
+    print('FCM Token: $fcmToken');
+  }
+
   void handleAddLocation() async {
     final hasPermission = await location.hasPermission();
     if (hasPermission == PermissionStatus.granted) {
@@ -106,23 +127,21 @@ class _UserOnBoardState extends State<UserOnBoard> {
     });
   }
 
-Future<void> pickImage() async {
-  final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+  Future<void> pickImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
-  if (pickedFile != null) {
-    setState(() {
-      selectedImage = File(pickedFile.path);
-    });
+    if (pickedFile != null) {
+      setState(() {
+        selectedImage = File(pickedFile.path);
+      });
 
-    // Convert image path to a File object
-    String filePath = pickedFile.path;
+      // Convert image path to a File object
+      String filePath = pickedFile.path;
 
-    // Call handleProfile with the File object
-    handleProfile(File(filePath));
+      // Call handleProfile with the File object
+      handleProfile(File(filePath));
+    }
   }
-}
-
-
 
   Future<void> fetchLocationInfo(double latitude, double longitude) async {
     final response = await http.get(Uri.parse(
@@ -152,13 +171,13 @@ Future<void> pickImage() async {
       return;
     }
     if (index == 2) {
-       showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext context) {
-                                return Loader();
-                              },
-                            );
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return Loader();
+        },
+      );
       handleProfile();
     }
     setState(() {
@@ -173,7 +192,6 @@ Future<void> pickImage() async {
   }
 
   Future<void> handleProfile([File? file]) async {
-
     String apiUrl =
         'https://bet-x-new.onrender.com/user/addUser/${widget.mobile}';
     Map<String, dynamic> body = {
@@ -209,13 +227,13 @@ Future<void> pickImage() async {
         },
         body: jsonEncode(body),
       );
- // Parse the response body
+      // Parse the response body
       final Map<String, dynamic> responseData = jsonDecode(response.body);
 
       if (response.statusCode == 200) {
         // Handle success
         print('User registration successful');
-            Navigator.of(context).pushReplacement(
+        Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => BottomNavigationScreen(),
           ),
@@ -232,9 +250,8 @@ Future<void> pickImage() async {
         await MobileNo.saveMobilenumber(widget.mobile);
         await RefferalService.clearRefferal();
         await RefferalService.saveRefferal("${responseData['referralId']}");
-    
       } else {
-         Fluttertoast.showToast(
+        Fluttertoast.showToast(
           msg: responseData['message'],
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
@@ -401,21 +418,22 @@ Future<void> pickImage() async {
           children: [
             Center(
               child: Lottie.asset(
-                      'assets/location.json',
-                      width: 350,
-                      height: 350,
-                    ),
+                'assets/location.json',
+                width: 350,
+                height: 350,
+              ),
             ),
             SizedBox(height: 30),
             if (userLocation != null)
-             loadingLocation
+              loadingLocation
                   ? CircularProgressIndicator()
-                  :  Align(
-                  alignment: Alignment.center,
-                  child: Text(
-                    userCity,
-                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.w600),
-                  )),
+                  : Align(
+                      alignment: Alignment.center,
+                      child: Text(
+                        userCity,
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w600),
+                      )),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {

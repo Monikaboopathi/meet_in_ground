@@ -1,15 +1,18 @@
 import 'dart:convert';
 
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Screens/authenticate/favourite_page.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/util/api/Firebase_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:meet_in_ground/widgets/Loader.dart';
-import '../util/Services/refferral_service.dart';
+import 'package:meet_in_ground/util/Services/refferral_service.dart';
 
+String fcmToken = "";
 String referralId = "";
 
 class PasswordPage extends StatefulWidget {
@@ -34,6 +37,21 @@ class _PasswordPageState extends State<PasswordPage> {
   @override
   void initState() {
     super.initState();
+    getToken();
+  }
+
+  void getToken() async {
+    // Initialize Firebase
+    await Firebase.initializeApp();
+
+    // Get FCM token
+    setState(() async {
+      fcmToken = await FirebaseApi().getFcmToken();
+      referralId = (await RefferalService.getRefferal()) ?? "";
+    });
+
+    // Use fcmToken here
+    print('FCM Token: $fcmToken');
   }
 
   Future<void> verifyPassword(
@@ -49,7 +67,9 @@ class _PasswordPageState extends State<PasswordPage> {
     final Map<String, dynamic> requestBody = {
       'phoneNumber': phoneNumber,
       'password': password,
+      'fcmToken': fcmToken
     };
+    print(fcmToken);
 
     try {
       // Make the POST request to the API endpoint

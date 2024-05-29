@@ -3,7 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Screens/authenticate/login_page.dart';
-import 'package:meet_in_ground/Screens/util/Services/refferral_service.dart';
+import 'package:meet_in_ground/util/Services/refferral_service.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:meet_in_ground/widgets/Loader.dart';
