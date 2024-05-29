@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:meet_in_ground/Screens/chat/ChatScreen.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 
 class Messages extends StatelessWidget {
@@ -24,7 +25,13 @@ class Messages extends StatelessWidget {
         itemCount: 5,
         itemBuilder: (context, index) {
           return ListTile(
-            onTap: () {},
+            onTap: () {
+              Navigator.of(context).pushReplacement(
+                MaterialPageRoute(
+                  builder: (context) => ChatScreen(),
+                ),
+              );
+            },
             title: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
