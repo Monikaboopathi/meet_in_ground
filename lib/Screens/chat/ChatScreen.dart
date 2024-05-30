@@ -12,9 +12,14 @@ import 'package:meet_in_ground/widgets/Loader.dart';
 class ChatScreen extends StatefulWidget {
   String recieverName;
   String recieverImage;
-  ChatScreen(
-      {Key? key, required this.recieverName, required this.recieverImage})
-      : super(key: key);
+  String receiverId;
+
+  ChatScreen({
+    Key? key,
+    required this.recieverName,
+    required this.recieverImage,
+    required this.receiverId,
+  }) : super(key: key);
 
   @override
   _ChatScreenState createState() => _ChatScreenState();
@@ -30,7 +35,8 @@ class _ChatScreenState extends State<ChatScreen> {
 
   void onSendMessage() async {
     if (messageController.text.isNotEmpty) {
-      await _chatservice.sendMessage("8072974576", messageController.text);
+      await _chatservice.sendMessage(widget.receiverId, messageController.text,
+          widget.recieverName, widget.recieverImage);
       messageController.clear();
     } else {
       print("Enter Some Text");
@@ -84,7 +90,7 @@ class _ChatScreenState extends State<ChatScreen> {
           children: [
             Expanded(
               child: StreamBuilder<QuerySnapshot>(
-                stream: _chatservice.getMessages("8072974576", "8072974576"),
+                stream: _chatservice.getMessages(widget.receiverId),
                 builder: (context, snapshot) {
                   if (!snapshot.hasData) {
                     return Loader();
