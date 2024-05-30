@@ -59,6 +59,8 @@ dependencies:
   flutter_rating_bar: ^4.0.1
   flutter_dotenv: ^5.1.0
   intl: 0.18.1
+  cloud_firestore: ^4.17.5
+  firebase_storage: ^11.7.7
 
 
 
