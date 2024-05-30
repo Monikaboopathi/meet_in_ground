@@ -63,7 +63,7 @@ class _FavouritePageState extends State<FavouritePage> {
         );
         // Handle successful response here
         print('Data submitted successfully');
-        Navigator.push(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(
               builder: (context) => SetPasswordPage(
@@ -71,6 +71,7 @@ class _FavouritePageState extends State<FavouritePage> {
                   hero: favoriteHero,
                   color: favoriteColor,
                   status: 200)),
+                  (route) => false,
         );
       } else {
         Fluttertoast.showToast(
@@ -225,7 +226,7 @@ class _FavouritePageState extends State<FavouritePage> {
                                 if (widget.status == 200) {
                                   submitUserData(widget.mobile, hero, color);
                                 } else {
-                                  Navigator.push(
+                                  Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => SetPasswordPage(
@@ -233,6 +234,7 @@ class _FavouritePageState extends State<FavouritePage> {
                                             hero: hero,
                                             color: color,
                                             status: 0)),
+                                            (route) => false,
                                   );
 
                                   Fluttertoast.showToast(

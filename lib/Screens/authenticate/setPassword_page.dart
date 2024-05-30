@@ -87,10 +87,11 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
         await RefferalService.saveRefferal("${responseData['referralId']}");
 
         // Navigate to the home page
-        Navigator.of(context).pushReplacement(
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (context) => LoginPage(),
           ),
+          (route) => false,
         );
         // Handle navigation or any other action as needed
       } else {
@@ -279,7 +280,7 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                                   _submitpatchform();
                                   ;
                                 } else {
-                                  Navigator.push(
+                                  Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
                                         builder: (context) => UserOnBoard(
@@ -288,6 +289,7 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                                             favcolor: color,
                                             password: password,
                                             confirmpassword: confirmPassword)),
+                                            (route) => false,
                                   );
 
                                   Fluttertoast.showToast(
