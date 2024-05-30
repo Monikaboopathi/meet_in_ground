@@ -135,7 +135,7 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
                   children: [
                     Text(
                       'Did you face any issues in our services? Please let us know your thoughts. We’ll try to solve your concern as soon as possible!',
-                      style: TextStyle(fontSize: 16.0),
+                      style: TextStyle(fontSize: 16.0, color: ThemeService.textColor),
                     ),
                     SizedBox(height: 16.0),
                     _buildInputField(
@@ -152,7 +152,7 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
                     ),
                     SizedBox(height: 16.0),
                     Text('Have any Screenshots? (Optional)',
-                        style: TextStyle(fontSize: 16.0)),
+                        style: TextStyle(fontSize: 16.0, color: ThemeService.textColor)),
                     SizedBox(height: 8.0),
                     _buildImagePicker(),
                     SizedBox(height: 24.0),
@@ -219,7 +219,7 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
               TextSpan(text: '*', style: TextStyle(color: Colors.red)),
             ],
           ),
-          style: TextStyle(fontSize: 16.0),
+          style: TextStyle(fontSize: 16.0, color: ThemeService.textColor),
         ),
         SizedBox(height: 8.0),
         TextField(
@@ -227,6 +227,7 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
           maxLines: maxLines,
           decoration: InputDecoration(
             hintText: 'Type your $label here',
+            hintStyle: TextStyle( color: ThemeService.textColor),
             errorText: errorText.isEmpty ? null : errorText,
             border: OutlineInputBorder(),
           ),
@@ -250,8 +251,8 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
         IconButton(
           icon: Icon(
             Icons.add_a_photo,
-            color: Colors.grey[800],
-            size: 100,
+            color: ThemeService.textColor,
+            size: 80,
           ),
           onPressed: pickImage,
         ),

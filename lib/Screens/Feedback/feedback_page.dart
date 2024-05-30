@@ -118,14 +118,14 @@ class _FeedbackpageState extends State<Feedbackpage> {
                 children: [
                   Text(
                     'Have suggestions to say? Please share with us below..',
-                    style: TextStyle(fontSize: 18),
+                    style: TextStyle(fontSize: 18, color: ThemeService.textColor),
                   ),
                   SizedBox(height: 20.0),
                   Row(
                     children: [
                       Text(
                         'Message ',
-                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800),
+                        style: TextStyle(fontSize: 20, fontWeight: FontWeight.w800, color: ThemeService.textColor),
                       ),
                        Text(
                             '*',
@@ -141,7 +141,7 @@ class _FeedbackpageState extends State<Feedbackpage> {
                     maxLines: 5,
                     decoration: InputDecoration(
                       hintText: 'Type your message here',
-                      hintStyle: TextStyle(color: Colors.grey),
+                      hintStyle: TextStyle( color: ThemeService.textColor),
                       errorText:
                           _messageError.isNotEmpty ? _messageError : null,
                       border: OutlineInputBorder(),
