@@ -394,6 +394,7 @@ void showDialogRateUs(BuildContext context) {
   showDialog(
     context: context,
     barrierDismissible: true,
+  
     builder: (context) => RateUsDialog(),
   );
 }
