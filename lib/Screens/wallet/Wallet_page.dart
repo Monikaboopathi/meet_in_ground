@@ -13,8 +13,8 @@ class _WalletPageState extends State<WalletPage> {
   bool _visible = false;
   bool _isChecked1 = false;
   bool _isChecked2 = false;
-  Color _checkColor1 = Colors.black;
-  Color _checkColor2 = Colors.black;
+  Color _checkColor1 = ThemeService.primary;
+  Color _checkColor2 = ThemeService.primary;
   String _balance = '0';
 
   @override
@@ -25,46 +25,45 @@ class _WalletPageState extends State<WalletPage> {
 
   Future<void> _fetchData() async {}
 
- void _handleSubmit() async {
-  setState(() {
-    _textError = '';
-  });
-
-  String trimmedText = _textController.text.trim();
-
-  if (trimmedText.isEmpty) {
+  void _handleSubmit() async {
     setState(() {
-      _textError = 'Please enter your UPI ID.';
+      _textError = '';
     });
-    return;
+
+    String trimmedText = _textController.text.trim();
+
+    if (trimmedText.isEmpty) {
+      setState(() {
+        _textError = 'Please enter your UPI ID.';
+      });
+      return;
+    }
+
+    // Define regular expression pattern for UPI ID
+    RegExp upiRegex = RegExp(r'^[a-zA-Z0-9\.\-_]+@[a-zA-Z]+$');
+    if (!upiRegex.hasMatch(trimmedText)) {
+      setState(() {
+        _textError = 'Invalid UPI ID format.';
+      });
+      return;
+    }
+
+    if (!_isChecked1) {
+      setState(() {
+        _checkColor1 = Colors.red;
+      });
+      return;
+    }
+
+    if (!_isChecked2) {
+      setState(() {
+        _checkColor2 = Colors.red;
+      });
+      return;
+    }
+
+    // Handle submission logic here
   }
-
-  // Define regular expression pattern for UPI ID
-  RegExp upiRegex = RegExp(r'^[a-zA-Z0-9\.\-_]+@[a-zA-Z]+$');
-  if (!upiRegex.hasMatch(trimmedText)) {
-    setState(() {
-      _textError = 'Invalid UPI ID format.';
-    });
-    return;
-  }
-
-  if (!_isChecked1) {
-    setState(() {
-      _checkColor1 = Colors.red;
-    });
-    return;
-  }
-
-  if (!_isChecked2) {
-    setState(() {
-      _checkColor2 = Colors.red;
-    });
-    return;
-  }
-
-  // Handle submission logic here
-}
-
 
   void _toggleCheckbox1() {
     setState(() {
@@ -272,41 +271,65 @@ class _WalletPageState extends State<WalletPage> {
                   child: Column(
                     mainAxisSize: MainAxisSize.min,
                     children: [
-                      Text(
-                        'Please enter your UPI Id',
-                        style: TextStyle(
-                            fontSize: 18,
-                            fontWeight: FontWeight.w600,
-                            color: Colors.black),
+                      Row(
+                        children: [
+                          Text(
+                            'Please enter your UPI Id',
+                            style: TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.w600,
+                                color: Colors.black),
+                          ),
+                            Text(
+                            '*',
+                            style: TextStyle(
+                                color: Colors.red,
+                                fontSize: 20,
+                                fontWeight: FontWeight.w500),
+                          ),
+                        ],
                       ),
                       SizedBox(height: 20),
                       TextField(
                         controller: _textController,
                         decoration: InputDecoration(
+                          border: OutlineInputBorder(),
                           hintText: 'sam.wilson@upi',
                           errorText: _textError.isNotEmpty ? _textError : null,
                         ),
                       ),
                       SizedBox(height: 20),
-                      CheckboxListTile(
-                        value: _isChecked1,
-                        onChanged: (bool? value) {
-                          _toggleCheckbox1();
-                        },
-                        title: Text(
-                          'I accept this is a valid UPI Id',
-                          style: TextStyle(color: _checkColor1),
-                        ),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: _isChecked1,
+                            onChanged: (bool? value) {
+                              _toggleCheckbox1();
+                            },
+                          ),
+                          Expanded(
+                            child: Text(
+                              'I accept this is a valid UPI Id',
+                              style: TextStyle(color: _checkColor1),
+                            ),
+                          ),
+                        ],
                       ),
-                      CheckboxListTile(
-                        value: _isChecked2,
-                        onChanged: (bool? value) {
-                          _toggleCheckbox2();
-                        },
-                        title: Text(
-                          'Save this UPI Id for Future Withdrawals',
-                          style: TextStyle(color: _checkColor2),
-                        ),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: _isChecked2,
+                            onChanged: (bool? value) {
+                              _toggleCheckbox2();
+                            },
+                          ),
+                          Expanded(
+                            child: Text(
+                              'Save this UPI Id for Future Withdrawals',
+                              style: TextStyle(color: _checkColor2),
+                            ),
+                          ),
+                        ],
                       ),
                       SizedBox(height: 20),
                       ElevatedButton(
