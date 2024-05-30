@@ -1,0 +1,261 @@
+import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:image_picker/image_picker.dart';
+import 'dart:io';
+import 'package:http/http.dart' as http;
+import 'package:meet_in_ground/constant/themes_service.dart';
+import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
+import 'package:meet_in_ground/widgets/Loader.dart';
+
+class ReportIssuesPage extends StatefulWidget {
+  @override
+  _ReportIssuesPageState createState() => _ReportIssuesPageState();
+}
+
+class _ReportIssuesPageState extends State<ReportIssuesPage> {
+  final _subjectController = TextEditingController();
+  final _messageController = TextEditingController();
+  String _subjectError = '';
+  String _messageError = '';
+  File? _selectedImage;
+  final picker = ImagePicker();
+
+  Future<void> pickImage() async {
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+
+    if (pickedFile != null) {
+      setState(() {
+        _selectedImage = File(pickedFile.path);
+      });
+
+      // Convert image path to a File object
+      String filePath = pickedFile.path;
+
+      // Call handleProfile with the File object
+      _handleSubmit(File(filePath));
+    }
+  }
+
+  Future<void> _handleSubmit([File? file]) async {
+    setState(() {
+      _subjectError = _subjectController.text.trim().isEmpty
+          ? 'Subject cannot be empty'
+          : '';
+      _messageError = _messageController.text.trim().isEmpty
+          ? 'Message cannot be empty'
+          : '';
+    });
+    String message = _messageController.text;
+    String subject = _subjectController.text;
+
+    String? userMobileNumber = await MobileNo.getMobilenumber();
+    print(userMobileNumber);
+
+    if (_subjectError.isEmpty && _messageError.isEmpty) {
+      try {
+        var uri = Uri.parse(
+            'https://bet-x-new.onrender.com/user/addIssues/$userMobileNumber');
+        var request = http.MultipartRequest('POST', uri);
+        request.fields['subject'] = subject;
+        request.fields['message'] = message;
+
+        if (_selectedImage != null) {
+          request.files.add(await http.MultipartFile.fromPath(
+            'screenshotImg',
+            _selectedImage!.path,
+          ));
+        }
+
+        var response = await request.send();
+        var responseBody = await http.Response.fromStream(response);
+        if (response.statusCode == 200) {
+          _messageController.clear();
+          _subjectController.clear();
+          Fluttertoast.showToast(
+            msg: "Issue reported successfully",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 2,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+          );
+          print('Issue reported successfully');
+        } else {
+          Fluttertoast.showToast(
+            msg: "Failed to report issue",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 2,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+          );
+          print('Failed to report issue: ${responseBody.body}');
+        }
+      } catch (e) {
+        print('Error reporting issue: $e');
+      } finally {}
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        automaticallyImplyLeading: true,
+        backgroundColor: ThemeService.background,
+        title: Text(
+          'Report Issues',
+          style: TextStyle(
+            color: ThemeService.textColor,
+            fontFamily: 'Billabong',
+            fontSize: 25,
+          ),
+        ),
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back, color: ThemeService.textColor, size: 35),
+          onPressed: () => Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => BottomNavigationScreen(currentIndex: 4),
+            ),
+          ),
+        ),
+        centerTitle: true,
+      ),
+      backgroundColor: ThemeService.background,
+      body: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            Expanded(
+              child: SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Did you face any issues in our services? Please let us know your thoughts. We’ll try to solve your concern as soon as possible!',
+                      style: TextStyle(fontSize: 16.0),
+                    ),
+                    SizedBox(height: 16.0),
+                    _buildInputField(
+                      label: 'Subject',
+                      controller: _subjectController,
+                      errorText: _subjectError,
+                    ),
+                    SizedBox(height: 16.0),
+                    _buildInputField(
+                      label: 'Message',
+                      controller: _messageController,
+                      errorText: _messageError,
+                      maxLines: 5,
+                    ),
+                    SizedBox(height: 16.0),
+                    Text('Have any Screenshots? (Optional)',
+                        style: TextStyle(fontSize: 16.0)),
+                    SizedBox(height: 8.0),
+                    _buildImagePicker(),
+                    SizedBox(height: 24.0),
+                  ],
+                ),
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  onPressed: () async {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext context) {
+                        return Loader();
+                      },
+                    );
+                    // Delay for 2 seconds to show the loader
+                    await Future.delayed(Duration(seconds: 2));
+
+                    // Dismiss the loader and return to the previous page
+                    Navigator.pop(context);
+                    _handleSubmit();
+                  },
+                  style: ElevatedButton.styleFrom(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(8.0),
+                    ),
+                    backgroundColor: ThemeService.buttonBg,
+                    padding: EdgeInsets.symmetric(vertical: 8.0),
+                  ),
+                  child: Text(
+                    'Submit',
+                    style: TextStyle(
+                      fontSize: 20,
+                      color: Colors.white,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInputField({
+    required String label,
+    required TextEditingController controller,
+    String errorText = '',
+    int maxLines = 1,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text.rich(
+          TextSpan(
+            text: '$label ',
+            children: [
+              TextSpan(text: '*', style: TextStyle(color: Colors.red)),
+            ],
+          ),
+          style: TextStyle(fontSize: 16.0),
+        ),
+        SizedBox(height: 8.0),
+        TextField(
+          controller: controller,
+          maxLines: maxLines,
+          decoration: InputDecoration(
+            hintText: 'Type your $label here',
+            errorText: errorText.isEmpty ? null : errorText,
+            border: OutlineInputBorder(),
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildImagePicker() {
+    return Row(
+      children: [
+        _selectedImage != null
+            ? Image.file(
+                _selectedImage!,
+                width: 100,
+                height: 100,
+                fit: BoxFit.cover,
+              )
+            : SizedBox.shrink(),
+        SizedBox(width: 16.0),
+        IconButton(
+          icon: Icon(
+            Icons.add_a_photo,
+            color: Colors.grey[800],
+            size: 100,
+          ),
+          onPressed: pickImage,
+        ),
+      ],
+    );
+  }
+}
