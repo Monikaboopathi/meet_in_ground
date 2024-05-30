@@ -233,12 +233,13 @@ class _UserOnBoardState extends State<UserOnBoard> {
       if (response.statusCode == 200) {
         // Handle success
         print('User registration successful');
-        Navigator.of(context).pushReplacement(
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (context) => BottomNavigationScreen(
               currentIndex: 0,
             ),
           ),
+          (route) => false,
         );
         Fluttertoast.showToast(
           msg: 'SUCCESS',

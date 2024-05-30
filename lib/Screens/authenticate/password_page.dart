@@ -86,12 +86,13 @@ class _PasswordPageState extends State<PasswordPage> {
 
       // Check if the request was successful (status code 200)
       if (response.statusCode == 200) {
-        Navigator.of(context).pushReplacement(
+        Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
             builder: (context) => BottomNavigationScreen(
               currentIndex: 0,
             ),
           ),
+          (route) => false,
         );
         Fluttertoast.showToast(
           msg: 'SUCCESS',

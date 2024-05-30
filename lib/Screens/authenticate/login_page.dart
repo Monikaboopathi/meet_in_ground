@@ -58,12 +58,14 @@ class _LoginPageState extends State<LoginPage> {
       final Map<String, dynamic> responseData = json.decode(response.body);
 
       if (response.statusCode == 200) {
-        Navigator.of(context).pushReplacement(
+        Navigator.pushAndRemoveUntil(
+          context,
           MaterialPageRoute(
             builder: (context) => PasswordPage(
               mobile: phoneNumber,
             ),
           ),
+          (route) => false,
         );
 
         await MobileNo.clearMobilenumber();
@@ -148,7 +150,6 @@ class _LoginPageState extends State<LoginPage> {
                           counterText: "",
                         ),
                         initialCountryCode: 'IN',
-                        
                         validator: (phone) {
                           if (phone == null || phone.number.isEmpty) {
                             return 'Please enter a valid mobile number';
