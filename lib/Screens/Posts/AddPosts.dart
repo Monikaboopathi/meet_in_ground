@@ -6,6 +6,9 @@ import 'package:intl/intl.dart';
 import 'package:meet_in_ground/constant/sports_names.dart';
 import 'package:meet_in_ground/constant/themes_service.dart'; // Ensure you have this import for DateFormat
 import 'package:http/http.dart' as http;
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/widgets/Loader.dart';
 
 class Addposts extends StatefulWidget {
   @override
@@ -62,92 +65,73 @@ class _AddpostsState extends State<Addposts> {
     return isValid;
   }
 
- Future<void> _handleSubmit([File? file]) async {
-  if (_validateFields()) {
-   
-    Map<String, dynamic> postData = {
-      "userName": "Ranjith",
-      "sport": selectedValue,
-      "matchDetails": postText,
-      "matchDate": DateFormat('dd/MM/yyyy').format(date),
-      "betAmount": price.toString(),
-      "placeOfMatch": location,
-      "image": file 
-    };
+  Future<void> _handleSubmit([File? file]) async {
+    if (_validateFields()) {
 
-    // Convert the data to JSON
-    String jsonString = json.encode(postData);
+        String? userMobileNumber = await MobileNo.getMobilenumber();
+      print(userMobileNumber);
 
-    // Make the API post request
-    try {
-      final response = await http.post(
-        Uri.parse('https://bet-x-new.onrender.com/post/addPost/8072974576'),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonString,
-      );
+      Map<String, dynamic> postData = {
+        "userName": "Ranjith",
+        "sport": selectedValue,
+        "matchDetails": postText,
+        "matchDate": DateFormat('dd/MM/yyyy').format(date),
+        "betAmount": price.toString(),
+        "placeOfMatch": location,
+        "image": file
+      };
 
-      // Check the response status
-      if (response.statusCode == 200) {
-        
-        print('Post request successful');
-      } else {
-       
-        print('Post request failed with status: ${response.statusCode}');
-        showDialog(
-          context: context,
-          builder: (context) => AlertDialog(
-            title: Text('Error'),
-            content: Text('Failed to submit post. Please try again later.'),
-            actions: <Widget>[
-              TextButton(
-                child: Text('OK'),
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              ),
-            ],
-          ),
+      // Convert the data to JSON
+      String jsonString = json.encode(postData);
+
+      // Make the API post request
+      try {
+        final response = await http.post(
+          Uri.parse('https://bet-x-new.onrender.com/post/addPost/$userMobileNumber'),
+          headers: <String, String>{
+            'Content-Type': 'application/json; charset=UTF-8',
+          },
+          body: jsonString,
         );
+
+        // Check the response status
+        if (response.statusCode == 200) {
+          Fluttertoast.showToast(
+            msg: "Post Added Successfully",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 2,
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+          );
+          // Navigator.of(context).pushReplacement(
+          //   MaterialPageRoute(
+          //     builder: (context) =>
+          //   ),
+          // );
+
+          print('Post request successful');
+        } else {
+          print('Post request failed with status: ${response.statusCode}');
+          Fluttertoast.showToast(
+            msg: "Failed to submit post. Please try again later.",
+            toastLength: Toast.LENGTH_SHORT,
+            gravity: ToastGravity.TOP,
+            timeInSecForIosWeb: 2,
+            backgroundColor: Colors.red,
+            textColor: Colors.white,
+          );
+        }
+      } catch (error) {
+        // Handle any exceptions that might occur during the request
+        print('Error: $error');
       }
-    } catch (error) {
-      // Handle any exceptions that might occur during the request
-      print('Error: $error');
-      showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: Text('Error'),
-          content: Text('An error occurred. Please try again later.'),
-          actions: <Widget>[
-            TextButton(
-              child: Text('OK'),
-              onPressed: () {
-                Navigator.of(context).pop();
-              },
-            ),
-          ],
-        ),
-      );
-    }
-  } else {
-    showDialog(
-      context: context,
-      builder: (context) => AlertDialog(
-        title: Text('Error'),
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text('Please fill all the required fields'),
-        actions: <Widget>[
-          TextButton(
-            child: Text('OK'),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ],
-      ),
-    );
+      ));
+    }
   }
-}
 
   Future<void> pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
@@ -185,7 +169,7 @@ class _AddpostsState extends State<Addposts> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       appBar: AppBar(
+      appBar: AppBar(
         automaticallyImplyLeading: false,
         backgroundColor: ThemeService.background,
         title: Text(
@@ -236,7 +220,9 @@ class _AddpostsState extends State<Addposts> {
                     children: <Widget>[
                       Text('Sport*',
                           style: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.w800,color: ThemeService.textColor)),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: ThemeService.textColor)),
                       SizedBox(height: 5),
                       Container(
                         decoration: BoxDecoration(
@@ -253,7 +239,11 @@ class _AddpostsState extends State<Addposts> {
                               child: Padding(
                                 padding: EdgeInsets.symmetric(
                                     horizontal: 10, vertical: 15),
-                                child: Text(sport,style: TextStyle(color: ThemeService.textColor),),
+                                child: Text(
+                                  sport,
+                                  style:
+                                      TextStyle(color: ThemeService.textColor),
+                                ),
                               ),
                             );
                           }).toList(),
@@ -265,7 +255,10 @@ class _AddpostsState extends State<Addposts> {
                           },
                           hint: Padding(
                             padding: EdgeInsets.symmetric(horizontal: 10),
-                            child: Text('Select Sport',style: TextStyle(color: ThemeService.textColor),),
+                            child: Text(
+                              'Select Sport',
+                              style: TextStyle(color: ThemeService.textColor),
+                            ),
                           ),
                         ),
                       ),
@@ -281,7 +274,9 @@ class _AddpostsState extends State<Addposts> {
                     children: <Widget>[
                       Text('Date*',
                           style: TextStyle(
-                              fontSize: 15, fontWeight: FontWeight.w800,color: ThemeService.textColor)),
+                              fontSize: 15,
+                              fontWeight: FontWeight.w800,
+                              color: ThemeService.textColor)),
                       SizedBox(height: 5),
                       GestureDetector(
                         onTap: () {
@@ -297,8 +292,12 @@ class _AddpostsState extends State<Addposts> {
                           child: Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: <Widget>[
-                              Text(_formatDate(date),style: TextStyle(color: ThemeService.textColor),),
-                              Icon(Icons.calendar_today,color:ThemeService.textColor),
+                              Text(
+                                _formatDate(date),
+                                style: TextStyle(color: ThemeService.textColor),
+                              ),
+                              Icon(Icons.calendar_today,
+                                  color: ThemeService.textColor),
                             ],
                           ),
                         ),
@@ -312,7 +311,10 @@ class _AddpostsState extends State<Addposts> {
             ),
             SizedBox(height: 20),
             Text('Location*',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800,color: ThemeService.textColor)),
+                style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: ThemeService.textColor)),
             SizedBox(height: 5),
             TextField(
               decoration: InputDecoration(
@@ -331,7 +333,10 @@ class _AddpostsState extends State<Addposts> {
               Text(locationError!, style: TextStyle(color: Colors.red)),
             SizedBox(height: 20),
             Text('Bet Amount*',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800,color: ThemeService.textColor)),
+                style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: ThemeService.textColor)),
             SizedBox(height: 5),
             TextField(
               keyboardType: TextInputType.number,
@@ -351,7 +356,10 @@ class _AddpostsState extends State<Addposts> {
               Text(priceError!, style: TextStyle(color: Colors.red)),
             SizedBox(height: 20),
             Text('Match details*',
-                style: TextStyle(fontSize: 15, fontWeight: FontWeight.w800,color: ThemeService.textColor)),
+                style: TextStyle(
+                    fontSize: 15,
+                    fontWeight: FontWeight.w800,
+                    color: ThemeService.textColor)),
             SizedBox(height: 5),
             TextField(
               maxLines: 5,
@@ -379,7 +387,7 @@ class _AddpostsState extends State<Addposts> {
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey[100],
                   side: BorderSide(
-                    color:ThemeService.buttonBg,
+                    color: ThemeService.buttonBg,
                   ),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
@@ -389,7 +397,7 @@ class _AddpostsState extends State<Addposts> {
                   'My Post',
                   style: TextStyle(
                     fontSize: 20,
-                    color:ThemeService.buttonBg,
+                    color: ThemeService.buttonBg,
                   ),
                 ),
               ),
@@ -397,7 +405,21 @@ class _AddpostsState extends State<Addposts> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _handleSubmit,
+                  onPressed: () async {
+                    showDialog(
+                      context: context,
+                      barrierDismissible: false,
+                      builder: (BuildContext context) {
+                        return Loader();
+                      },
+                    );
+                    // Delay for 2 seconds to show the loader
+                    await Future.delayed(Duration(seconds: 2));
+
+                    // Dismiss the loader and return to the previous page
+                    Navigator.pop(context);
+                    _handleSubmit();
+                  },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
