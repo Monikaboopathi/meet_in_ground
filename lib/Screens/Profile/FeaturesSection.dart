@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:meet_in_ground/Screens/Feedback/feedback_page.dart';
+import 'package:meet_in_ground/Screens/Issues/issues_page.dart';
 import 'package:meet_in_ground/Screens/requestedPosts/RequestedPosts.dart';
+import 'package:meet_in_ground/Screens/wallet/Wallet_page.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:meet_in_ground/widgets/RateUs.dart';
 
@@ -31,7 +34,7 @@ class FeaturesSection extends StatelessWidget {
         'icon': Icons.account_balance_wallet,
         'featureName': 'Wallet',
         'leadText': '₹ ${balance.toString()}',
-        'navigate': '/wallet',
+        'navigate': WalletPage(),
         'onPress': null,
       },
       {
@@ -52,14 +55,14 @@ class FeaturesSection extends StatelessWidget {
         'icon': Icons.feedback,
         'featureName': 'Feedback',
         'leadText': '',
-        'navigate': 'feedback',
+        'navigate': Feedbackpage(),
         'onPress': null,
       },
       {
         'icon': Icons.flag,
         'featureName': 'Raise Issue',
         'leadText': '',
-        'navigate': 'issues',
+        'navigate': ReportIssuesPage(),
         'onPress': null,
       },
       {
