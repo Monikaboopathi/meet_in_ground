@@ -262,8 +262,10 @@ class _Post_WidgetState extends State<Post_Widget> {
                       Navigator.of(context).pushReplacement(
                         MaterialPageRoute(
                           builder: (context) => ChatScreen(
-                              recieverName: widget.userName,
-                              recieverImage: widget.postOwnerImage),
+                            recieverName: widget.userName,
+                            recieverImage: widget.postOwnerImage,
+                            receiverId: widget.phoneNumber,
+                          ),
                         ),
                       );
                     },

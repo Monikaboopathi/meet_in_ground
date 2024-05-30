@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:meet_in_ground/Models/Message.dart';
+
 import 'package:meet_in_ground/Screens/chat/ChatScreen.dart';
 import 'package:meet_in_ground/constant/format_time.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:meet_in_ground/util/Services/ChatService.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
+
 import 'package:meet_in_ground/widgets/Loader.dart';
+import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
 
 class Messages extends StatelessWidget {
   Messages({Key? key}) : super(key: key);
@@ -26,29 +27,30 @@ class Messages extends StatelessWidget {
         ),
         centerTitle: true,
       ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: _chatservice.getMessages("8072974576", "8072974576"),
+      body: FutureBuilder<List<Map<String, dynamic>>>(
+        future: _chatservice.getAllMessagesAndRooms("8072974576"),
         builder: (context, snapshot) {
-          if (!snapshot.hasData) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
             return Loader();
           }
+          if (!snapshot.hasData || snapshot.data!.isEmpty) {
+            return NoDataFoundWidget();
+          }
 
-          var chatRooms = snapshot.data!.docs.map((doc) {
-            return Message.fromMap(doc.data() as Map<String, dynamic>);
-          }).toList();
-          print(chatRooms);
+          List<Map<String, dynamic>> chatRooms = snapshot.data!;
           return ListView.builder(
-            itemCount: 1,
+            itemCount: chatRooms.length,
             itemBuilder: (context, index) {
-              var chatRoom = chatRooms[chatRooms.length - 1];
+              var chatRoom = chatRooms[index];
 
               return ListTile(
                 onTap: () {
-                  Navigator.of(context).pushReplacement(
+                  Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => ChatScreen(
-                        recieverName: chatRoom.sender,
-                        recieverImage: chatRoom.message,
+                        recieverName: chatRoom['receiverName'],
+                        recieverImage: chatRoom['recieverImage'],
+                        receiverId: chatRoom['receiver'],
                       ),
                     ),
                   );
@@ -57,15 +59,14 @@ class Messages extends StatelessWidget {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      chatRoom.receiver,
+                      chatRoom['receiver'],
                       style: TextStyle(
                         fontSize: 15,
                         color: ThemeService.textColor,
                       ),
                     ),
                     Text(
-                      formatDate(chatRoom
-                          .timestamp), 
+                      formatDate(chatRoom['timestamp']),
                       style: TextStyle(
                         fontSize: 13,
                         color: ThemeService.placeHolder,
@@ -76,15 +77,14 @@ class Messages extends StatelessWidget {
                 subtitle: Padding(
                   padding: const EdgeInsets.only(top: 3),
                   child: Text(
-                    chatRoom
-                        .message,
+                    chatRoom['message'],
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
                     style: TextStyle(color: ThemeService.placeHolder),
                   ),
                 ),
                 leading: CircleAvatar(
-                  backgroundImage: NetworkImage(chatRoom.receiver),
+                  backgroundImage: NetworkImage(chatRoom['receiverImage']),
                   backgroundColor: Colors.grey[300],
                 ),
               );
