@@ -282,23 +282,36 @@ class _Post_WidgetState extends State<Post_Widget> {
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            IconButton(
-                              icon: Icon(Icons.edit, color: Colors.white),
-                              onPressed: () {
-                                widget.onEditPost();
-                                setState(() {
-                                  showEditDeleteIcons = false;
-                                });
-                              },
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: IconButton(
+                                icon: Icon(Icons.edit, color: Colors.white),
+                                onPressed: () {
+                                  widget.onEditPost();
+                                  setState(() {
+                                    showEditDeleteIcons = false;
+                                  });
+                                },
+                              ),
                             ),
-                            IconButton(
-                              icon: Icon(Icons.delete, color: Colors.white),
-                              onPressed: () {
-                                // Add your delete functionality here
-                                setState(() {
-                                  showEditDeleteIcons = false;
-                                });
-                              },
+                            SizedBox(width: 20),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade400,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: IconButton(
+                                icon: Icon(Icons.delete, color: Colors.white),
+                                onPressed: () {
+                                  widget.onDeletePost();
+                                  setState(() {
+                                    showEditDeleteIcons = false;
+                                  });
+                                },
+                              ),
                             ),
                           ],
                         ),

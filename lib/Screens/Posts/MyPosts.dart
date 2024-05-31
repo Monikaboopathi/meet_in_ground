@@ -1,7 +1,9 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Screens/Posts/EditPosts.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
+import 'package:meet_in_ground/widgets/Delete_Dialog.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
 import 'package:meet_in_ground/widgets/SportSelectDialog.dart';
@@ -74,6 +76,42 @@ class _MyPostsState extends State<MyPosts> {
       return posts;
     } else {
       throw Exception('Failed to load posts');
+    }
+  }
+
+  Future<void> deletePost(String postId) async {
+    final String apiUrl =
+        'https://bet-x-new.onrender.com/post/deletePost/${postId}';
+
+    final response = await http.delete(
+      Uri.parse(apiUrl),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    if (response.statusCode == 200) {
+      setState(() {
+        futurePosts = fetchPosts();
+      });
+      Fluttertoast.showToast(
+        msg: responseData['message'] ?? "",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: responseData['error'] ?? "",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
     }
   }
 
@@ -332,7 +370,8 @@ class _MyPostsState extends State<MyPosts> {
                                       EditPost(postId: post["_id"])),
                             )
                           },
-                      onDeletePost: () => {});
+                      onDeletePost: () => showDeleteDialog(
+                          context, () => deletePost(post['_id'])));
                 },
               );
             }
