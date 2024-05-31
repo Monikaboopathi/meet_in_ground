@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meet_in_ground/Screens/Feedback/feedback_page.dart';
 import 'package:meet_in_ground/Screens/Issues/issues_page.dart';
+import 'package:meet_in_ground/Screens/notification/Notification_page.dart';
 import 'package:meet_in_ground/Screens/requestedPosts/RequestedPosts.dart';
 import 'package:meet_in_ground/Screens/wallet/Wallet_page.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
@@ -41,7 +42,7 @@ class FeaturesSection extends StatelessWidget {
         'icon': Icons.notifications_active,
         'featureName': 'Notifications',
         'leadText': '$notificationCount',
-        'navigate': 'notifications',
+        'navigate': Notificationspage(),
         'onPress': null,
       },
       {
