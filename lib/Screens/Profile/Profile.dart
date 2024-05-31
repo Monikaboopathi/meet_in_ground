@@ -107,11 +107,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Future<String> getAddressFromLatLng(double lat, double lng) async {
     try {
       List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
-      print(placemarks);
 
       Placemark place = placemarks[0];
-      print(
-          "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}");
+
       return "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
     } catch (e) {
       return 'Error getting address';
