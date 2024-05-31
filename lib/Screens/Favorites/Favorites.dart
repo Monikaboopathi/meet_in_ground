@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Models/Post.dart';
+import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
 import 'package:meet_in_ground/widgets/SportSelectDialog.dart';
@@ -16,19 +17,35 @@ class Favorites extends StatefulWidget {
 }
 
 class _FavoritesState extends State<Favorites> {
-  late Future<List<Post>> futurePosts;
+  Future<List<Post>>? futurePosts;
   final TextEditingController _searchController = TextEditingController();
   bool isAscending = true;
   String selectedSport = '';
   Map<String, bool> showMoreMap = {};
-  String currentMobileNumber = "";
+  String? currentMobileNumber;
 
   @override
   void initState() {
     super.initState();
-    currentMobileNumber = "8072974576";
-    futurePosts = fetchPosts();
+    initializeData().then((mobileNumber) {
+      if (mounted) {
+        setState(() {
+          currentMobileNumber = mobileNumber!;
+          futurePosts = fetchPosts();
+        });
+      }
+    });
     _searchController.addListener(_onSearchChanged);
+  }
+
+  Future<String?> initializeData() async {
+    try {
+      String? number = await MobileNo.getMobilenumber();
+      return number;
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
   }
 
   void _onSearchChanged() {
@@ -44,6 +61,7 @@ class _FavoritesState extends State<Favorites> {
   }
 
   Future<List<Post>> fetchPosts({String? query}) async {
+    print(currentMobileNumber.toString());
     final url = query != null && query.isNotEmpty
         ? 'https://bet-x-new.onrender.com/user/viewFavorites/$currentMobileNumber?search=$query'
         : 'https://bet-x-new.onrender.com/user/viewFavorites/$currentMobileNumber';
@@ -465,14 +483,16 @@ class _FavoritesState extends State<Favorites> {
                     isShowMore: isShowMore,
                     onToggleShowMore: _toggleShowMore,
                     isFavorite: post.favorites.any((favorite) =>
-                        favorite['phoneNumber'] == "+91" + currentMobileNumber),
+                        favorite['phoneNumber'] ==
+                        "+91" + currentMobileNumber!),
                     onDeleteFav: () => deleteFav(post.id),
                     onFavoriteToggle: () => toggleFavorite(post.id),
                     isRequest: post.requests.any((requuest) =>
-                        requuest['phoneNumber'] == "+91" + currentMobileNumber),
+                        requuest['phoneNumber'] ==
+                        "+91" + currentMobileNumber!),
                     onDeleteRequest: () => deleteRequest(post.id),
                     onRequestToggle: () => toggleRequest(post.id),
-                    currentMobileNumber: "+91" + currentMobileNumber,
+                    currentMobileNumber: "+91" + currentMobileNumber!,
                   );
                 },
               );

@@ -1,7 +1,10 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
+import 'package:meet_in_ground/Screens/Posts/EditPosts.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
+import 'package:meet_in_ground/widgets/Delete_Dialog.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
 import 'package:meet_in_ground/widgets/SportSelectDialog.dart';
@@ -10,12 +13,12 @@ import 'package:meet_in_ground/constant/sports_names.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
 
-class RequestedPosts extends StatefulWidget {
+class MyPosts extends StatefulWidget {
   @override
-  _RequestedPostsState createState() => _RequestedPostsState();
+  _MyPostsState createState() => _MyPostsState();
 }
 
-class _RequestedPostsState extends State<RequestedPosts> {
+class _MyPostsState extends State<MyPosts> {
   Future<List>? futurePosts;
   final TextEditingController _searchController = TextEditingController();
   bool isAscending = true;
@@ -61,8 +64,8 @@ class _RequestedPostsState extends State<RequestedPosts> {
 
   Future<List> fetchPosts({String? query}) async {
     final url = query != null && query.isNotEmpty
-        ? 'https://bet-x-new.onrender.com/user/viewMyRequests/$currentMobileNumber?search=$query'
-        : 'https://bet-x-new.onrender.com/user/viewMyRequests/$currentMobileNumber';
+        ? 'https://bet-x-new.onrender.com/post/viewMyPosts/$currentMobileNumber?search=$query'
+        : 'https://bet-x-new.onrender.com/post/viewMyPosts/$currentMobileNumber';
 
     final response = await http.get(Uri.parse(url));
 
@@ -93,6 +96,42 @@ class _RequestedPostsState extends State<RequestedPosts> {
     }
   }
 
+  Future<void> deletePost(String postId) async {
+    final String apiUrl =
+        'https://bet-x-new.onrender.com/post/deletePost/${postId}';
+
+    final response = await http.delete(
+      Uri.parse(apiUrl),
+      headers: <String, String>{
+        'Content-Type': 'application/json; charset=UTF-8',
+      },
+    );
+
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    if (response.statusCode == 200) {
+      setState(() {
+        futurePosts = fetchPosts();
+      });
+      Fluttertoast.showToast(
+        msg: responseData['message'] ?? "",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.green,
+        textColor: Colors.white,
+      );
+    } else {
+      Fluttertoast.showToast(
+        msg: responseData['error'] ?? "",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    }
+  }
+
   void _toggleSortOrder() {
     setState(() {
       isAscending = !isAscending;
@@ -116,12 +155,12 @@ class _RequestedPostsState extends State<RequestedPosts> {
           icon: Icon(Icons.arrow_back, color: ThemeService.textColor, size: 35),
           onPressed: () => Navigator.of(context).pushReplacement(
             MaterialPageRoute(
-              builder: (context) => BottomNavigationScreen(currentIndex: 4),
+              builder: (context) => BottomNavigationScreen(currentIndex: 2),
             ),
           ),
         ),
         title: Text(
-          'Requested Posts',
+          'My Posts',
           style: TextStyle(
             color: ThemeService.textColor,
             fontFamily: 'Billabong',
@@ -314,33 +353,42 @@ class _RequestedPostsState extends State<RequestedPosts> {
                   bool isShowMore = showMoreMap[post['_id']] ?? false;
 
                   return Post_Widget(
-                    userName: post['userName'],
-                    placeOfMatch: post['placeOfMatch'],
-                    likes: 0,
-                    comments: 0,
-                    betAmount: post['betAmount'],
-                    id: post['_id'],
-                    image: post['image'],
-                    postOwnerImage: post['postOwnerImage'],
-                    matchDate: post['matchDate'],
-                    matchDetails: post['matchDetails'],
-                    phoneNumber: post['phoneNumber'],
-                    sport: post['sport'],
-                    status: post['status'],
-                    result: post['result'],
-                    createdAt: post['createdAt'],
-                    isShowMore: isShowMore,
-                    onToggleShowMore: _toggleShowMore,
-                    isFavorite: false,
-                    onDeleteFav: () => {},
-                    onFavoriteToggle: () => {},
-                    isRequest: false,
-                    onDeleteRequest: () => {},
-                    onRequestToggle: () => {},
-                    currentMobileNumber: "+91" + currentMobileNumber!,
-                    showLMSSection: false,
-                    showStatus: true,
-                  );
+                      userName: post['userName'],
+                      placeOfMatch: post['placeOfMatch'],
+                      likes: 0,
+                      comments: post['requests'].length,
+                      betAmount: post['betAmount'],
+                      id: post['_id'],
+                      image: post['image'] ?? "r",
+                      postOwnerImage: post['postOwnerImage'],
+                      matchDate: post['matchDate'],
+                      matchDetails: post['matchDetails'],
+                      phoneNumber: post['phoneNumber'],
+                      sport: post['sport'],
+                      status: post['status'],
+                      result: post['result'] == null ? "----" : post['result'],
+                      createdAt: post['createdAt'],
+                      isShowMore: isShowMore,
+                      onToggleShowMore: _toggleShowMore,
+                      isFavorite: false,
+                      onDeleteFav: () => {},
+                      onFavoriteToggle: () => {},
+                      isRequest: false,
+                      onDeleteRequest: () => {},
+                      onRequestToggle: () => {},
+                      currentMobileNumber: "+91" + currentMobileNumber!,
+                      showLMSSection: false,
+                      showStatus: true,
+                      showRequests: true,
+                      onEditPost: () => {
+                            Navigator.of(context).push(
+                              MaterialPageRoute(
+                                  builder: (context) =>
+                                      EditPost(postId: post["_id"])),
+                            )
+                          },
+                      onDeletePost: () => showDeleteDialog(
+                          context, () => deletePost(post['_id'])));
                 },
               );
             }

@@ -4,12 +4,15 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:meet_in_ground/Screens/Profile/EditPage.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:meet_in_ground/Screens/Profile/FeaturesSection.dart';
 import 'package:meet_in_ground/Screens/Profile/ProfileDetails.dart';
 import 'package:meet_in_ground/Screens/Profile/ProfileHeader.dart';
 import 'package:meet_in_ground/Screens/authenticate/login_page.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:meet_in_ground/util/Services/Auth_service.dart';
+import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/ShareMethods.dart';
 
@@ -29,11 +32,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
   double rating = 0.0;
   bool isLoading = false;
   bool modalVisible = false;
+  String? currentMobileNumber;
 
   @override
   void initState() {
     super.initState();
-    fetchData();
+    initializeData().then((mobileNumber) {
+      if (mounted) {
+        setState(() {
+          currentMobileNumber = mobileNumber!;
+          fetchData();
+        });
+      }
+    });
+  }
+
+  Future<String?> initializeData() async {
+    try {
+      String? number = await MobileNo.getMobilenumber() ?? "";
+      return number;
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
   }
 
   Future<void> fetchData() async {
@@ -42,17 +63,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
         isLoading = true;
       });
       var response = await http.get(Uri.parse(
-          'https://bet-x-new.onrender.com/user/viewUserProfile/8072974576'));
+          'https://bet-x-new.onrender.com/user/viewUserProfile/$currentMobileNumber'));
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body)['data'];
+        List<String> latlog =
+            data['userDetails']['location'].toString().split(",");
+        double lat = double.parse(latlog[0]);
+        double lng = double.parse(latlog[1]);
 
+        String location = await getAddressFromLatLng(lat, lng);
         setState(() {
           userDetails = {
             'profileImg': data['userDetails']['profileImg'],
             'userName': data['userDetails']['userName'],
             'phoneNumber': data['userDetails']['phoneNumber'],
-            'location': "",
+            'location': location,
             'sport': data['userDetails']['sport'],
             'referralId': data['userDetails']['referralId']
           };
@@ -80,23 +106,26 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // Future<String> getAddressFromLatLng(double lat, double lng) async {
-  //   try {
-  //     List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
-  //     print(placemarks);
-  //     Placemark place = placemarks[0];
-  //     return "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
-  //   } catch (e) {
-  //     return 'Error getting address';
-  //   }
-  // }
+  Future<String> getAddressFromLatLng(double lat, double lng) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+
+      Placemark place = placemarks[0];
+
+      return "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
+    } catch (e) {
+      return 'Error getting address';
+    }
+  }
 
   Future<void> _refresh() async {
     await fetchData();
   }
 
-  void handleLogout() {
-    Navigator.of(context).pushReplacement(
+  void handleLogout() async {
+    await AuthService.clearToken();
+    await MobileNo.clearMobilenumber();
+    await Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => LoginPage()),
     );
   }
