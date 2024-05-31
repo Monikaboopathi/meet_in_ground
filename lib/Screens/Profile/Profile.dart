@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:clipboard/clipboard.dart';
+import 'package:meet_in_ground/Screens/Profile/EditPage.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:meet_in_ground/Screens/Profile/FeaturesSection.dart';
 import 'package:meet_in_ground/Screens/Profile/ProfileDetails.dart';
@@ -170,7 +171,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       userDetails: userDetails,
                       userCity: userCity,
                       onEditProfile: () {
-                        Navigator.pushNamed(context, '/editProfile');
+                        Navigator.pushAndRemoveUntil(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => EditProfile()),
+                          (route) => false,
+                        );
                       },
                     ),
                     ProfileDetails(userDetails: userDetails),
