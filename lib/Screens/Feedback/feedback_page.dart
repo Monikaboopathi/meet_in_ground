@@ -42,7 +42,6 @@ class _FeedbackpageState extends State<Feedbackpage> {
 
       String? userMobileNumber = await MobileNo.getMobilenumber();
       print(userMobileNumber);
-
       final String apiUrl =
           "https://bet-x-new.onrender.com/user/addFeedback/$userMobileNumber";
       final response = await http.post(
@@ -139,6 +138,7 @@ class _FeedbackpageState extends State<Feedbackpage> {
                   TextField(
                     controller: _messageController,
                     maxLines: 5,
+                    style: TextStyle(color:ThemeService.textColor),
                     decoration: InputDecoration(
                       hintText: 'Type your message here',
                       hintStyle: TextStyle( color: ThemeService.textColor),
@@ -147,6 +147,7 @@ class _FeedbackpageState extends State<Feedbackpage> {
                       border: OutlineInputBorder(),
                     ),
                     onChanged: (text) {
+
                       setState(() {
                         _messageError = '';
                       });

@@ -1,6 +1,12 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
+import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
+import 'package:http/http.dart' as http;
+import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
 
 class WalletPage extends StatefulWidget {
   @override
@@ -15,15 +21,37 @@ class _WalletPageState extends State<WalletPage> {
   bool _isChecked2 = false;
   Color _checkColor1 = ThemeService.primary;
   Color _checkColor2 = ThemeService.primary;
-  String _balance = '0';
+  String _balance = '';
+  List<Map<String, dynamic>> _withdrawalHistory = [];
 
   @override
   void initState() {
     super.initState();
     _fetchData();
+    _fetchWithdrawalHistory();
   }
 
-  Future<void> _fetchData() async {}
+  Future<void> _fetchData() async {
+    String? userMobileNumber = await MobileNo.getMobilenumber();
+    print(userMobileNumber);
+
+    final url = Uri.parse(
+        'https://bet-x-new.onrender.com/user/walletDetails/$userMobileNumber');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          _balance = data['data']['walletBalance'].toString();
+        });
+      } else {
+        print('Failed to load wallet balance');
+      }
+    } catch (e) {
+      print('Error fetching wallet balance: $e');
+    }
+  }
 
   void _handleSubmit() async {
     setState(() {
@@ -62,7 +90,69 @@ class _WalletPageState extends State<WalletPage> {
       return;
     }
 
-    // Handle submission logic here
+    String? userMobileNumber = await MobileNo.getMobilenumber();
+
+    final url = Uri.parse(
+        'https://bet-x-new.onrender.com/user/withdrawRequest/$userMobileNumber');
+
+    try {
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'upiID': trimmedText}),
+      );
+
+      if (response.statusCode == 200) {
+        // Handle success
+        setState(() {
+          _visible = false;
+          _textController.clear();
+          _isChecked1 = false;
+          _isChecked2 = false;
+        });
+        // Show success message or handle UI update
+        Fluttertoast.showToast(
+          msg: "Withdraw request submitted successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+      } else {
+        // Handle error
+        Fluttertoast.showToast(
+          msg: "Failed to submit withdraw request",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
+      }
+    } catch (e) {
+      print('Error submitting withdraw request: $e');
+    }
+  }
+
+  Future<void> _fetchWithdrawalHistory() async {
+    String? userMobileNumber = await MobileNo.getMobilenumber();
+    final url = Uri.parse(
+        'https://bet-x-new.onrender.com/user/viewMyWithdrawRequests/$userMobileNumber');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        setState(() {
+          _withdrawalHistory = List<Map<String, dynamic>>.from(data['data']);
+        });
+      } else {
+        print('Failed to load withdrawal history');
+      }
+    } catch (e) {
+      print('Error fetching withdrawal history: $e');
+    }
   }
 
   void _toggleCheckbox1() {
@@ -115,7 +205,7 @@ class _WalletPageState extends State<WalletPage> {
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       Text(
-                        '₹$_balance',
+                        '₹ $_balance',
                         style: TextStyle(
                             fontSize: 24,
                             color: ThemeService.textColor,
@@ -176,34 +266,107 @@ class _WalletPageState extends State<WalletPage> {
                         color: ThemeService.placeHolder, size: 26),
                   ],
                 ),
-                SizedBox(height: 16),
+                SizedBox(height: 15.0),
                 Expanded(
-                  child: ListView.builder(
-                    itemCount: 0, // replace with actual transaction count
-                    itemBuilder: (context, index) {
-                      // replace with actual transaction data
-                      return Container(
-                        padding: EdgeInsets.symmetric(vertical: 10),
-                        margin: EdgeInsets.only(bottom: 10),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text('UPI Id: '), // replace with actual data
-                            Text('Amount: '), // replace with actual data
-                            Text('Requested on: '), // replace with actual data
-                            Text(
-                              'Approved on: ', // replace with actual data
-                            ),
-                            Container(
-                              padding: EdgeInsets.all(8),
-                              color: ThemeService.third,
-                              child: Text(''), // replace with actual status
-                            ),
-                          ],
+                  child: _withdrawalHistory.isEmpty
+                      ? Center(
+                          child: NoDataFoundWidget(),
+                        )
+                      : ListView.builder(
+                          itemCount: _withdrawalHistory.length,
+                          itemBuilder: (context, index) {
+                            var transaction = _withdrawalHistory[index];
+                            return Stack(
+                              children: [
+                                Card(
+                                  shape: RoundedRectangleBorder(
+                                    side: BorderSide(
+                                      color: ThemeService.primary,
+                                      width: 1.0,
+                                    ),
+                                    borderRadius: BorderRadius.circular(10.0),
+                                  ),
+                                  margin: EdgeInsets.symmetric(vertical: 8.0),
+                                  child: Padding(
+                                    padding: EdgeInsets.all(16.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'UPI ID: ${transaction['upiID']}',
+                                              style: TextStyle(
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.w600,
+                                                  color:
+                                                      ThemeService.textColor),
+                                            ),
+                                            Text(
+                                              '₹${transaction['amount']}',
+                                              style: TextStyle(
+                                                  color: ThemeService.primary,
+                                                  fontSize: 16,
+                                                  fontWeight: FontWeight.bold),
+                                            ),
+                                          ],
+                                        ),
+                                        SizedBox(height: 8.0),
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              'Requested on: ${transaction['createdAt'].split(" ")[0]}',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  color:
+                                                      ThemeService.textColor),
+                                            ),
+                                            Text(
+                                              'Approved on: ${transaction['status'] == "Pending" ? "----" : transaction['updatedAt'].split(" ")[0]}',
+                                              style: TextStyle(
+                                                  fontSize: 14,
+                                                  fontWeight: FontWeight.w600,
+                                                  color:
+                                                      ThemeService.textColor),
+                                            ),
+                                          ],
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: 0,
+                                  right: 4,
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 2.0, horizontal: 13.0),
+                                    decoration: BoxDecoration(
+                                      color: transaction['status'] == "Pending"
+                                          ? Colors.orange
+                                          : Colors.green,
+                                      borderRadius: BorderRadius.circular(5.0),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        transaction['status'],
+                                        style: TextStyle(
+                                            color: Colors.white,
+                                            fontWeight: FontWeight.bold),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            );
+                          },
                         ),
-                      );
-                    },
-                  ),
                 ),
               ],
             ),
@@ -280,7 +443,7 @@ class _WalletPageState extends State<WalletPage> {
                                 fontWeight: FontWeight.w600,
                                 color: Colors.black),
                           ),
-                            Text(
+                          Text(
                             '*',
                             style: TextStyle(
                                 color: Colors.red,

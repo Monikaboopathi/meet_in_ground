@@ -225,6 +225,7 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
         TextField(
           controller: controller,
           maxLines: maxLines,
+          style: TextStyle(color:ThemeService.textColor),
           decoration: InputDecoration(
             hintText: 'Type your $label here',
             hintStyle: TextStyle( color: ThemeService.textColor),

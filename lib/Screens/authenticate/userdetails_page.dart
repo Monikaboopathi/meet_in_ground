@@ -7,7 +7,9 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:lottie/lottie.dart';
+import 'package:meet_in_ground/util/Services/image_service.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/util/Services/userName_service.dart';
 import 'package:meet_in_ground/util/api/Firebase_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
@@ -251,6 +253,9 @@ class _UserOnBoardState extends State<UserOnBoard> {
         );
         // String email = responseData['phoneNumber'];
         await MobileNo.saveMobilenumber(widget.mobile);
+        await UsernameService.saveUserName(username);
+        await ImageService.saveImage("${responseData['profileImg']}");
+        print(responseData['profileImg']);
         await RefferalService.clearRefferal();
         await RefferalService.saveRefferal("${responseData['referralId']}");
       } else {
