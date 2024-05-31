@@ -161,6 +161,7 @@ class _NotificationspageState extends State<Notificationspage> {
                             ),
                           ),
                           Card(
+                            color: ThemeService.background,
                             shape: RoundedRectangleBorder(
                               side: BorderSide(
                                 color: ThemeService.primary,
