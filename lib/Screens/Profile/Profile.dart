@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:clipboard/clipboard.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:meet_in_ground/Screens/Profile/FeaturesSection.dart';
 import 'package:meet_in_ground/Screens/Profile/ProfileDetails.dart';
 import 'package:meet_in_ground/Screens/Profile/ProfileHeader.dart';
@@ -64,13 +65,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body)['data'];
+        List<String> latlog =
+            data['userDetails']['location'].toString().split(",");
+        double lat = double.parse(latlog[0]);
+        double lng = double.parse(latlog[1]);
 
+        String location = await getAddressFromLatLng(lat, lng);
         setState(() {
           userDetails = {
             'profileImg': data['userDetails']['profileImg'],
             'userName': data['userDetails']['userName'],
             'phoneNumber': data['userDetails']['phoneNumber'],
-            'location': "",
+            'location': location,
             'sport': data['userDetails']['sport'],
             'referralId': data['userDetails']['referralId']
           };
@@ -98,16 +104,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
     }
   }
 
-  // Future<String> getAddressFromLatLng(double lat, double lng) async {
-  //   try {
-  //     List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
-  //     print(placemarks);
-  //     Placemark place = placemarks[0];
-  //     return "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
-  //   } catch (e) {
-  //     return 'Error getting address';
-  //   }
-  // }
+  Future<String> getAddressFromLatLng(double lat, double lng) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+      print(placemarks);
+
+      Placemark place = placemarks[0];
+      print(
+          "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}");
+      return "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
+    } catch (e) {
+      return 'Error getting address';
+    }
+  }
 
   Future<void> _refresh() async {
     await fetchData();
