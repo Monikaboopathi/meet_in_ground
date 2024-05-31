@@ -14,6 +14,11 @@ class ProfileHeader extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Providing default values if userDetails keys are null
+    final profileImg =
+        userDetails['profileImg'] ?? 'assets/images/empty-img.jpg';
+    final userName = userDetails['userName'] ?? 'Unknown User';
+
     return Container(
       width: MediaQuery.of(context).size.width - 20,
       margin: EdgeInsets.symmetric(vertical: 10),
@@ -36,14 +41,13 @@ class ProfileHeader extends StatelessWidget {
               children: [
                 CircleAvatar(
                   radius: 50,
-                  backgroundImage: userDetails['profileImg'] != null
-                      ? NetworkImage(userDetails['profileImg'])
-                      : AssetImage('assets/images/empty-img.jpg')
-                          as ImageProvider,
+                  backgroundImage: profileImg.startsWith('http')
+                      ? NetworkImage(profileImg)
+                      : AssetImage(profileImg) as ImageProvider,
                 ),
                 SizedBox(height: 10),
                 Text(
-                  userDetails['userName'],
+                  userName,
                   style: TextStyle(
                     color: ThemeService.textColor,
                     fontWeight: FontWeight.bold,

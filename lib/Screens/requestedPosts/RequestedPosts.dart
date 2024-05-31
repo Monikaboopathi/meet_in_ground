@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
@@ -15,19 +16,35 @@ class RequestedPosts extends StatefulWidget {
 }
 
 class _RequestedPostsState extends State<RequestedPosts> {
-  late Future<List> futurePosts;
+  Future<List>? futurePosts;
   final TextEditingController _searchController = TextEditingController();
   bool isAscending = true;
   String selectedSport = '';
   Map<String, bool> showMoreMap = {};
-  String currentMobileNumber = "";
+  String? currentMobileNumber;
 
   @override
   void initState() {
     super.initState();
-    currentMobileNumber = "8072974576";
-    futurePosts = fetchPosts();
+    initializeData().then((mobileNumber) {
+      if (mounted) {
+        setState(() {
+          currentMobileNumber = mobileNumber!;
+          futurePosts = fetchPosts();
+        });
+      }
+    });
     _searchController.addListener(_onSearchChanged);
+  }
+
+  Future<String?> initializeData() async {
+    try {
+      String? number = await MobileNo.getMobilenumber();
+      return number;
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
   }
 
   void _onSearchChanged() {
@@ -320,7 +337,7 @@ class _RequestedPostsState extends State<RequestedPosts> {
                     isRequest: false,
                     onDeleteRequest: () => {},
                     onRequestToggle: () => {},
-                    currentMobileNumber: "+91" + currentMobileNumber,
+                    currentMobileNumber: "+91" + currentMobileNumber!,
                     showLMSSection: false,
                     showStatus: true,
                   );
