@@ -33,7 +33,9 @@ class Post_Widget extends StatefulWidget {
   final showLMSSection;
   final result;
   final showStatus;
-
+  final showRequests;
+  final onEditPost;
+  final onDeletePost;
   const Post_Widget(
       {required this.id,
       required this.image,
@@ -61,7 +63,10 @@ class Post_Widget extends StatefulWidget {
       this.currentMobileNumber,
       this.showLMSSection,
       this.result,
-      this.showStatus})
+      this.showStatus,
+      this.showRequests,
+      this.onEditPost,
+      this.onDeletePost})
       : super(key: key);
 
   @override
@@ -70,7 +75,7 @@ class Post_Widget extends StatefulWidget {
 
 class _Post_WidgetState extends State<Post_Widget> {
   bool isAnimating = false;
-
+  bool showEditDeleteIcons = false;
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -96,6 +101,39 @@ class _Post_WidgetState extends State<Post_Widget> {
                 SizedBox(
                   width: 8,
                 ),
+                if (widget.showRequests == true)
+                  GestureDetector(
+                    onTap: null,
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: ThemeService.textColor,
+                          width: 1.0,
+                        ),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      padding: EdgeInsets.symmetric(vertical: 1, horizontal: 6),
+                      child: Row(
+                        children: [
+                          Text(
+                            widget.comments.toString(),
+                            style: TextStyle(
+                                fontSize: 10.0,
+                                color: ThemeService.primary,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          SizedBox(
+                            width: 4,
+                          ),
+                          Text(
+                            widget.comments > 1 ? "Requests" : "Request",
+                            style: TextStyle(
+                                fontSize: 10.0, color: ThemeService.textColor),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
                 if (widget.phoneNumber != widget.currentMobileNumber)
                   GestureDetector(
                     onTap: !widget.isRequest
@@ -143,14 +181,31 @@ class _Post_WidgetState extends State<Post_Widget> {
           ),
           GestureDetector(
             onDoubleTap: () {
-              setState(() {
+              if (widget.showLMSSection != false) {
+                print("on double tap");
+                setState(() {
+                  if (widget.phoneNumber != widget.currentMobileNumber)
+                    isAnimating = true;
+                });
                 if (widget.phoneNumber != widget.currentMobileNumber)
-                  isAnimating = true;
-              });
-              if (widget.phoneNumber != widget.currentMobileNumber)
-                !widget.isFavorite
-                    ? widget.onFavoriteToggle()
-                    : widget.onDeleteFav();
+                  !widget.isFavorite
+                      ? widget.onFavoriteToggle()
+                      : widget.onDeleteFav();
+              }
+            },
+            onLongPress: () {
+              if (widget.showRequests == true) {
+                setState(() {
+                  showEditDeleteIcons = true;
+                });
+              }
+            },
+            onTap: () {
+              if (widget.showRequests == true) {
+                setState(() {
+                  showEditDeleteIcons = false;
+                });
+              }
             },
             child: Stack(
               alignment: Alignment.center,
@@ -218,6 +273,50 @@ class _Post_WidgetState extends State<Post_Widget> {
                         isAnimating = false;
                       });
                     },
+                  ),
+                if (showEditDeleteIcons)
+                  Positioned.fill(
+                    child: Container(
+                      color: Colors.black54, // Black transparent background
+                      child: Center(
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.green,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: IconButton(
+                                icon: Icon(Icons.edit, color: Colors.white),
+                                onPressed: () {
+                                  widget.onEditPost();
+                                  setState(() {
+                                    showEditDeleteIcons = false;
+                                  });
+                                },
+                              ),
+                            ),
+                            SizedBox(width: 20),
+                            Container(
+                              decoration: BoxDecoration(
+                                color: Colors.red.shade400,
+                                borderRadius: BorderRadius.circular(10),
+                              ),
+                              child: IconButton(
+                                icon: Icon(Icons.delete, color: Colors.white),
+                                onPressed: () {
+                                  widget.onDeletePost();
+                                  setState(() {
+                                    showEditDeleteIcons = false;
+                                  });
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
                   ),
               ],
             ),

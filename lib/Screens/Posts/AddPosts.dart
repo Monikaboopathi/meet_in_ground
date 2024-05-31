@@ -3,8 +3,9 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:meet_in_ground/Screens/Posts/MyPosts.dart';
 import 'package:meet_in_ground/constant/sports_names.dart';
-import 'package:meet_in_ground/constant/themes_service.dart'; // Ensure you have this import for DateFormat
+import 'package:meet_in_ground/constant/themes_service.dart'; 
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
@@ -67,8 +68,7 @@ class _AddpostsState extends State<Addposts> {
 
   Future<void> _handleSubmit([File? file]) async {
     if (_validateFields()) {
-
-        String? userMobileNumber = await MobileNo.getMobilenumber();
+      String? userMobileNumber = await MobileNo.getMobilenumber();
       print(userMobileNumber);
 
       Map<String, dynamic> postData = {
@@ -87,7 +87,8 @@ class _AddpostsState extends State<Addposts> {
       // Make the API post request
       try {
         final response = await http.post(
-          Uri.parse('https://bet-x-new.onrender.com/post/addPost/$userMobileNumber'),
+          Uri.parse(
+              'https://bet-x-new.onrender.com/post/addPost/$userMobileNumber'),
           headers: <String, String>{
             'Content-Type': 'application/json; charset=UTF-8',
           },
@@ -382,7 +383,9 @@ class _AddpostsState extends State<Addposts> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.pushNamed(context, "/MyPosts");
+                  Navigator.of(context).push(
+                    MaterialPageRoute(builder: (context) => MyPosts()),
+                  );
                 },
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.grey[100],
@@ -405,21 +408,21 @@ class _AddpostsState extends State<Addposts> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                  onPressed: () async {
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (BuildContext context) {
-                        return Loader();
-                      },
-                    );
-                    // Delay for 2 seconds to show the loader
-                    await Future.delayed(Duration(seconds: 2));
+                onPressed: () async {
+                  showDialog(
+                    context: context,
+                    barrierDismissible: false,
+                    builder: (BuildContext context) {
+                      return Loader();
+                    },
+                  );
+                  // Delay for 2 seconds to show the loader
+                  await Future.delayed(Duration(seconds: 2));
 
-                    // Dismiss the loader and return to the previous page
-                    Navigator.pop(context);
-                    _handleSubmit();
-                  },
+                  // Dismiss the loader and return to the previous page
+                  Navigator.pop(context);
+                  _handleSubmit();
+                },
                 style: ElevatedButton.styleFrom(
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(8.0),
