@@ -9,6 +9,7 @@ import 'package:meet_in_ground/Screens/Profile/ProfileHeader.dart';
 import 'package:meet_in_ground/Screens/authenticate/login_page.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
+import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/ShareMethods.dart';
 
@@ -28,11 +29,29 @@ class _ProfileScreenState extends State<ProfileScreen> {
   double rating = 0.0;
   bool isLoading = false;
   bool modalVisible = false;
+  String? currentMobileNumber;
 
   @override
   void initState() {
     super.initState();
-    fetchData();
+    initializeData().then((mobileNumber) {
+      if (mounted) {
+        setState(() {
+          currentMobileNumber = mobileNumber!;
+          fetchData();
+        });
+      }
+    });
+  }
+
+  Future<String?> initializeData() async {
+    try {
+      String? number = await MobileNo.getMobilenumber() ?? "";
+      return number;
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
   }
 
   Future<void> fetchData() async {
