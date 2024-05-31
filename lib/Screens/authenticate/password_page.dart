@@ -4,7 +4,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Screens/authenticate/favourite_page.dart';
+import 'package:meet_in_ground/util/Services/image_service.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/util/Services/userName_service.dart';
 import 'package:meet_in_ground/util/api/Firebase_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
@@ -105,8 +107,13 @@ class _PasswordPageState extends State<PasswordPage> {
         // String email = responseData['phoneNumber'];
         await MobileNo.saveMobilenumber(phoneNumber);
         print(phoneNumber);
+        print(responseData['referralId']);
+        print(responseData['userName']);
+        print(responseData['profileImg']);
         await RefferalService.clearRefferal();
         await RefferalService.saveRefferal("${responseData['referralId']}");
+        await UsernameService.saveUserName("${responseData['userName']}");
+        await ImageService.saveImage("${responseData['profileImg']}");
       } else {
         Fluttertoast.showToast(
           msg: responseData['message'],
