@@ -28,7 +28,7 @@ class Messages extends StatelessWidget {
         centerTitle: true,
       ),
       body: FutureBuilder<List<Map<String, dynamic>>>(
-        future: _chatservice.getAllMessagesAndRooms("8072974576"),
+        future: _chatservice.getAllMessagesAndRooms(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Loader();
