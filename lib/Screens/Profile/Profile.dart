@@ -62,7 +62,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         isLoading = true;
       });
       var response = await http.get(Uri.parse(
-          'https://bet-x-new.onrender.com/user/viewUserProfile/8072974576'));
+          'https://bet-x-new.onrender.com/user/viewUserProfile/$currentMobileNumber'));
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body)['data'];
@@ -124,8 +124,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void handleLogout() async {
     await AuthService.clearToken();
     await MobileNo.clearMobilenumber();
-    await 
-    Navigator.of(context).pushReplacement(
+    await Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => LoginPage()),
     );
   }

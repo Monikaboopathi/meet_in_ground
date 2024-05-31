@@ -183,6 +183,7 @@ class _Post_WidgetState extends State<Post_Widget> {
             onDoubleTap: () {
               if (widget.showLMSSection != false) {
                 print("on double tap");
+                print(widget.currentMobileNumber);
                 setState(() {
                   if (widget.phoneNumber != widget.currentMobileNumber)
                     isAnimating = true;
