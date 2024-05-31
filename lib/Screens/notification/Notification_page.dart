@@ -25,6 +25,10 @@ class _NotificationspageState extends State<Notificationspage> {
     fetchData();
   }
 
+  Future<void> _refresh() async {
+    await fetchData();
+  }
+
   fetchData() async {
     try {
       String? userMobileNumber = await MobileNo.getMobilenumber();
@@ -133,98 +137,103 @@ class _NotificationspageState extends State<Notificationspage> {
         centerTitle: true,
       ),
       backgroundColor: ThemeService.background,
-      body: isLoading
-          ? Center(child: CircularProgressIndicator())
-          : notificationData.isNotEmpty
-              ? ListView.builder(
-                  itemCount: notificationData.length,
-                  itemBuilder: (context, index) {
-                    var notification = notificationData[index];
-                    DateTime? date = notification['createdAt'] != null
-                        ? DateTime.parse(notification['createdAt'])
-                        : null;
-                    return Padding(
-                      padding: const EdgeInsets.fromLTRB(10.0, 2, 10, 2),
-                      child: Column(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(left:12.0),
-                            child: Text(
-                              getHeaderDate(date!),
-                              style: TextStyle(
-                                color: ThemeService.primary,
-                                fontSize: 18,
-                                fontWeight: FontWeight.w800,
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        child: isLoading
+            ? Center(child: CircularProgressIndicator())
+            : notificationData.isNotEmpty
+                ? ListView.builder(
+                    itemCount: notificationData.length,
+                    itemBuilder: (context, index) {
+                      var notification = notificationData[index];
+                      DateTime? date = notification['createdAt'] != null
+                          ? DateTime.parse(notification['createdAt'])
+                          : null;
+                      return Padding(
+                        padding: const EdgeInsets.fromLTRB(10.0, 2, 10, 2),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(left: 12.0),
+                              child: Text(
+                                getHeaderDate(date!),
+                                style: TextStyle(
+                                  color: ThemeService.primary,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                ),
                               ),
                             ),
-                          ),
-                          Card(
-                            color: ThemeService.background,
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(
-                                color: ThemeService.primary,
-                                width: 3,
+                            Card(
+                              color: ThemeService.background,
+                              shape: RoundedRectangleBorder(
+                                side: BorderSide(
+                                  color: ThemeService.primary,
+                                  width: 3,
+                                ),
+                                borderRadius: BorderRadius.circular(10),
                               ),
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            child: Padding(
-                              padding: const EdgeInsets.all(15.0),
-                              child: Row(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Container(
-                                    width: 60,
-                                    height: 60,
-                                    child: Image.network(
-                                      notification['image'] ?? '',
-                                      width: 50,
-                                      height: 50,
-                                      fit: BoxFit.cover,
+                              child: Padding(
+                                padding: const EdgeInsets.all(15.0),
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Container(
+                                      width: 60,
+                                      height: 60,
+                                      child: Image.network(
+                                        notification['image'] ?? '',
+                                        width: 50,
+                                        height: 50,
+                                        fit: BoxFit.cover,
+                                      ),
                                     ),
-                                  ),
-                                  SizedBox(width: 10),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          notification['title'],
-                                          style: TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
-                                            color: ThemeService.textColor
-                                          ),
-                                        ),
-                                        SizedBox(height: 5),
-                                        Text(notification['body'],style:TextStyle(color: ThemeService.textColor)),
-                                        SizedBox(height: 5),
-                                        Align(
-                                          alignment: Alignment.bottomRight,
-                                          child: Text(
-                                            formatTimestamp(date),
+                                    SizedBox(width: 10),
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            notification['title'],
                                             style: TextStyle(
-                                              color: ThemeService.buttonBg,
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w800,
+                                                fontSize: 18,
+                                                fontWeight: FontWeight.bold,
+                                                color: ThemeService.textColor),
+                                          ),
+                                          SizedBox(height: 5),
+                                          Text(notification['body'],
+                                              style: TextStyle(
+                                                  color:
+                                                      ThemeService.textColor)),
+                                          SizedBox(height: 5),
+                                          Align(
+                                            alignment: Alignment.bottomRight,
+                                            child: Text(
+                                              formatTimestamp(date),
+                                              style: TextStyle(
+                                                color: ThemeService.buttonBg,
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w800,
+                                              ),
                                             ),
                                           ),
-                                        ),
-                                      ],
+                                        ],
+                                      ),
                                     ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                  },
-                )
-              : NoDataFoundWidget(),
+                          ],
+                        ),
+                      );
+                    },
+                  )
+                : NoDataFoundWidget(),
+      ),
     );
   }
 }
