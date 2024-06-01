@@ -7,6 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:lottie/lottie.dart';
+import 'package:meet_in_ground/util/Services/Auth_service.dart';
+import 'package:meet_in_ground/util/Services/PreferencesService.dart';
 import 'package:meet_in_ground/util/Services/image_service.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/util/Services/userName_service.dart';
@@ -15,6 +17,8 @@ import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import '../../constant/themes_service.dart';
 import 'package:meet_in_ground/util/Services/refferral_service.dart';
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart';
 
 String fcmToken = "";
 String referralId = "";
@@ -136,12 +140,6 @@ class _UserOnBoardState extends State<UserOnBoard> {
       setState(() {
         selectedImage = File(pickedFile.path);
       });
-
-      // Convert image path to a File object
-      String filePath = pickedFile.path;
-
-      // Call handleProfile with the File object
-      handleProfile(File(filePath));
     }
   }
 
@@ -183,7 +181,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
       handleProfile();
     }
     setState(() {
-      index = (index + 1) % 3; // Assuming there are 3 onboarding steps
+      index = (index + 1) % 3;
     });
   }
 
@@ -193,47 +191,70 @@ class _UserOnBoardState extends State<UserOnBoard> {
     ));
   }
 
-  Future<void> handleProfile([File? file]) async {
-    String apiUrl =
-        'https://bet-x-new.onrender.com/user/addUser/${widget.mobile}';
-    Map<String, dynamic> body = {
+  Future<void> handleProfile() async {
+    String? mobileNo = await PreferencesService.getValue("mobile");
+    String? favColor = await PreferencesService.getValue("color");
+    String? favHero = await PreferencesService.getValue("hero");
+    String? password = await PreferencesService.getValue("password");
+    String? cpassword = await PreferencesService.getValue("confirmPassword");
+    print(mobileNo);
+    print(favColor);
+    print(favHero);
+    print(password);
+    print(cpassword);
+
+    if (userLocation == null) {
+      print("User location is null");
+      showError("Location not available");
+      return;
+    }
+
+    if (selectedImage == null) {
+      print("Selected image is null");
+      showError("Profile picture is required");
+      return;
+    }
+
+    Map<String, String> formData = {
       'userName': username,
-      'sport': selectedItems
-          .join(','), // Joining selected sports into a single string
+      'sport': selectedItems.join(','),
       'location': '${userLocation!.latitude},${userLocation!.longitude}',
-      'profileImg': file,
-      'referralId': referralId,
+      'referralId': referralId.isEmpty ? "" : referralId,
       'fcmToken': fcmToken,
-      'password': widget.password,
-      'confirmPassword': widget.confirmpassword,
-      'favoriteColor': widget.favcolor,
-      'favoriteHero': widget.favhero,
+      'password': widget.password.isEmpty ? password! : widget.password,
+      'confirmPassword':
+          widget.confirmpassword.isEmpty ? cpassword! : widget.confirmpassword,
+      'favoriteColor': widget.favcolor.isEmpty ? favColor! : widget.favcolor,
+      'favoriteHero': widget.favhero.isEmpty ? favHero! : widget.favhero,
     };
-    print(username);
-    print(selectedItems);
-    print(selectedImage!);
-    print(userLocation!.latitude);
-    print(userLocation!.longitude);
-    print(referralId);
-    print(fcmToken);
-    print(widget.password);
-    print(widget.confirmpassword);
-    print(widget.favcolor);
-    print(widget.favhero);
 
     try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(body),
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(
+            'https://bet-x-new.onrender.com/user/addUser/${widget.mobile.isEmpty ? mobileNo : widget.mobile}'),
       );
-      // Parse the response body
-      final Map<String, dynamic> responseData = jsonDecode(response.body);
 
+      request.fields.addAll(formData);
+
+      if (selectedImage != null) {
+        final mimeTypeData =
+            lookupMimeType(selectedImage!.path, headerBytes: [0xFF, 0xD8])
+                ?.split('/');
+        final file = await http.MultipartFile.fromPath(
+          'profileImg',
+          selectedImage!.path,
+          contentType: mimeTypeData != null
+              ? MediaType(mimeTypeData[0], mimeTypeData[1])
+              : MediaType('image', 'jpeg'),
+        );
+        request.files.add(file);
+      }
+
+      final responseStream = await request.send();
+      final response = await http.Response.fromStream(responseStream);
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        // Handle success
         print('User registration successful');
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
@@ -243,24 +264,26 @@ class _UserOnBoardState extends State<UserOnBoard> {
           ),
           (route) => false,
         );
+
         Fluttertoast.showToast(
-          msg: 'SUCCESS',
+          msg: responseData['message'] ?? 'SUCCESS',
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 2,
           backgroundColor: Colors.green,
           textColor: Colors.white,
         );
-        // String email = responseData['phoneNumber'];
-        await MobileNo.saveMobilenumber(widget.mobile);
+
+        await AuthService.saveToken("token");
+        await MobileNo.saveMobilenumber(
+            widget.mobile.isEmpty ? mobileNo! : widget.mobile);
         await UsernameService.saveUserName(username);
         await ImageService.saveImage("${responseData['profileImg']}");
-        print(responseData['profileImg']);
         await RefferalService.clearRefferal();
         await RefferalService.saveRefferal("${responseData['referralId']}");
       } else {
         Fluttertoast.showToast(
-          msg: responseData['message'],
+          msg: responseData['error'],
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 2,
@@ -271,7 +294,6 @@ class _UserOnBoardState extends State<UserOnBoard> {
         print('Failed to register user. Error: ${response.reasonPhrase}');
       }
     } catch (e) {
-      // Handle exceptions
       print('Exception during user registration: $e');
     }
   }

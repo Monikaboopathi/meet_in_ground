@@ -11,6 +11,8 @@ import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
+import 'package:http_parser/http_parser.dart';
+import 'package:mime/mime.dart';
 
 class EditPost extends StatefulWidget {
   final String postId;
@@ -99,22 +101,17 @@ class _EditPostState extends State<EditPost> {
       final data = json.decode(response.body)['data'];
 
       if (response.statusCode == 200) {
-        setState(() {
-          selectedValue = data['sport'];
-          // Parse date manually
-          List<String> dateParts = data['matchDate'].split('/');
-          date = DateTime(int.parse(dateParts[2]), int.parse(dateParts[1]),
-              int.parse(dateParts[0]));
-          priceController.text = data['betAmount'].toString();
-          locationController.text = data['placeOfMatch'].toString();
-          matchDetailsController.text = data['matchDetails'];
-          selectedResult = data['result'] == null ? "----" : data['result'];
+        date = DateTime.parse(data['matchDate']);
+        selectedValue = data['sport'];
+        priceController.text = data['betAmount'].toString();
+        locationController.text = data['placeOfMatch'].toString();
+        matchDetailsController.text = data['matchDetails'];
+        selectedResult = data['result'] == null ? "----" : data['result'];
 
-          imageUrl = data['image'];
-          price = double.parse(data['betAmount'].toString());
-          location = data['placeOfMatch'];
-          postText = data['matchDetails'];
-        });
+        imageUrl = data['image'];
+        price = double.parse(data['betAmount'].toString());
+        location = data['placeOfMatch'];
+        postText = data['matchDetails'];
       }
     } catch (exception) {
       print('Error fetching post data: $exception');
@@ -130,30 +127,66 @@ class _EditPostState extends State<EditPost> {
       String? userMobileNumber = await MobileNo.getMobilenumber();
       print(userMobileNumber);
 
-      Map<String, dynamic> postData = {
-        "sport": selectedValue,
-        "matchDetails": postText,
+      Map<String, String> postData = {
+        "sport": selectedValue ?? "",
+        "matchDetails": postText ?? "",
         "matchDate": date.toString(),
         "betAmount": price.toString(),
-        "placeOfMatch": location,
-        "image": imageUrl!.isNotEmpty ? imageUrl : selectedImage,
-        "result": selectedResult
+        "placeOfMatch": location ?? "",
+        "result": selectedResult == '----' ? null ?? "" : selectedResult ?? ""
       };
+
+      // Add the "image" field conditionally
+      if (imageUrl != null && imageUrl!.isNotEmpty) {
+        postData["image"] = imageUrl!;
+      } else if (selectedImage != null) {
+        final mimeTypeData =
+            lookupMimeType(selectedImage!.path, headerBytes: [0xFF, 0xD8])
+                ?.split('/');
+        final file = await http.MultipartFile.fromPath(
+          'image',
+          selectedImage!.path,
+          contentType: mimeTypeData != null
+              ? MediaType(mimeTypeData[0], mimeTypeData[1])
+              : MediaType('image', 'jpeg'),
+        );
+        // Do not include the file object directly in the postData map
+        // Instead, handle it separately in the request body
+      }
 
       // Convert the data to JSON
       String jsonString = json.encode(postData);
 
-      // Make the API post request
+      // Make the API PATCH request
       try {
-        final response = await http.patch(
+        http.MultipartRequest request = http.MultipartRequest(
+          'PATCH',
           Uri.parse(
               'https://bet-x-new.onrender.com/post/updatePost/${widget.postId}'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonString,
         );
-        final Map<String, dynamic> responseData = json.decode(response.body);
+        request.headers['Content-Type'] = 'application/json';
+        request.fields.addAll(postData);
+
+        if (selectedImage != null) {
+          final mimeTypeData =
+              lookupMimeType(selectedImage!.path, headerBytes: [0xFF, 0xD8])
+                  ?.split('/');
+          final file = await http.MultipartFile.fromPath(
+            'image',
+            selectedImage!.path,
+            contentType: mimeTypeData != null
+                ? MediaType(mimeTypeData[0], mimeTypeData[1])
+                : MediaType('image', 'jpeg'),
+          );
+
+          // Add the image file to the request
+          request.files.add(file);
+        }
+
+        final response = await request.send();
+        final String responseString = await response.stream.bytesToString();
+        final Map<String, dynamic> responseData = json.decode(responseString);
+
         // Check the response status
         if (response.statusCode == 200) {
           Fluttertoast.showToast(
@@ -254,7 +287,7 @@ class _EditPostState extends State<EditPost> {
                             border: Border.all(
                                 color: ThemeService.buttonBg, width: 3),
                           ),
-                          child: imageUrl!.isEmpty
+                          child: (imageUrl ?? '').isEmpty
                               ? selectedImage == null
                                   ? Center(
                                       child: Icon(Icons.add_a_photo,

@@ -8,10 +8,10 @@ import 'package:meet_in_ground/Screens/wallet/Wallet_page.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:meet_in_ground/widgets/RateUs.dart';
 
-class FeaturesSection extends StatelessWidget {
+class FeaturesSection extends StatefulWidget {
   final String balance;
   final int notificationCount;
-  final String referredPost;
+  final int referredPost;
   final Map<String, dynamic> referralDetails;
   final VoidCallback onRateUs;
   final VoidCallback onShareUs;
@@ -26,30 +26,35 @@ class FeaturesSection extends StatelessWidget {
   });
 
   @override
-  Widget build(BuildContext context) {
-    void RateUs() {
-      showDialogRateUs(context);
-    }
+  _FeaturesSectionState createState() => _FeaturesSectionState();
+}
 
+class _FeaturesSectionState extends State<FeaturesSection> {
+  void RateUs() {
+    showDialogRateUs(context);
+  }
+
+  @override
+  Widget build(BuildContext context) {
     List<Map<String, dynamic>> features = [
       {
         'icon': Icons.account_balance_wallet,
         'featureName': 'Wallet',
-        'leadText': '₹ ${balance.toString()}',
+        'leadText': '₹ ${widget.balance}',
         'navigate': WalletPage(),
         'onPress': null,
       },
       {
         'icon': Icons.notifications_active,
         'featureName': 'Notifications',
-        'leadText': '$notificationCount',
+        'leadText': '${widget.notificationCount}',
         'navigate': Notificationspage(),
         'onPress': null,
       },
       {
         'icon': Icons.note,
         'featureName': 'Requested Posts',
-        'leadText': referredPost,
+        'leadText': widget.referredPost.toString(),
         'navigate': RequestedPosts(),
         'onPress': null,
       },
@@ -70,7 +75,10 @@ class FeaturesSection extends StatelessWidget {
       {
         'icon': Icons.group,
         'featureName': 'Referred Users',
-        'leadText': referralDetails['registeredUserCount'].toString(),
+        'leadText':
+            widget.referralDetails['registeredUserCount'].toString().isEmpty
+                ? "0"
+                : widget.referralDetails['registeredUserCount'].toString(),
         'navigate': RequestsScreen(),
         'onPress': null,
       },
@@ -86,7 +94,7 @@ class FeaturesSection extends StatelessWidget {
         'featureName': 'Share Us',
         'leadText': '',
         'navigate': '',
-        'onPress': onShareUs,
+        'onPress': widget.onShareUs,
       },
     ];
 

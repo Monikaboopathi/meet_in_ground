@@ -4,6 +4,8 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Screens/authenticate/favourite_page.dart';
+import 'package:meet_in_ground/util/Services/Auth_service.dart';
+import 'package:meet_in_ground/util/Services/PreferencesService.dart';
 import 'package:meet_in_ground/util/Services/image_service.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/util/Services/userName_service.dart';
@@ -111,6 +113,8 @@ class _PasswordPageState extends State<PasswordPage> {
         print(responseData['userName']);
         print(responseData['profileImg']);
         await RefferalService.clearRefferal();
+        await AuthService.saveToken("token");
+        await PreferencesService.saveValue('login', "true");
         await RefferalService.saveRefferal("${responseData['referralId']}");
         await UsernameService.saveUserName("${responseData['userName']}");
         await ImageService.saveImage("${responseData['profileImg']}");

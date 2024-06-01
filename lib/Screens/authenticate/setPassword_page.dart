@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Screens/authenticate/login_page.dart';
+import 'package:meet_in_ground/util/Services/PreferencesService.dart';
 import 'package:meet_in_ground/util/Services/refferral_service.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
@@ -269,17 +270,30 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                                 String password = passwordController.text;
                                 String confirmPassword =
                                     confirmpasswordController.text;
-                                     showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext context) {
-                                return Loader();
-                              },
-                            );
+                                showDialog(
+                                  context: context,
+                                  barrierDismissible: false,
+                                  builder: (BuildContext context) {
+                                    return Loader();
+                                  },
+                                );
                                 if (widget.status == 200) {
                                   _submitpatchform();
                                   ;
                                 } else {
+                                  await PreferencesService.saveValue(
+                                      "mobile", mobile);
+                                  await PreferencesService.saveValue(
+                                      "hero", hero);
+                                  await PreferencesService.saveValue(
+                                      "color", color);
+                                  await PreferencesService.saveValue(
+                                      "password", password);
+                                  await PreferencesService.saveValue(
+                                      "confirmPassword", confirmPassword);
+                                  await PreferencesService.saveValue(
+                                      'login', "true");
+
                                   Navigator.pushAndRemoveUntil(
                                     context,
                                     MaterialPageRoute(
@@ -289,7 +303,7 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                                             favcolor: color,
                                             password: password,
                                             confirmpassword: confirmPassword)),
-                                            (route) => false,
+                                    (route) => false,
                                   );
 
                                   Fluttertoast.showToast(

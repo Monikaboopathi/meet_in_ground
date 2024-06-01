@@ -1,15 +1,17 @@
-import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:meet_in_ground/Screens/Posts/MyPosts.dart';
 import 'package:meet_in_ground/constant/sports_names.dart';
-import 'package:meet_in_ground/constant/themes_service.dart'; 
+import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/util/Services/userName_service.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart';
 
 class Addposts extends StatefulWidget {
   @override
@@ -66,37 +68,51 @@ class _AddpostsState extends State<Addposts> {
     return isValid;
   }
 
-  Future<void> _handleSubmit([File? file]) async {
+  Future<void> _handleSubmit() async {
     if (_validateFields()) {
       String? userMobileNumber = await MobileNo.getMobilenumber();
+      String? userName = await UsernameService.getUserName();
       print(userMobileNumber);
+      print(userName);
 
-      Map<String, dynamic> postData = {
-        "userName": "Ranjith",
-        "sport": selectedValue,
-        "matchDetails": postText,
+      Map<String, String> formData = {
+        "userName": userName ?? "",
+        "sport": selectedValue ?? "",
+        "matchDetails": postText ?? "",
         "matchDate": DateFormat('dd/MM/yyyy').format(date),
-        "betAmount": price.toString(),
-        "placeOfMatch": location,
-        "image": file
+        "betAmount": price?.toString() ?? "",
+        "placeOfMatch": location ?? "",
       };
 
-      // Convert the data to JSON
-      String jsonString = json.encode(postData);
-
-      // Make the API post request
       try {
-        final response = await http.post(
+        var request = http.MultipartRequest(
+          'POST',
           Uri.parse(
               'https://bet-x-new.onrender.com/post/addPost/$userMobileNumber'),
-          headers: <String, String>{
-            'Content-Type': 'application/json; charset=UTF-8',
-          },
-          body: jsonString,
         );
 
-        // Check the response status
+        request.fields.addAll(formData);
+
+        if (selectedImage != null) {
+          final mimeTypeData =
+              lookupMimeType(selectedImage!.path, headerBytes: [0xFF, 0xD8])
+                  ?.split('/');
+          final file = await http.MultipartFile.fromPath(
+            'image',
+            selectedImage!.path,
+            contentType: mimeTypeData != null
+                ? MediaType(mimeTypeData[0], mimeTypeData[1])
+                : MediaType('image', 'jpeg'),
+          );
+          print(file);
+          request.files.add(file);
+        }
+        final response = await request.send();
+        print(formData);
         if (response.statusCode == 200) {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(builder: (context) => MyPosts()),
+          );
           Fluttertoast.showToast(
             msg: "Post Added Successfully",
             toastLength: Toast.LENGTH_SHORT,
@@ -105,15 +121,12 @@ class _AddpostsState extends State<Addposts> {
             backgroundColor: Colors.green,
             textColor: Colors.white,
           );
-          // Navigator.of(context).pushReplacement(
-          //   MaterialPageRoute(
-          //     builder: (context) =>
-          //   ),
-          // );
 
           print('Post request successful');
         } else {
           print('Post request failed with status: ${response.statusCode}');
+          print(
+              'Post request failed with status: ${response.request.toString()}');
           Fluttertoast.showToast(
             msg: "Failed to submit post. Please try again later.",
             toastLength: Toast.LENGTH_SHORT,
@@ -124,7 +137,6 @@ class _AddpostsState extends State<Addposts> {
           );
         }
       } catch (error) {
-        // Handle any exceptions that might occur during the request
         print('Error: $error');
       }
     } else {
@@ -141,12 +153,6 @@ class _AddpostsState extends State<Addposts> {
       setState(() {
         selectedImage = File(pickedFile.path);
       });
-
-      // Convert image path to a File object
-      String filePath = pickedFile.path;
-
-      // Call handleProfile with the File object
-      _handleSubmit(File(filePath));
     }
   }
 

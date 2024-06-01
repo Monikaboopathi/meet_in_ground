@@ -1,7 +1,9 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:meet_in_ground/Models/Message.dart';
+import 'package:meet_in_ground/util/Services/image_service.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/util/Services/userName_service.dart';
 
 class Chatservice extends ChangeNotifier {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -20,6 +22,34 @@ class Chatservice extends ChangeNotifier {
     }
   }
 
+  Future<String> _getUserImage() async {
+    try {
+      String? image = await ImageService.getImage();
+      if (image != null) {
+        return image;
+      } else {
+        throw Exception("Mobile number is null");
+      }
+    } catch (e) {
+      print("Error fetching mobile number: $e");
+      throw Exception("Failed to get current user's mobile number");
+    }
+  }
+
+  Future<String> _getUsername() async {
+    try {
+      String? username = await UsernameService.getUserName();
+      if (username != null) {
+        return username;
+      } else {
+        throw Exception("Mobile number is null");
+      }
+    } catch (e) {
+      print("Error fetching mobile number: $e");
+      throw Exception("Failed to get current user's mobile number");
+    }
+  }
+
   Future<void> sendMessage(
     String receiverId,
     String message,
@@ -27,20 +57,20 @@ class Chatservice extends ChangeNotifier {
     String receiverImage,
   ) async {
     final String currentUserId = await _getCurrentUserId();
-    final String senderName = "Ranjith";
-    final String senderImage = "";
+    final String senderName = await _getUsername();
+    final String senderImage = await _getUserImage();
     final Timestamp timestamp = Timestamp.now();
 
     Message newMessage = Message(
-      sender: currentUserId,
-      receiver: receiverId,
-      timestamp: timestamp,
-      message: message,
-      receiverName: receiverName,
-      recieverImage: receiverImage,
-      senderImage: senderImage,
-      senderName: senderName,
-    );
+        sender: currentUserId,
+        receiver: receiverId,
+        timestamp: timestamp,
+        message: message,
+        receiverName: receiverName,
+        recieverImage: receiverImage,
+        senderImage: senderImage,
+        senderName: senderName,
+        roomId: currentUserId + "-" + receiverId);
 
     List<String> ids = [currentUserId, receiverId];
     ids.sort();
@@ -67,8 +97,23 @@ class Chatservice extends ChangeNotifier {
         .snapshots();
   }
 
+  Stream<QuerySnapshot> getMessages1() async* {
+    yield* _firestore
+        .collection('messages')
+        .orderBy('timestamp', descending: false)
+        .snapshots();
+  }
+
   Future<List<Map<String, dynamic>>> getAllMessagesAndRooms() async {
     try {
+      getMessages1().listen(
+        (QuerySnapshot snapshot) {
+          snapshot.docs.forEach((DocumentSnapshot doc) {
+            print(doc.data()); // This will print the data of each document
+          });
+        },
+        onError: (error) => print('Error fetching messages: $error'),
+      );
       testFirestoreAccess();
       getAllRoomIds();
       final String currentUserId = await _getCurrentUserId();
