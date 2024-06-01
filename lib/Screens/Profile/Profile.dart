@@ -25,7 +25,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Map<String, dynamic> userDetails = {};
   Map<String, dynamic> referralDetails = {};
   String userCity = "";
-  String referredPost = "";
+  int referredPost = 0;
   String userPhone = "";
   String balance = "";
   List<dynamic> notificationData = [];
@@ -84,19 +84,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
           };
 
           referralDetails = {
-            'registeredUserCount':
-                data['referralDetails']['registeredUserCount'] == null
-                    ? "0"
-                    : data['referralDetails']['registeredUserCount']
+            'registeredUserCount': data['referralDetails'] == null
+                ? "0"
+                : data['referralDetails']['registeredUserCount']
           };
 
-          referredPost = data['myRequestsCount'].toString();
+          referredPost = data['myRequestsCount'];
 
           userCity = '';
-          balance =
-              data['referralDetails']['referralUserWallet'].toString().isEmpty
-                  ? "0"
-                  : data['referralDetails']['referralUserWallet'].toString();
+          balance = data['referralDetails'] == null
+              ? "0"
+              : data['referralDetails']['referralUserWallet'].toString();
           notificationData = [];
         });
       } else {

@@ -6,7 +6,7 @@ import 'package:meet_in_ground/util/api/firebase_service.dart'; // Adjust import
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
   // Initialize Firebase
   await Firebase.initializeApp(
     options: FirebaseOptions(
@@ -14,12 +14,13 @@ Future<void> main() async {
       appId: "1:599300384798:android:af2f7b71e66b3abfed260f",
       messagingSenderId: "599300384798",
       projectId: "meetinground-464c9",
+      storageBucket: "meetinground-464c9.appspot.com",
+      measurementId: "G-BFZ54J6G31",
+      authDomain: "meetinground-464c9.firebaseapp.com",
     ),
   );
-
-  // Initialize Firebase notifications
   await FirebaseApi().initNotifications();
-  
+
   runApp(const MyApp());
 }
 
@@ -29,7 +30,6 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
         fontFamily: 'Poppins',

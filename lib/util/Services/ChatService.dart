@@ -97,8 +97,23 @@ class Chatservice extends ChangeNotifier {
         .snapshots();
   }
 
+  Stream<QuerySnapshot> getMessages1() async* {
+    yield* _firestore
+        .collection('messages')
+        .orderBy('timestamp', descending: false)
+        .snapshots();
+  }
+
   Future<List<Map<String, dynamic>>> getAllMessagesAndRooms() async {
     try {
+      getMessages1().listen(
+        (QuerySnapshot snapshot) {
+          snapshot.docs.forEach((DocumentSnapshot doc) {
+            print(doc.data()); // This will print the data of each document
+          });
+        },
+        onError: (error) => print('Error fetching messages: $error'),
+      );
       testFirestoreAccess();
       getAllRoomIds();
       final String currentUserId = await _getCurrentUserId();
