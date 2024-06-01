@@ -84,17 +84,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
           };
 
           referralDetails = {
-            'registeredUserCount': data['referralDetails'] == null
+            'registeredUserCount': data['totalReferredUsers'] == null
                 ? "0"
-                : data['referralDetails']['registeredUserCount']
+                : data['totalReferredUsers']
           };
 
           referredPost = data['myRequestsCount'];
 
           userCity = '';
-          balance = data['referralDetails'] == null
+          balance = data['walletAmount'] == null
               ? "0"
-              : data['referralDetails']['referralUserWallet'].toString();
+              : data['walletAmount'].toString();
           notificationData = [];
         });
       } else {
