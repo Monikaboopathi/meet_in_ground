@@ -15,6 +15,8 @@ import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import '../../constant/themes_service.dart';
 import 'package:meet_in_ground/util/Services/refferral_service.dart';
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart';
 
 String fcmToken = "";
 String referralId = "";
@@ -136,12 +138,6 @@ class _UserOnBoardState extends State<UserOnBoard> {
       setState(() {
         selectedImage = File(pickedFile.path);
       });
-
-      // Convert image path to a File object
-      String filePath = pickedFile.path;
-
-      // Call handleProfile with the File object
-      handleProfile(File(filePath));
     }
   }
 
@@ -183,7 +179,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
       handleProfile();
     }
     setState(() {
-      index = (index + 1) % 3; // Assuming there are 3 onboarding steps
+      index = (index + 1) % 3;
     });
   }
 
@@ -193,16 +189,12 @@ class _UserOnBoardState extends State<UserOnBoard> {
     ));
   }
 
-  Future<void> handleProfile([File? file]) async {
-    String apiUrl =
-        'https://bet-x-new.onrender.com/user/addUser/${widget.mobile}';
-    Map<String, dynamic> body = {
+  Future<void> handleProfile() async {
+    Map<String, String> formData = {
       'userName': username,
-      'sport': selectedItems
-          .join(','), // Joining selected sports into a single string
+      'sport': selectedItems.join(','),
       'location': '${userLocation!.latitude},${userLocation!.longitude}',
-      'profileImg': file,
-      'referralId': referralId,
+      'referralId': referralId.isEmpty ? "" : referralId,
       'fcmToken': fcmToken,
       'password': widget.password,
       'confirmPassword': widget.confirmpassword,
@@ -222,16 +214,32 @@ class _UserOnBoardState extends State<UserOnBoard> {
     print(widget.favhero);
 
     try {
-      final response = await http.post(
-        Uri.parse(apiUrl),
-        headers: <String, String>{
-          'Content-Type': 'application/json; charset=UTF-8',
-        },
-        body: jsonEncode(body),
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse(
+            'https://bet-x-new.onrender.com/user/addUser/${widget.mobile}'),
       );
-      // Parse the response body
-      final Map<String, dynamic> responseData = jsonDecode(response.body);
 
+      request.fields.addAll(formData);
+
+      if (selectedImage != null) {
+        final mimeTypeData =
+            lookupMimeType(selectedImage!.path, headerBytes: [0xFF, 0xD8])
+                ?.split('/');
+        final file = await http.MultipartFile.fromPath(
+          'profileImg',
+          selectedImage!.path,
+          contentType: mimeTypeData != null
+              ? MediaType(mimeTypeData[0], mimeTypeData[1])
+              : MediaType('image', 'jpeg'),
+        );
+        print(file);
+        request.files.add(file);
+      }
+
+      final responseStream = await request.send();
+      final response = await http.Response.fromStream(responseStream);
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
       if (response.statusCode == 200) {
         // Handle success
         print('User registration successful');
@@ -244,7 +252,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
           (route) => false,
         );
         Fluttertoast.showToast(
-          msg: 'SUCCESS',
+          msg: responseData['message'] ?? 'SUCCESS',
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 2,
@@ -260,7 +268,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
         await RefferalService.saveRefferal("${responseData['referralId']}");
       } else {
         Fluttertoast.showToast(
-          msg: responseData['message'],
+          msg: responseData['error'],
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 2,
