@@ -9,6 +9,7 @@ class Message {
   String recieverImage;
   String senderName;
   String receiverName;
+  final roomId;
 
   Message({
     required this.sender,
@@ -19,6 +20,7 @@ class Message {
     required this.recieverImage,
     required this.senderImage,
     required this.senderName,
+    this.roomId,
   });
 
   Map<String, dynamic> toMap() {

@@ -333,7 +333,8 @@ class _Post_WidgetState extends State<Post_Widget> {
                 OutlinedText_widget(
                     iconData: Icons.sports_esports, text: '${widget.sport}'),
                 OutlinedText_widget(
-                    iconData: Icons.calendar_today, text: "${widget.matchDate}")
+                    iconData: Icons.calendar_today,
+                    text: "${widget.matchDate.toString().split(' ')[0]}")
               ],
             ),
           ),

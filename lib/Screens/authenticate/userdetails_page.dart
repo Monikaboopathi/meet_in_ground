@@ -7,6 +7,8 @@ import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
 import 'package:lottie/lottie.dart';
+import 'package:meet_in_ground/util/Services/Auth_service.dart';
+import 'package:meet_in_ground/util/Services/PreferencesService.dart';
 import 'package:meet_in_ground/util/Services/image_service.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/util/Services/userName_service.dart';
@@ -190,34 +192,47 @@ class _UserOnBoardState extends State<UserOnBoard> {
   }
 
   Future<void> handleProfile() async {
+    String? mobileNo = await PreferencesService.getValue("mobile");
+    String? favColor = await PreferencesService.getValue("color");
+    String? favHero = await PreferencesService.getValue("hero");
+    String? password = await PreferencesService.getValue("password");
+    String? cpassword = await PreferencesService.getValue("confirmPassword");
+    print(mobileNo);
+    print(favColor);
+    print(favHero);
+    print(password);
+    print(cpassword);
+
+    if (userLocation == null) {
+      print("User location is null");
+      showError("Location not available");
+      return;
+    }
+
+    if (selectedImage == null) {
+      print("Selected image is null");
+      showError("Profile picture is required");
+      return;
+    }
+
     Map<String, String> formData = {
       'userName': username,
       'sport': selectedItems.join(','),
       'location': '${userLocation!.latitude},${userLocation!.longitude}',
       'referralId': referralId.isEmpty ? "" : referralId,
       'fcmToken': fcmToken,
-      'password': widget.password,
-      'confirmPassword': widget.confirmpassword,
-      'favoriteColor': widget.favcolor,
-      'favoriteHero': widget.favhero,
+      'password': widget.password.isEmpty ? password! : widget.password,
+      'confirmPassword':
+          widget.confirmpassword.isEmpty ? cpassword! : widget.confirmpassword,
+      'favoriteColor': widget.favcolor.isEmpty ? favColor! : widget.favcolor,
+      'favoriteHero': widget.favhero.isEmpty ? favHero! : widget.favhero,
     };
-    print(username);
-    print(selectedItems);
-    print(selectedImage!);
-    print(userLocation!.latitude);
-    print(userLocation!.longitude);
-    print(referralId);
-    print(fcmToken);
-    print(widget.password);
-    print(widget.confirmpassword);
-    print(widget.favcolor);
-    print(widget.favhero);
 
     try {
       var request = http.MultipartRequest(
         'POST',
         Uri.parse(
-            'https://bet-x-new.onrender.com/user/addUser/${widget.mobile}'),
+            'https://bet-x-new.onrender.com/user/addUser/${widget.mobile.isEmpty ? mobileNo : widget.mobile}'),
       );
 
       request.fields.addAll(formData);
@@ -233,7 +248,6 @@ class _UserOnBoardState extends State<UserOnBoard> {
               ? MediaType(mimeTypeData[0], mimeTypeData[1])
               : MediaType('image', 'jpeg'),
         );
-        print(file);
         request.files.add(file);
       }
 
@@ -241,7 +255,6 @@ class _UserOnBoardState extends State<UserOnBoard> {
       final response = await http.Response.fromStream(responseStream);
       final Map<String, dynamic> responseData = jsonDecode(response.body);
       if (response.statusCode == 200) {
-        // Handle success
         print('User registration successful');
         Navigator.of(context).pushAndRemoveUntil(
           MaterialPageRoute(
@@ -251,6 +264,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
           ),
           (route) => false,
         );
+
         Fluttertoast.showToast(
           msg: responseData['message'] ?? 'SUCCESS',
           toastLength: Toast.LENGTH_SHORT,
@@ -259,11 +273,12 @@ class _UserOnBoardState extends State<UserOnBoard> {
           backgroundColor: Colors.green,
           textColor: Colors.white,
         );
-        // String email = responseData['phoneNumber'];
-        await MobileNo.saveMobilenumber(widget.mobile);
+
+        await AuthService.saveToken("token");
+        await MobileNo.saveMobilenumber(
+            widget.mobile.isEmpty ? mobileNo! : widget.mobile);
         await UsernameService.saveUserName(username);
         await ImageService.saveImage("${responseData['profileImg']}");
-        print(responseData['profileImg']);
         await RefferalService.clearRefferal();
         await RefferalService.saveRefferal("${responseData['referralId']}");
       } else {
@@ -279,7 +294,6 @@ class _UserOnBoardState extends State<UserOnBoard> {
         print('Failed to register user. Error: ${response.reasonPhrase}');
       }
     } catch (e) {
-      // Handle exceptions
       print('Exception during user registration: $e');
     }
   }

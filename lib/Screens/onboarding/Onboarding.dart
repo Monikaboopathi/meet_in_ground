@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:introduction_screen/introduction_screen.dart';
+import 'package:meet_in_ground/util/Services/PreferencesService.dart';
 
 import '../authenticate/login_page.dart';
 
@@ -12,6 +13,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   int _currentPage = 0;
 
   void handleDone() async {
+    await PreferencesService.saveValue("onboard", "true");
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
@@ -19,7 +21,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       ),
     );
   }
-   final List<Color> pageColors = [
+
+  final List<Color> pageColors = [
     Color(0xFF003B71),
     Color(0xFF008905),
     Color(0xFF320071),
@@ -149,20 +152,27 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         },
         showSkipButton: true,
         skip: const Text('Skip',
-            style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600,color:  Colors.white)),
-        next: const Icon(Icons.arrow_forward, size: 30,color:  Colors.white,),
+            style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.w600,
+                color: Colors.white)),
+        next: const Icon(
+          Icons.arrow_forward,
+          size: 30,
+          color: Colors.white,
+        ),
         done: Padding(
-          padding: const EdgeInsets.only(bottom:8.0),
+          padding: const EdgeInsets.only(bottom: 8.0),
           child: Text(
             'Get Started',
             style: TextStyle(
               fontWeight: FontWeight.w800,
               fontSize: 18,
-              color:  Colors.white, // Color based on your theme
+              color: Colors.white, // Color based on your theme
             ),
           ),
         ),
-        globalBackgroundColor:pageColors[_currentPage] ,
+        globalBackgroundColor: pageColors[_currentPage],
         globalHeader: Container(
           padding: EdgeInsets.only(top: 50),
           child: buildIcons(),

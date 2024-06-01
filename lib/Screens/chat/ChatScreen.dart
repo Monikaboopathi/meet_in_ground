@@ -5,6 +5,7 @@ import 'package:meet_in_ground/Models/Message.dart';
 import 'package:meet_in_ground/constant/format_time.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:meet_in_ground/util/Services/ChatService.dart';
+import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
@@ -30,8 +31,30 @@ class _ChatScreenState extends State<ChatScreen> {
   ScrollController _emojiScroll = ScrollController();
   bool showEmojiPicker = false;
   final Chatservice _chatservice = Chatservice();
+  String? currentMobileNumber;
 
   Map<int, bool> isMessageExpanded = {};
+  @override
+  void initState() {
+    super.initState();
+    initializeData().then((mobileNumber) {
+      if (mounted) {
+        setState(() {
+          currentMobileNumber = mobileNumber!;
+        });
+      }
+    });
+  }
+
+  Future<String?> initializeData() async {
+    try {
+      String? number = await MobileNo.getMobilenumber();
+      return number;
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
+  }
 
   void onSendMessage() async {
     if (messageController.text.isNotEmpty) {
@@ -105,7 +128,7 @@ class _ChatScreenState extends State<ChatScreen> {
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final message = messages[index];
-                      final isSender = message.sender == "8072974576";
+                      final isSender = message.sender == currentMobileNumber;
                       final isMessageTruncated = message.message.length > 100;
                       final isExpanded = isMessageExpanded.containsKey(index)
                           ? isMessageExpanded[index]!
