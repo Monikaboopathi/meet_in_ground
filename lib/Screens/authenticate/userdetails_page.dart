@@ -121,7 +121,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
     }
 
     userLocation = await location.getLocation();
-    fetchLocationInfo(userLocation!.latitude!, userLocation!.longitude!);
+    await fetchLocationInfo(userLocation!.latitude!, userLocation!.longitude!);
 
     setState(() {
       locationLoader = false;
@@ -421,7 +421,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
             ),
           ],
         ),
-        'textInput': Column(
+        'textInput':Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Center(
@@ -432,16 +432,16 @@ class _UserOnBoardState extends State<UserOnBoard> {
               ),
             ),
             SizedBox(height: 30),
-            if (userLocation != null)
-              loadingLocation
-                  ? CircularProgressIndicator()
-                  : Align(
-                      alignment: Alignment.center,
-                      child: Text(
-                        userCity,
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w600),
-                      )),
+            if (loadingLocation)
+              CircularProgressIndicator()
+            else if (userLocation != null)
+              Align(
+                  alignment: Alignment.center,
+                  child: Text(
+                    userCity,
+                    style: TextStyle(
+                        fontSize: 18, fontWeight: FontWeight.w600),
+                  )),
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {

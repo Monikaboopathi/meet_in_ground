@@ -1,5 +1,4 @@
 import 'dart:io';
-
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
@@ -7,26 +6,56 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
+import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 
-
 class EditProfile extends StatefulWidget {
+  final Map<String, dynamic> userDetails;
+
+  EditProfile({required this.userDetails});
+
   @override
   _EditProfileState createState() => _EditProfileState();
 }
 
 class _EditProfileState extends State<EditProfile> {
   final ImagePicker _picker = ImagePicker();
-  final TextEditingController _usernameController = TextEditingController();
-  String? _location;
+  late TextEditingController _usernameController = TextEditingController();
+  late TextEditingController _locationController = TextEditingController();
   String? _selectedImage;
   List<String> _selectedSports = [];
-  bool _isLoading = false;
+  bool _isLocationLoading = false;
 
   List<Map<String, dynamic>> sportNames = [
     {'id': 1, 'name': 'Football'},
     {'id': 2, 'name': 'Basketball'},
+    {'id': 3, 'name': 'Tennis'},
+    {'id': 4, 'name': 'Cricket'},
+    {'id': 5, 'name': 'Rugby'},
+    {'id': 6, 'name': 'Soccer'},
+    {'id': 7, 'name': 'Golf'},
+    {'id': 8, 'name': 'Swimming'},
+    {'id': 9, 'name': 'Baseball'},
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    // Initialize controllers with default values from userDetails
+    _usernameController =
+        TextEditingController(text: widget.userDetails['userName']);
+    _locationController =
+        TextEditingController(text: widget.userDetails['location']);
+    _selectedImage = widget.userDetails['profileImg'];
+    _selectedSports = widget.userDetails['sport']?.split(',') ?? [];
+  }
+
+  @override
+  void dispose() {
+    _usernameController.dispose();
+    _locationController.dispose();
+    super.dispose();
+  }
 
   Future<void> pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
@@ -37,45 +66,25 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
-  Future<void> fetchLocationInfo(double latitude, double longitude) async {
-    try {
-      final response = await http.get(Uri.parse(
-          'https://nominatim.openstreetmap.org/reverse?lat=$latitude&lon=$longitude&format=json'));
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        setState(() {
-          _location = data['display_name'] ?? 'Unknown location';
-        });
-      }
-    } catch (error) {
-      print('Error fetching location: $error');
-    }
-  }
-
   Future<void> handleLocation() async {
-    Location location = new Location();
-    bool _serviceEnabled;
-    PermissionStatus _permissionGranted;
-    LocationData _locationData;
+    setState(() {
+      _isLocationLoading = true;
+    });
 
-    _serviceEnabled = await location.serviceEnabled();
-    if (!_serviceEnabled) {
-      _serviceEnabled = await location.requestService();
-      if (!_serviceEnabled) {
-        return;
-      }
+    Location location = Location();
+    LocationData? locationData;
+
+    try {
+      locationData = await location.getLocation();
+      _locationController.text =
+          'Lat: ${locationData.latitude}, Long: ${locationData.longitude}';
+    } catch (error) {
+      print('Error getting location: $error');
+    } finally {
+      setState(() {
+        _isLocationLoading = false;
+      });
     }
-
-    _permissionGranted = await location.hasPermission();
-    if (_permissionGranted == PermissionStatus.denied) {
-      _permissionGranted = await location.requestPermission();
-      if (_permissionGranted != PermissionStatus.granted) {
-        return;
-      }
-    }
-
-    _locationData = await location.getLocation();
-    fetchLocationInfo(_locationData.latitude!, _locationData.longitude!);
   }
 
   Future<void> handleSave() async {
@@ -83,7 +92,7 @@ class _EditProfileState extends State<EditProfile> {
       Fluttertoast.showToast(msg: 'Please enter your username.');
       return;
     }
-    if (_location == null || _location!.trim().isEmpty) {
+    if (_locationController.text.trim().isEmpty) {
       Fluttertoast.showToast(msg: 'Please select your location.');
       return;
     }
@@ -92,28 +101,127 @@ class _EditProfileState extends State<EditProfile> {
       return;
     }
 
-    setState(() {
-      _isLoading = true;
-    });
+    setState(() {});
+    String? userMobileNumber = await MobileNo.getMobilenumber();
+    print(userMobileNumber);
 
     try {
-      // Mock the API call for updating profile
-      await Future.delayed(Duration(seconds: 2));
+      String url =
+          'https://bet-x-new.onrender.com/user/updateUser/$userMobileNumber';
+      String username = _usernameController.text.trim();
+      String sports = _selectedSports.join(',');
+      String location = _locationController.text.trim();
 
-      Fluttertoast.showToast(msg: 'Profile updated successfully');
+      Map<String, String> headers = {
+        'Content-Type': 'application/json',
+      };
+
+      Map<String, dynamic> body = {
+        'userName': username,
+        'sport': sports,
+        'location': location,
+      };
+      print(username);
+      print(sports);
+      print(location);
+      if (_selectedImage != null) {
+        body['profileImg'] =
+            base64Encode(File(_selectedImage!).readAsBytesSync());
+      }
+
+      final response = await http.patch(
+        Uri.parse(url),
+        headers: headers,
+        body: json.encode(body),
+      );
+
+      if (response.statusCode == 200) {
+        Fluttertoast.showToast(
+          msg: "Profile updated successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+      } else {
+        Fluttertoast.showToast(
+          msg: "Failed to update profile",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+        );
+      }
     } catch (error) {
-      Fluttertoast.showToast(msg: 'Failed to update profile');
+      print(error);
     } finally {
-      setState(() {
-        _isLoading = false;
-      });
+      setState(() {});
     }
+  }
+
+  Future<void> showSportsDialog() async {
+    List<String> tempSelectedSports = List.from(_selectedSports);
+    await showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: Text('Select Sports'),
+              content: SingleChildScrollView(
+                child: ListBody(
+                  children: sportNames.map((sport) {
+                    return CheckboxListTile(
+                      value: tempSelectedSports.contains(sport['name']),
+                      title: Text(sport['name']),
+                      onChanged: (bool? value) {
+                        setState(() {
+                          if (value == true) {
+                            tempSelectedSports.add(sport['name']);
+                          } else {
+                            tempSelectedSports.remove(sport['name']);
+                          }
+                        });
+                      },
+                    );
+                  }).toList(),
+                ),
+              ),
+              actions: <Widget>[
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    TextButton(
+                      child: Text('Cancel'),
+                      onPressed: () {
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                    TextButton(
+                      child: Text('Save'),
+                      onPressed: () {
+                        setState(() {
+                          _selectedSports = tempSelectedSports;
+                        });
+                        Navigator.of(context).pop();
+                      },
+                    ),
+                  ],
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-       appBar: AppBar(
+      appBar: AppBar(
         automaticallyImplyLeading: true,
         backgroundColor: ThemeService.background,
         title: Text(
@@ -135,90 +243,177 @@ class _EditProfileState extends State<EditProfile> {
         centerTitle: true,
       ),
       backgroundColor: ThemeService.background,
-        body: SingleChildScrollView(
-          padding: EdgeInsets.all(16.0),
-          child: Column(
-            children: [
-              GestureDetector(
-                onTap: pickImage,
-                child: _selectedImage != null
-                    ? Image.file(
-                        File(_selectedImage!),
-                        height: 200,
-                        width: 200,
-                        fit: BoxFit.cover,
-                      )
-                    : Image.network(
-                        'https://via.placeholder.com/200',
-                        height: 200,
-                        width: 200,
-                      ),
-              ),
-              SizedBox(height: 16.0),
-              TextField(
-                controller: _usernameController,
-                decoration: InputDecoration(
-                  labelText: 'Username',
-                  border: OutlineInputBorder(),
+      body: SingleChildScrollView(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Stack(
+              children: [
+                CircleAvatar(
+                  radius: 80,
+                  backgroundImage: _selectedImage != null
+                      ? FileImage(File(_selectedImage!))
+                      : null,
+                  child: _selectedImage == null
+                      ? Icon(Icons.person, size: 80, color: Colors.grey)
+                      : null,
                 ),
-              ),
-              SizedBox(height: 16.0),
-              GestureDetector(
-                onTap: handleLocation,
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(4.0),
-                  ),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: Text(
-                          _location ?? 'Select your location',
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
+                Positioned(
+                  bottom: 5,
+                  right: 5,
+                  child: GestureDetector(
+                    onTap: pickImage,
+                    child: CircleAvatar(
+                      radius: 20,
+                      backgroundColor: ThemeService.buttonBg,
+                      child: Icon(
+                        Icons.camera_alt,
+                        color: Colors.white,
                       ),
-                      Icon(Icons.location_on, color: Colors.grey[600]),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 16.0),
+            Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.center,
+                children: [
+                  SizedBox(height: 16.0),
+                  Row(
+                    children: [
+                      Text(
+                        'Username',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w800),
+                      ),
                     ],
                   ),
-                ),
-              ),
-              SizedBox(height: 16.0),
-              GestureDetector(
-                onTap: () => setState(() {
-                }),
-                child: Container(
-                  padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(4.0),
+                  SizedBox(height: 8),
+                  TextField(
+                    controller: _usernameController,
+                    decoration: InputDecoration(
+                      hintText: 'Username',
+                      border: OutlineInputBorder(),
+                    ),
                   ),
-                  child: Row(
+                  SizedBox(height: 16.0),
+                  Row(
                     children: [
-                      Expanded(
-                        child: Text(
-                          _selectedSports.isEmpty
-                              ? 'Select your sports'
-                              : _selectedSports.join(', '),
-                          style: TextStyle(color: Colors.grey[600]),
-                        ),
+                      Text(
+                        'Location',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w800),
                       ),
-                      Icon(Icons.sports, color: Colors.grey[600]),
                     ],
                   ),
-                ),
+                  SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: handleLocation,
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 15.0, horizontal: 8.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: _isLocationLoading
+                                ? Row(
+                                    children: [
+                                      Container(
+                                        width: 20,
+                                        height: 20,
+                                        child: CircularProgressIndicator(
+                                          color: ThemeService.buttonBg,
+                                        ),
+                                      ),
+                                      SizedBox(width: 10),
+                                      Text(
+                                        'Fetching location...',
+                                        softWrap: true,
+                                      ),
+                                    ],
+                                  )
+                                : TextField(
+                                    controller: _locationController,
+                                    decoration: InputDecoration(
+                                      hintText: 'Select your location',
+                                      border: InputBorder.none,
+                                    ),
+                                  ),
+                          ),
+                          Icon(Icons.location_on, color: Colors.grey[600]),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 16.0),
+                  Row(
+                    children: [
+                      Text(
+                        'Sports',
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.w800),
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 8),
+                  GestureDetector(
+                    onTap: showSportsDialog,
+                    child: Container(
+                      padding:
+                          EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
+                      decoration: BoxDecoration(
+                        border: Border.all(color: Colors.grey),
+                        borderRadius: BorderRadius.circular(4.0),
+                      ),
+                      child: Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              _selectedSports.isEmpty
+                                  ? 'Select your sports'
+                                  : _selectedSports.join(', '),
+                              style: TextStyle(color: Colors.grey[600]),
+                            ),
+                          ),
+                          Icon(Icons.sports, color: Colors.grey[600]),
+                        ],
+                      ),
+                    ),
+                  ),
+                  SizedBox(height: 36.0),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: handleSave,
+                      style: ElevatedButton.styleFrom(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8.0),
+                        ),
+                        backgroundColor: ThemeService.buttonBg,
+                      ),
+                      child: const Text(
+                        'Save Profile',
+                        style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-              SizedBox(height: 16.0),
-              ElevatedButton(
-                onPressed: _isLoading ? null : handleSave,
-                child: _isLoading
-                    ? CircularProgressIndicator(color: Colors.white)
-                    : Text('Save'),
-              ),
-            ],
-          ),
+            ),
+          ],
         ),
-         );
+      ),
+    );
   }
 }
