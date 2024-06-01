@@ -12,6 +12,7 @@ import 'package:meet_in_ground/Screens/authenticate/login_page.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
 import 'package:meet_in_ground/util/Services/Auth_service.dart';
+import 'package:meet_in_ground/util/Services/PreferencesService.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/ShareMethods.dart';
@@ -128,6 +129,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
   void handleLogout() async {
     await AuthService.clearToken();
     await MobileNo.clearMobilenumber();
+    await PreferencesService.clearValue("mobile");
+    await PreferencesService.clearValue("hero");
+    await PreferencesService.clearValue("color");
+    await PreferencesService.clearValue("password");
+    await PreferencesService.clearValue("confirmPassword");
+    await PreferencesService.clearValue("login");
     await Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => LoginPage()),
     );
