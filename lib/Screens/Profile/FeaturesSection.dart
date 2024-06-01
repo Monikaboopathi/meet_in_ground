@@ -34,7 +34,7 @@ class FeaturesSection extends StatelessWidget {
       {
         'icon': Icons.account_balance_wallet,
         'featureName': 'Wallet',
-        'leadText': '₹ ${balance.toString()}',
+        'leadText': '₹ ${balance}',
         'navigate': WalletPage(),
         'onPress': null,
       },
@@ -48,7 +48,7 @@ class FeaturesSection extends StatelessWidget {
       {
         'icon': Icons.note,
         'featureName': 'Requested Posts',
-        'leadText': referredPost,
+        'leadText': referredPost.isEmpty ? "0" : referredPost,
         'navigate': RequestedPosts(),
         'onPress': null,
       },
@@ -69,7 +69,9 @@ class FeaturesSection extends StatelessWidget {
       {
         'icon': Icons.group,
         'featureName': 'Referred Users',
-        'leadText': referralDetails['registeredUserCount'].toString(),
+        'leadText': referralDetails['registeredUserCount'].toString().isEmpty
+            ? "0"
+            : referralDetails['registeredUserCount'].toString(),
         'navigate': 'referredUsers',
         'onPress': null,
       },
