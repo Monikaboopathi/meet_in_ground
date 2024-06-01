@@ -62,15 +62,15 @@ class Chatservice extends ChangeNotifier {
     final Timestamp timestamp = Timestamp.now();
 
     Message newMessage = Message(
-      sender: currentUserId,
-      receiver: receiverId,
-      timestamp: timestamp,
-      message: message,
-      receiverName: receiverName,
-      recieverImage: receiverImage,
-      senderImage: senderImage,
-      senderName: senderName,
-    );
+        sender: currentUserId,
+        receiver: receiverId,
+        timestamp: timestamp,
+        message: message,
+        receiverName: receiverName,
+        recieverImage: receiverImage,
+        senderImage: senderImage,
+        senderName: senderName,
+        roomId: currentUserId + "-" + receiverId);
 
     List<String> ids = [currentUserId, receiverId];
     ids.sort();
