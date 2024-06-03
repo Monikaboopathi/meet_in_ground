@@ -1,3 +1,5 @@
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
@@ -69,11 +71,16 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
 
         var response = await request.send();
         var responseBody = await http.Response.fromStream(response);
+
+        final Map<String, dynamic> responseData = jsonDecode(responseBody.body);
+
+        print(responseData);
+
         if (response.statusCode == 200) {
           _messageController.clear();
           _subjectController.clear();
           Fluttertoast.showToast(
-            msg: "Issue reported successfully",
+            msg: responseData['message'],
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.TOP,
             timeInSecForIosWeb: 2,
@@ -83,7 +90,7 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
           print('Issue reported successfully');
         } else {
           Fluttertoast.showToast(
-            msg: "Failed to report issue",
+            msg:responseData['error'],
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.TOP,
             timeInSecForIosWeb: 2,
@@ -135,7 +142,8 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
                   children: [
                     Text(
                       'Did you face any issues in our services? Please let us know your thoughts. We’ll try to solve your concern as soon as possible!',
-                      style: TextStyle(fontSize: 16.0, color: ThemeService.textColor),
+                      style: TextStyle(
+                          fontSize: 16.0, color: ThemeService.textColor),
                     ),
                     SizedBox(height: 16.0),
                     _buildInputField(
@@ -152,7 +160,8 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
                     ),
                     SizedBox(height: 16.0),
                     Text('Have any Screenshots? (Optional)',
-                        style: TextStyle(fontSize: 16.0, color: ThemeService.textColor)),
+                        style: TextStyle(
+                            fontSize: 16.0, color: ThemeService.textColor)),
                     SizedBox(height: 8.0),
                     _buildImagePicker(),
                     SizedBox(height: 24.0),
@@ -225,10 +234,10 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
         TextField(
           controller: controller,
           maxLines: maxLines,
-          style: TextStyle(color:ThemeService.textColor),
+          style: TextStyle(color: ThemeService.textColor),
           decoration: InputDecoration(
             hintText: 'Type your $label here',
-            hintStyle: TextStyle( color: ThemeService.textColor),
+            hintStyle: TextStyle(color: ThemeService.textColor),
             errorText: errorText.isEmpty ? null : errorText,
             border: OutlineInputBorder(),
           ),

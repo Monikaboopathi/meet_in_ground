@@ -53,11 +53,14 @@ class _FeedbackpageState extends State<Feedbackpage> {
           "message": message,
         }),
       );
+       final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+      print(responseData);
 
       if (response.statusCode == 200) {
         _messageController.clear();
         Fluttertoast.showToast(
-          msg: "Feedback submitted successfully!",
+          msg: responseData['message'],
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 2,
@@ -66,7 +69,7 @@ class _FeedbackpageState extends State<Feedbackpage> {
         );
       } else {
         Fluttertoast.showToast(
-          msg: "Failed to submit feedback",
+          msg: responseData['error'],
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 2,

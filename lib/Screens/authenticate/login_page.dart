@@ -100,6 +100,7 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: ThemeService.background,
       body: SingleChildScrollView(
         child: Form(
           key: _formKey,
@@ -144,12 +145,15 @@ class _LoginPageState extends State<LoginPage> {
                         disableLengthCheck: false,
                         decoration: InputDecoration(
                           labelText: 'Mobile Number',
+                          labelStyle: TextStyle(color:ThemeService.textColor),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                           counterText: "",
                         ),
                         initialCountryCode: 'IN',
+
+                        style: TextStyle(color:ThemeService.textColor),
                         validator: (phone) {
                           if (phone == null || phone.number.isEmpty) {
                             return 'Please enter a valid mobile number';
