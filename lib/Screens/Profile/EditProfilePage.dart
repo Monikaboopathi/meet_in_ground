@@ -24,7 +24,7 @@ class _EditProfileState extends State<EditProfile> {
   final ImagePicker _picker = ImagePicker();
   late TextEditingController _usernameController = TextEditingController();
   late TextEditingController _locationController = TextEditingController();
-  String? _selectedImage;
+  File? _selectedImage;
   String? imageUrl;
   List<String> _selectedSports = [];
   bool _isLocationLoading = false;
@@ -49,7 +49,7 @@ class _EditProfileState extends State<EditProfile> {
         TextEditingController(text: widget.userDetails['userName']);
     _locationController =
         TextEditingController(text: widget.userDetails['location']);
-    _selectedImage = widget.userDetails['profileImg'];
+    imageUrl = widget.userDetails['profileImg'];
     _selectedSports = widget.userDetails['sport']?.split(',') ?? [];
   }
 
@@ -62,9 +62,11 @@ class _EditProfileState extends State<EditProfile> {
 
   Future<void> pickImage() async {
     final pickedFile = await _picker.pickImage(source: ImageSource.gallery);
+
     if (pickedFile != null) {
       setState(() {
-        _selectedImage = pickedFile.path;
+        _selectedImage = File(pickedFile.path);
+        imageUrl = "";
       });
     }
   }
@@ -90,7 +92,7 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
- Future<void> handleSave() async {
+  Future<void> handleSave() async {
     if (_usernameController.text.trim().isEmpty) {
       Fluttertoast.showToast(msg: 'Please enter your username.');
       return;
@@ -107,26 +109,27 @@ class _EditProfileState extends State<EditProfile> {
     setState(() {});
     String? userMobileNumber = await MobileNo.getMobilenumber();
     print(userMobileNumber);
-     // Add the "image" field conditionally
-      if (imageUrl != null && imageUrl!.isNotEmpty) {
-        widget.userDetails['profileImg']= imageUrl!;
-      } else if (_selectedImage != null) {
-        final mimeTypeData =
-            lookupMimeType(_selectedImage!, headerBytes: [0xFF, 0xD8])
-                ?.split('/');
-        final file = await http.MultipartFile.fromPath(
-          'image',
-          _selectedImage!,
-          contentType: mimeTypeData != null
-              ? MediaType(mimeTypeData[0], mimeTypeData[1])
-              : MediaType('image', 'jpeg'),
-        );
-        // Do not include the file object directly in the postData map
-        // Instead, handle it separately in the request body
-      }
 
-      // Convert the data to JSON
-    
+    // Add the "image" field conditionally
+    if (imageUrl != null && imageUrl!.isNotEmpty) {
+      widget.userDetails['profileImg'] = imageUrl!;
+    } else if (_selectedImage != null) {
+      final mimeTypeData =
+          lookupMimeType(_selectedImage!.path, headerBytes: [0xFF, 0xD8])
+              ?.split('/');
+      final file = await http.MultipartFile.fromPath(
+        'image',
+        _selectedImage!.path,
+        contentType: mimeTypeData != null
+            ? MediaType(mimeTypeData[0], mimeTypeData[1])
+            : MediaType('image', 'jpeg'),
+      );
+      // Do not include the file object directly in the postData map
+      // Instead, handle it separately in the request body
+    }
+
+    // Convert the data to JSON
+
     try {
       String url =
           'https://bet-x-new.onrender.com/user/updateUser/$userMobileNumber';
@@ -147,18 +150,18 @@ class _EditProfileState extends State<EditProfile> {
       print(sports);
       print(location);
 
-    final request = http.MultipartRequest('PATCH', Uri.parse(url));
+      final request = http.MultipartRequest('PATCH', Uri.parse(url));
       request.headers.addAll(headers);
       request.fields
           .addAll(body.map((key, value) => MapEntry(key, value.toString())));
 
       if (_selectedImage != null) {
         final mimeTypeData =
-            lookupMimeType(_selectedImage!, headerBytes: [0xFF, 0xD8])
+            lookupMimeType(_selectedImage!.path, headerBytes: [0xFF, 0xD8])
                 ?.split('/');
         final file = await http.MultipartFile.fromPath(
           'profileImg',
-          _selectedImage!,
+          _selectedImage!.path,
           contentType: mimeTypeData != null
               ? MediaType(mimeTypeData[0], mimeTypeData[1])
               : MediaType('image', 'jpeg'),
@@ -167,10 +170,9 @@ class _EditProfileState extends State<EditProfile> {
       }
 
       final response = await request.send();
-        final String responseString = await response.stream.bytesToString();
-        final Map<String, dynamic> responseData = json.decode(responseString);
+      final String responseString = await response.stream.bytesToString();
+      final Map<String, dynamic> responseData = json.decode(responseString);
 
-      
       if (response.statusCode == 200) {
         Fluttertoast.showToast(
           msg: "Profile updated successfully",
@@ -289,36 +291,81 @@ class _EditProfileState extends State<EditProfile> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Stack(
-              children: [
-                CircleAvatar(
-                  radius: 80,
-                  backgroundImage: _selectedImage != null
-                      ? FileImage(File(_selectedImage!)) as ImageProvider
-                      : widget.userDetails['profileImg'] != null
-                          ? NetworkImage(widget.userDetails['profileImg'])
-                          : null,
-                  child: _selectedImage == null &&
-                          widget.userDetails['profileImg'] == null
-                      ? Icon(Icons.person, size: 80, color: Colors.grey)
-                      : null,
-                ),
-                Positioned(
-                  bottom: 5,
-                  right: 5,
-                  child: GestureDetector(
-                    onTap: pickImage,
-                    child: CircleAvatar(
-                      radius: 20,
-                      backgroundColor: ThemeService.buttonBg,
-                      child: Icon(
-                        Icons.camera_alt,
-                        color: Colors.white,
+            Center(
+              child: Stack(
+                children: [
+                  Container(
+                    height: 150,
+                    width: 150,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey[300],
+                      border: Border.all(
+                        color: ThemeService.buttonBg,
+                        width: 3,
+                      ),
+                    ),
+                    child: ClipOval(
+                      child: (imageUrl ?? '').isEmpty
+                          ? _selectedImage == null
+                              ? Center(
+                                  child: Icon(
+                                    Icons.person,
+                                    color: Colors.grey[800],
+                                    size: 100,
+                                  ),
+                                )
+                              : Image.file(
+                                  _selectedImage!,
+                                  fit: BoxFit.cover,
+                                )
+                          : Image.network(
+                              imageUrl!,
+                              fit: BoxFit.cover,
+                              loadingBuilder:
+                                  (context, child, loadingProgress) {
+                                if (loadingProgress == null) return child;
+                                return Center(
+                                  child: CircularProgressIndicator(
+                                    value: loadingProgress.expectedTotalBytes !=
+                                            null
+                                        ? loadingProgress
+                                                .cumulativeBytesLoaded /
+                                            loadingProgress.expectedTotalBytes!
+                                        : null,
+                                  ),
+                                );
+                              },
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  color: Colors.grey[
+                                      300], // Placeholder color in case of error
+                                  child: Icon(
+                                    Icons.error,
+                                    color: Colors.red, // Error icon color
+                                  ),
+                                );
+                              },
+                            ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 5,
+                    right: 5,
+                    child: GestureDetector(
+                      onTap: pickImage,
+                      child: CircleAvatar(
+                        radius: 20,
+                        backgroundColor: ThemeService.buttonBg,
+                        child: Icon(
+                          Icons.camera_alt,
+                          color: Colors.white,
+                        ),
                       ),
                     ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
             SizedBox(height: 16.0),
             Padding(
