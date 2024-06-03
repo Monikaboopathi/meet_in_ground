@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Models/Post.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/widgets/Confirmation_Dialog.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
 import 'package:meet_in_ground/widgets/SportSelectDialog.dart';
@@ -490,8 +491,16 @@ class _HomeScreenState extends State<HomeScreen> {
                     isRequest: post.requests.any((requuest) =>
                         requuest['phoneNumber'] ==
                         "+91" + currentMobileNumber!),
-                    onDeleteRequest: () => deleteRequest(post.id),
-                    onRequestToggle: () => toggleRequest(post.id),
+                    onDeleteRequest: () => showConfirmationDialog(
+                        context,
+                        () => deleteRequest(post.id),
+                        "Do you want Delete this Post Request?",
+                        Colors.red.shade400),
+                    onRequestToggle: () => showConfirmationDialog(
+                        context,
+                        () => toggleRequest(post.id),
+                        "Do you want Request this Post?",
+                        Colors.green.shade400),
                     currentMobileNumber: "+91" + currentMobileNumber!,
                   );
                 },
