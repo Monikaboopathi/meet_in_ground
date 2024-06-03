@@ -79,6 +79,7 @@ class _FeaturesSectionState extends State<FeaturesSection> {
             widget.referralDetails['registeredUserCount'].toString().isEmpty
                 ? "0"
                 : widget.referralDetails['registeredUserCount'].toString(),
+
         'navigate': ReferredUsers(),
         'onPress': null,
       },

@@ -125,10 +125,14 @@ class _Post_WidgetState extends State<Post_Widget> {
                           SizedBox(
                             width: 4,
                           ),
-                          Text(
-                            widget.comments > 1 ? "Requests" : "Request",
-                            style: TextStyle(
-                                fontSize: 10.0, color: ThemeService.textColor),
+                          GestureDetector(
+                            onTap: () => widget.onRequestToggle(),
+                            child: Text(
+                              widget.comments > 1 ? "Requests" : "Request",
+                              style: TextStyle(
+                                  fontSize: 10.0,
+                                  color: ThemeService.textColor),
+                            ),
                           ),
                         ],
                       ),

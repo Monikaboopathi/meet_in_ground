@@ -89,6 +89,7 @@ class _MessagesState extends State<Messages> {
                       style: TextStyle(
                         fontSize: 15,
                         color: ThemeService.textColor,
+                        fontWeight: FontWeight.w800,
                       ),
                     ),
                     Text(
@@ -111,12 +112,25 @@ class _MessagesState extends State<Messages> {
                     style: TextStyle(color: ThemeService.placeHolder),
                   ),
                 ),
-                leading: CircleAvatar(
-                  backgroundImage: NetworkImage(
+                leading: Container(
+                  width: 50.0,
+                  height: 50.0,
+                  decoration: BoxDecoration(
+                    shape: BoxShape.circle,
+                    border: Border.all(
+                      color: ThemeService.primary,
+                      width: 1.0,
+                    ),
+                  ),
+                  child: CircleAvatar(
+                    backgroundImage: NetworkImage(
                       chatRoom['sender'] == chatRoom['currentUserId']
                           ? chatRoom['receiverImage']
-                          : chatRoom['senderImage']),
-                  backgroundColor: Colors.grey[300],
+                          : chatRoom['senderImage'],
+                    ),
+                    backgroundColor: ThemeService.textColor,
+                    foregroundColor: ThemeService.textColor,
+                  ),
                 ),
               );
             },

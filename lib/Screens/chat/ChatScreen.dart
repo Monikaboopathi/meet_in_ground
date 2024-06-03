@@ -29,6 +29,7 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   TextEditingController messageController = TextEditingController();
   ScrollController _emojiScroll = ScrollController();
+  ScrollController _messageScroll = ScrollController(); // Add this
   bool showEmojiPicker = false;
   final Chatservice _chatservice = Chatservice();
   String? currentMobileNumber;
@@ -61,8 +62,15 @@ class _ChatScreenState extends State<ChatScreen> {
       await _chatservice.sendMessage(widget.receiverId, messageController.text,
           widget.recieverName, widget.recieverImage);
       messageController.clear();
+      scrollToBottom(); // Scroll to bottom after sending a message
     } else {
       print("Enter Some Text");
+    }
+  }
+
+  void scrollToBottom() {
+    if (_messageScroll.hasClients) {
+      _messageScroll.jumpTo(_messageScroll.position.maxScrollExtent);
     }
   }
 
@@ -83,8 +91,19 @@ class _ChatScreenState extends State<ChatScreen> {
         titleSpacing: 0,
         title: Row(
           children: [
-            CircleAvatar(
-              backgroundImage: NetworkImage(widget.recieverImage),
+            Container(
+              width: 40,
+              height: 40,
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: ThemeService.textColor, // Border color
+                  width: 2.0, // Border width
+                ),
+              ),
+              child: CircleAvatar(
+                backgroundImage: NetworkImage(widget.recieverImage),
+              ),
             ),
             SizedBox(width: 10),
             Column(
@@ -123,7 +142,12 @@ class _ChatScreenState extends State<ChatScreen> {
                     return Message.fromMap(doc.data() as Map<String, dynamic>);
                   }).toList();
 
+                  WidgetsBinding.instance.addPostFrameCallback((_) {
+                    scrollToBottom();
+                  });
+
                   return ListView.builder(
+                    controller: _messageScroll,
                     padding: EdgeInsets.symmetric(vertical: 8),
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
