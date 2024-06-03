@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Models/Post.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/widgets/Confirmation_Dialog.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
 import 'package:meet_in_ground/widgets/SportSelectDialog.dart';
@@ -299,7 +300,9 @@ class _FavoritesState extends State<Favorites> {
                     children: [
                       Expanded(
                         child: Padding(
-                          padding: const EdgeInsets.only(left: 10),
+                          padding: snapshot.hasData && snapshot.data!.isNotEmpty
+                              ? const EdgeInsets.only(left: 10)
+                              : const EdgeInsets.symmetric(horizontal: 20),
                           child: Container(
                             height: 40,
                             child: TextField(
@@ -338,64 +341,70 @@ class _FavoritesState extends State<Favorites> {
                           ),
                         ),
                       ),
-                      Column(
-                        mainAxisSize: MainAxisSize.min,
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          Row(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(
-                                isAscending ? "asc" : "desc",
-                                style: TextStyle(
-                                  fontSize: 6,
-                                  color: ThemeService.primary,
+                      Visibility(
+                        visible: snapshot.hasData && snapshot.data!.isNotEmpty,
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: [
+                            Row(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  isAscending ? "asc" : "desc",
+                                  style: TextStyle(
+                                    fontSize: 6,
+                                    color: ThemeService.primary,
+                                  ),
                                 ),
-                              ),
-                            ],
-                          ),
-                          IconButton(
-                            icon: Icon(Icons.swap_vert),
-                            color: ThemeService.primary,
-                            onPressed: _toggleSortOrder,
-                            iconSize: 30,
-                          ),
-                        ],
+                              ],
+                            ),
+                            IconButton(
+                              icon: Icon(Icons.swap_vert),
+                              color: ThemeService.primary,
+                              onPressed: _toggleSortOrder,
+                              iconSize: 30,
+                            ),
+                          ],
+                        ),
                       ),
-                      selectedSport.isEmpty
-                          ? IconButton(
-                              icon: Icon(Icons.filter_alt),
-                              color: ThemeService.primary,
-                              onPressed: () {
-                                showDialog(
-                                  context: context,
-                                  builder: (BuildContext context) {
-                                    return SportSelectDialog(
-                                      sportNames: sportNames,
-                                      selectedSport: selectedSport,
-                                      onSportSelected: (selectedSport) {
-                                        if (selectedSport.isNotEmpty) {
-                                          setState(() {
-                                            this.selectedSport = selectedSport;
-                                            futurePosts = fetchPosts();
-                                          });
-                                        }
-                                      },
-                                    );
-                                  },
-                                );
-                              },
-                            )
-                          : IconButton(
-                              onPressed: () {
-                                selectedSport = "";
-                                setState(() {
-                                  selectedSport = "";
-                                  futurePosts = fetchPosts();
-                                });
-                              },
-                              color: ThemeService.primary,
-                              icon: Icon(Icons.filter_alt_off))
+                      Visibility(
+                        visible: snapshot.hasData && snapshot.data!.isNotEmpty,
+                        child: IconButton(
+                          icon: Icon(
+                            selectedSport.isEmpty
+                                ? Icons.filter_alt
+                                : Icons.filter_alt_off,
+                          ),
+                          color: ThemeService.primary,
+                          onPressed: () {
+                            if (selectedSport.isEmpty) {
+                              showDialog(
+                                context: context,
+                                builder: (BuildContext context) {
+                                  return SportSelectDialog(
+                                    sportNames: sportNames,
+                                    selectedSport: selectedSport,
+                                    onSportSelected: (selectedSport) {
+                                      if (selectedSport.isNotEmpty) {
+                                        setState(() {
+                                          this.selectedSport = selectedSport;
+                                          futurePosts = fetchPosts();
+                                        });
+                                      }
+                                    },
+                                  );
+                                },
+                              );
+                            } else {
+                              setState(() {
+                                selectedSport = '';
+                                futurePosts = fetchPosts();
+                              });
+                            }
+                          },
+                        ),
+                      ),
                     ],
                   );
                 },
@@ -491,8 +500,16 @@ class _FavoritesState extends State<Favorites> {
                     isRequest: post.requests.any((requuest) =>
                         requuest['phoneNumber'] ==
                         "+91" + currentMobileNumber!),
-                    onDeleteRequest: () => deleteRequest(post.id),
-                    onRequestToggle: () => toggleRequest(post.id),
+                    onDeleteRequest: () => showConfirmationDialog(
+                        context,
+                        () => deleteRequest(post.id),
+                        "Do you want Delete this Post Request?",
+                        Colors.red.shade400),
+                    onRequestToggle: () => showConfirmationDialog(
+                        context,
+                        () => toggleRequest(post.id),
+                        "Do you want Request this Post?",
+                        Colors.green.shade400),
                     currentMobileNumber: "+91" + currentMobileNumber!,
                   );
                 },

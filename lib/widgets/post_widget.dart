@@ -166,13 +166,16 @@ class _Post_WidgetState extends State<Post_Widget> {
                 Icon(
                   Icons.location_on,
                   size: 16,
-                  color: Colors.grey,
+                  color: ThemeService.third,
                 ),
                 SizedBox(width: 4),
                 Expanded(
                   child: Text(
                     widget.placeOfMatch,
-                    style: TextStyle(color: Colors.grey, fontSize: 10),
+                    style: TextStyle(
+                        color: ThemeService.third,
+                        fontSize: 10,
+                        fontWeight: FontWeight.w800),
                     overflow: TextOverflow.ellipsis,
                   ),
                 ),
@@ -227,12 +230,12 @@ class _Post_WidgetState extends State<Post_Widget> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Container(
-                        color: ThemeService.transparent,
+                        color: Colors.black54,
                         padding: EdgeInsets.all(8),
                         child: Text(
                           widget.result ?? "----",
                           style: TextStyle(
-                            color: Colors.white,
+                            color: ThemeService.third,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
@@ -247,12 +250,12 @@ class _Post_WidgetState extends State<Post_Widget> {
                     child: Padding(
                       padding: const EdgeInsets.all(8.0),
                       child: Container(
-                        color: ThemeService.transparent,
+                        color: Colors.black54,
                         padding: EdgeInsets.all(8),
                         child: Text(
                           widget.status,
                           style: TextStyle(
-                            color: Colors.white,
+                            color: ThemeService.third,
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
                           ),
@@ -278,7 +281,7 @@ class _Post_WidgetState extends State<Post_Widget> {
                 if (showEditDeleteIcons)
                   Positioned.fill(
                     child: Container(
-                      color: Colors.black54, // Black transparent background
+                      color: Colors.black54,
                       child: Center(
                         child: Row(
                           mainAxisSize: MainAxisSize.min,
