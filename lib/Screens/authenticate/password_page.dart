@@ -63,7 +63,6 @@ class _PasswordPageState extends State<PasswordPage> {
     setState(() {
       isLoading = true;
     });
-    print(referralId);
 
     final String apiUrl = 'https://bet-x-new.onrender.com/user/verifyPassword';
 
@@ -71,9 +70,8 @@ class _PasswordPageState extends State<PasswordPage> {
     final Map<String, dynamic> requestBody = {
       'phoneNumber': phoneNumber,
       'password': password,
-      'fcmToken': fcmToken
+      'fcmToken': fcmToken,
     };
-    print(fcmToken);
 
     try {
       // Make the POST request to the API endpoint
@@ -131,7 +129,19 @@ class _PasswordPageState extends State<PasswordPage> {
       }
     } catch (exception) {
       print(exception);
+      Fluttertoast.showToast(
+        msg: "An error occurred. Please try again.",
+        toastLength: Toast.LENGTH_SHORT,
+        gravity: ToastGravity.TOP,
+        timeInSecForIosWeb: 2,
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+      );
+    } finally {
+      // Hide loader
+      Navigator.of(context).pop();
     }
+
     setState(() {
       isLoading = false;
     });
