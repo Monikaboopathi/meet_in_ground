@@ -182,7 +182,7 @@ class _LoginPageState extends State<LoginPage> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
-                          backgroundColor: ThemeService.primary,
+                          backgroundColor: ThemeService.buttonBg,
                         ),
                         child: Text(
                           'Submit',
@@ -370,7 +370,7 @@ class _LoginPageState extends State<LoginPage> {
                           shape: RoundedRectangleBorder(
                             borderRadius: BorderRadius.circular(8.0),
                           ),
-                          backgroundColor: ThemeService.primary,
+                          backgroundColor: ThemeService.buttonBg,
                           padding: EdgeInsets.symmetric(vertical: 10),
                         ),
                         child: Container(
