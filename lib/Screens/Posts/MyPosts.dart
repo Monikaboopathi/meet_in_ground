@@ -4,7 +4,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Screens/Posts/EditPosts.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
-import 'package:meet_in_ground/widgets/Delete_Dialog.dart';
+import 'package:meet_in_ground/widgets/Confirmation_Dialog.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
 import 'package:meet_in_ground/widgets/SportSelectDialog.dart';
@@ -353,18 +353,18 @@ class _MyPostsState extends State<MyPosts> {
                   bool isShowMore = showMoreMap[post['_id']] ?? false;
 
                   return Post_Widget(
-                      userName: post['userName']??"",
-                      placeOfMatch: post['placeOfMatch']??"",
+                      userName: post['userName'] ?? "",
+                      placeOfMatch: post['placeOfMatch'] ?? "",
                       likes: 0,
-                      comments: post['requests'].length??0,
-                      betAmount: post['betAmount']??"",
-                      id: post['_id']??'',
+                      comments: post['requests'].length ?? 0,
+                      betAmount: post['betAmount'] ?? "",
+                      id: post['_id'] ?? '',
                       image: post['image'] ?? "",
-                      postOwnerImage: post['postOwnerImage']??"",
-                      matchDate: post['matchDate']??"",
-                      matchDetails: post['matchDetails']??"",
+                      postOwnerImage: post['postOwnerImage'] ?? "",
+                      matchDate: post['matchDate'] ?? "",
+                      matchDetails: post['matchDetails'] ?? "",
                       phoneNumber: post['phoneNumber'],
-                      sport: post['sport']??"",
+                      sport: post['sport'] ?? "",
                       status: post['status'],
                       result: post['result'] == null ? "----" : post['result'],
                       createdAt: post['createdAt'],
@@ -387,8 +387,11 @@ class _MyPostsState extends State<MyPosts> {
                                       EditPost(postId: post["_id"])),
                             )
                           },
-                      onDeletePost: () => showDeleteDialog(
-                          context, () => deletePost(post['_id'])));
+                      onDeletePost: () => showConfirmationDialog(
+                          context,
+                          () => deletePost(post['_id']),
+                          "Do you want delete this Post?",
+                          Colors.red.shade400));
                 },
               );
             }

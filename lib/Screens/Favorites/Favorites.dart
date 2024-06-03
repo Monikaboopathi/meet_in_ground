@@ -275,6 +275,7 @@ class _FavoritesState extends State<Favorites> {
       backgroundColor: ThemeService.background,
       appBar: AppBar(
         backgroundColor: ThemeService.background,
+        automaticallyImplyLeading: false,
         title: Text(
           'Favorites',
           style: TextStyle(

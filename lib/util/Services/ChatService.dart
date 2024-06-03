@@ -50,6 +50,17 @@ class Chatservice extends ChangeNotifier {
     }
   }
 
+  Future<void> _createRoom(String roomId) async {
+    try {
+      await FirebaseFirestore.instance.collection('rooms').doc(roomId).set({
+        // Add any initial data you want to set for the room
+      });
+      print('Room created successfully');
+    } catch (e) {
+      print('Error creating room: $e');
+    }
+  }
+
   Future<void> sendMessage(
     String receiverId,
     String message,
@@ -62,7 +73,7 @@ class Chatservice extends ChangeNotifier {
     final Timestamp timestamp = Timestamp.now();
 
     Message newMessage = Message(
-        sender: currentUserId,
+        sender: "+91" + currentUserId,
         receiver: receiverId,
         timestamp: timestamp,
         message: message,
@@ -70,22 +81,28 @@ class Chatservice extends ChangeNotifier {
         recieverImage: receiverImage,
         senderImage: senderImage,
         senderName: senderName,
-        roomId: currentUserId + "-" + receiverId);
+        roomId: "+91" + currentUserId + "-" + receiverId);
 
-    List<String> ids = [currentUserId, receiverId];
+    List<String> ids = ["+91" + currentUserId, receiverId];
     ids.sort();
     String chatRoomId = ids.join("-");
 
-    await _firestore
-        .collection('rooms')
-        .doc(chatRoomId)
-        .collection('messages')
-        .add(newMessage.toMap());
+    // Check if the 'rooms' collection exists, create it if not
+    final roomsCollection = _firestore.collection('rooms');
+    final roomDoc = roomsCollection.doc(chatRoomId);
+    final roomExists = await roomDoc.get().then((doc) => doc.exists);
+    if (!roomExists) {
+      await _createRoom(chatRoomId);
+    }
+
+    // Add the message to the 'messages' subcollection of the room
+    final messagesCollection = roomDoc.collection('messages');
+    await messagesCollection.add(newMessage.toMap());
   }
 
   Stream<QuerySnapshot> getMessages(String otherUserId) async* {
     final String currentUserId = await _getCurrentUserId();
-    List<String> ids = [currentUserId, otherUserId];
+    List<String> ids = ["+91" + currentUserId, otherUserId];
     ids.sort();
     String chatRoomId = ids.join("-");
 
@@ -105,119 +122,84 @@ class Chatservice extends ChangeNotifier {
   }
 
   Future<List<Map<String, dynamic>>> getAllMessagesAndRooms() async {
+    List<Map<String, dynamic>> chatRooms = [];
+    print("print 1");
+
+    final String currentUserId = await _getCurrentUserId();
+
     try {
-      getMessages1().listen(
-        (QuerySnapshot snapshot) {
-          snapshot.docs.forEach((DocumentSnapshot doc) {
-            print(doc.data()); // This will print the data of each document
-          });
-        },
-        onError: (error) => print('Error fetching messages: $error'),
-      );
-      testFirestoreAccess();
-      getAllRoomIds();
-      final String currentUserId = await _getCurrentUserId();
-      print("Current User ID: $currentUserId");
+      QuerySnapshot roomsSnapshot =
+          await FirebaseFirestore.instance.collection('rooms').get();
+      print("print 2");
 
-      QuerySnapshot roomsSnapshot = await _firestore.collection('rooms').get();
-      print("Rooms Snapshot: ${roomsSnapshot.size} rooms found.");
+      for (var roomDoc in roomsSnapshot.docs) {
+        print("print 3");
+        Map<String, dynamic> roomData = roomDoc.data() as Map<String, dynamic>;
+        print("print 4");
 
-      if (roomsSnapshot.size == 0) {
-        print("No rooms found in the 'rooms' collection.");
-      }
+        try {
+          // Fetch the last message for this room
+          QuerySnapshot messagesSnapshot = await roomDoc.reference
+              .collection('messages')
+              .orderBy('timestamp', descending: true)
+              .limit(1)
+              .get();
+          print("print 5");
 
-      List<Map<String, dynamic>> allMessagesAndRooms = [];
-      for (var room in roomsSnapshot.docs) {
-        String roomId = room.id;
-        print("Processing Room ID: $roomId");
+          if (messagesSnapshot.docs.isNotEmpty) {
+            final messageDoc = messagesSnapshot.docs.first;
+            final message = messageDoc['message'];
+            final recieverName = messageDoc['receiverName'];
+            final senderName = messageDoc['senderName'];
+            final createdAt = messageDoc['timestamp'];
+            final receiverImage = messageDoc['recieverImage'];
+            final senderImage = messageDoc['senderImage'];
+            final receiver = messageDoc['receiver'];
+            final sender = messageDoc['sender'];
 
-        QuerySnapshot messagesSnapshot = await _firestore
-            .collection('rooms')
-            .doc(roomId)
-            .collection('messages')
-            .where('sender', isEqualTo: currentUserId)
-            .orderBy('timestamp', descending: false)
-            .get();
-
-        print(
-            "Messages Snapshot: ${messagesSnapshot.size} messages found for Room ID: $roomId");
-
-        List<Message> messages = messagesSnapshot.docs
-            .map((doc) => Message.fromMap(doc.data() as Map<String, dynamic>))
-            .toList();
-
-        allMessagesAndRooms.add({
-          'roomId': roomId,
-          'messages': messages,
-        });
-
-        // Print room details and its messages
-        print("Room ID: $roomId");
-        for (var message in messages) {
-          print("Message: ${message.message}");
+            if (sender == "+91" + currentUserId ||
+                receiver == "+91" + currentUserId) {
+              roomData['message'] = message != null ? message : '';
+              roomData['timestamp'] = createdAt != null ? createdAt : '';
+              roomData['receiverName'] =
+                  recieverName != null ? recieverName : '';
+              roomData['senderName'] = senderName != null ? senderName : '';
+              roomData['receiver'] = receiver != null ? receiver : '';
+              roomData['receiverImage'] =
+                  receiverImage != null ? receiverImage : '';
+              roomData['senderImage'] = senderImage != null ? senderImage : '';
+              roomData['sender'] = sender != null ? sender : '';
+              roomData['currentUserId'] =
+                  "+91" + currentUserId != null ? "+91" + currentUserId : "";
+              chatRooms.add(roomData);
+            }
+          } else {
+            print("rooms empty: " + messagesSnapshot.docs.length.toString());
+          }
+        } catch (e) {
+          print("Error fetching messages for room ${roomDoc.id}: $e");
         }
       }
-
-      print("All messages and rooms processed successfully.");
-      return allMessagesAndRooms;
     } catch (e) {
-      print("An error occurred: $e");
-      return [];
+      print("Error fetching rooms: $e");
     }
+
+    return chatRooms;
   }
 
   void testFirestoreAccess() async {
     try {
-      DocumentSnapshot testDoc = await _firestore
+      DocumentSnapshot doc = await FirebaseFirestore.instance
           .collection('rooms')
-          .doc('+918072974572-8072974576')
+          .doc('+917200645321-8072974576')
           .get();
-      if (testDoc.exists) {
-        print("Test document data: ${testDoc.data()}");
+      if (doc.exists) {
+        print('Test document data: ${doc.data().toString()}');
       } else {
-        print("Test document does not exist.");
+        print('Test document does not exist');
       }
     } catch (e) {
-      print("Error accessing Firestore: $e");
-    }
-  }
-
-  Future<List<String>> getAllRoomIds() async {
-    try {
-      print("Fetching room IDs...");
-      QuerySnapshot roomsSnapshot =
-          await FirebaseFirestore.instance.collection('rooms').get();
-      print("Rooms Snapshot: ${roomsSnapshot.size} rooms found.");
-
-      if (roomsSnapshot.size == 0) {
-        print("No rooms found in the 'rooms' collection.");
-      }
-
-      List<String> roomIds = [];
-
-      // Iterate through each room document
-      for (var roomDoc in roomsSnapshot.docs) {
-        String roomId = roomDoc.id;
-        print("Processing Room ID: $roomId");
-
-        // Query the messages subcollection of each room
-        QuerySnapshot messagesSnapshot = await FirebaseFirestore.instance
-            .collection('rooms')
-            .doc(roomId)
-            .collection('messages')
-            .get();
-
-        // If the messages subcollection exists, add the room ID to the list
-        if (messagesSnapshot.docs.isNotEmpty) {
-          roomIds.add(roomId);
-        }
-      }
-
-      print("Room IDs: $roomIds");
-      return roomIds;
-    } catch (e) {
-      print("An error occurred while fetching room IDs: $e");
-      return []; // Or handle the error in an appropriate way
+      print('Error reading test document: $e');
     }
   }
 }

@@ -389,7 +389,7 @@ class _AddpostsState extends State<Addposts> {
               width: double.infinity,
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.of(context).push(
+                  Navigator.of(context).pushReplacement(
                     MaterialPageRoute(builder: (context) => MyPosts()),
                   );
                 },
@@ -422,10 +422,9 @@ class _AddpostsState extends State<Addposts> {
                       return Loader();
                     },
                   );
-                  // Delay for 2 seconds to show the loader
-                  await Future.delayed(Duration(seconds: 2));
 
-                  // Dismiss the loader and return to the previous page
+                  await Future.delayed(Duration(seconds: 1));
+
                   Navigator.pop(context);
                   _handleSubmit();
                 },
