@@ -1,13 +1,15 @@
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart';
 
 class EditProfile extends StatefulWidget {
   final Map<String, dynamic> userDetails;
@@ -23,6 +25,7 @@ class _EditProfileState extends State<EditProfile> {
   late TextEditingController _usernameController = TextEditingController();
   late TextEditingController _locationController = TextEditingController();
   String? _selectedImage;
+  String? imageUrl;
   List<String> _selectedSports = [];
   bool _isLocationLoading = false;
 
@@ -87,7 +90,7 @@ class _EditProfileState extends State<EditProfile> {
     }
   }
 
-  Future<void> handleSave() async {
+ Future<void> handleSave() async {
     if (_usernameController.text.trim().isEmpty) {
       Fluttertoast.showToast(msg: 'Please enter your username.');
       return;
@@ -104,7 +107,26 @@ class _EditProfileState extends State<EditProfile> {
     setState(() {});
     String? userMobileNumber = await MobileNo.getMobilenumber();
     print(userMobileNumber);
+     // Add the "image" field conditionally
+      if (imageUrl != null && imageUrl!.isNotEmpty) {
+        widget.userDetails['profileImg']= imageUrl!;
+      } else if (_selectedImage != null) {
+        final mimeTypeData =
+            lookupMimeType(_selectedImage!, headerBytes: [0xFF, 0xD8])
+                ?.split('/');
+        final file = await http.MultipartFile.fromPath(
+          'image',
+          _selectedImage!,
+          contentType: mimeTypeData != null
+              ? MediaType(mimeTypeData[0], mimeTypeData[1])
+              : MediaType('image', 'jpeg'),
+        );
+        // Do not include the file object directly in the postData map
+        // Instead, handle it separately in the request body
+      }
 
+      // Convert the data to JSON
+    
     try {
       String url =
           'https://bet-x-new.onrender.com/user/updateUser/$userMobileNumber';
@@ -124,17 +146,31 @@ class _EditProfileState extends State<EditProfile> {
       print(username);
       print(sports);
       print(location);
+
+    final request = http.MultipartRequest('PATCH', Uri.parse(url));
+      request.headers.addAll(headers);
+      request.fields
+          .addAll(body.map((key, value) => MapEntry(key, value.toString())));
+
       if (_selectedImage != null) {
-        body['profileImg'] =
-            base64Encode(File(_selectedImage!).readAsBytesSync());
+        final mimeTypeData =
+            lookupMimeType(_selectedImage!, headerBytes: [0xFF, 0xD8])
+                ?.split('/');
+        final file = await http.MultipartFile.fromPath(
+          'profileImg',
+          _selectedImage!,
+          contentType: mimeTypeData != null
+              ? MediaType(mimeTypeData[0], mimeTypeData[1])
+              : MediaType('image', 'jpeg'),
+        );
+        request.files.add(file);
       }
 
-      final response = await http.patch(
-        Uri.parse(url),
-        headers: headers,
-        body: json.encode(body),
-      );
+      final response = await request.send();
+        final String responseString = await response.stream.bytesToString();
+        final Map<String, dynamic> responseData = json.decode(responseString);
 
+      
       if (response.statusCode == 200) {
         Fluttertoast.showToast(
           msg: "Profile updated successfully",
@@ -144,13 +180,18 @@ class _EditProfileState extends State<EditProfile> {
           backgroundColor: Colors.green,
           textColor: Colors.white,
         );
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => BottomNavigationScreen(currentIndex: 4),
+          ),
+        );
       } else {
         Fluttertoast.showToast(
           msg: "Failed to update profile",
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 2,
-          backgroundColor: Colors.green,
+          backgroundColor: Colors.red,
           textColor: Colors.white,
         );
       }
@@ -253,9 +294,12 @@ class _EditProfileState extends State<EditProfile> {
                 CircleAvatar(
                   radius: 80,
                   backgroundImage: _selectedImage != null
-                      ? FileImage(File(_selectedImage!))
-                      : null,
-                  child: _selectedImage == null
+                      ? FileImage(File(_selectedImage!)) as ImageProvider
+                      : widget.userDetails['profileImg'] != null
+                          ? NetworkImage(widget.userDetails['profileImg'])
+                          : null,
+                  child: _selectedImage == null &&
+                          widget.userDetails['profileImg'] == null
                       ? Icon(Icons.person, size: 80, color: Colors.grey)
                       : null,
                 ),
