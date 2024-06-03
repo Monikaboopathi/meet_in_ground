@@ -99,7 +99,7 @@ class _PasswordPageState extends State<PasswordPage> {
           (route) => false,
         );
         Fluttertoast.showToast(
-          msg: 'SUCCESS',
+          msg: responseData['message'],
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 2,
@@ -120,7 +120,7 @@ class _PasswordPageState extends State<PasswordPage> {
         await ImageService.saveImage("${responseData['profileImg']}");
       } else {
         Fluttertoast.showToast(
-          msg: responseData['message'],
+          msg: responseData['error'],
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 2,
@@ -139,10 +139,11 @@ class _PasswordPageState extends State<PasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: SingleChildScrollView(
+    return Scaffold(
+      backgroundColor: ThemeService.background,
+        body: Stack(
+      children: [
+        SingleChildScrollView(
           child: Form(
             key: _formKey,
             child: Column(
@@ -170,7 +171,7 @@ class _PasswordPageState extends State<PasswordPage> {
                           Text(
                             'Enter your password here',
                             style: TextStyle(
-                                fontSize: 16, fontWeight: FontWeight.w500),
+                                fontSize: 16, fontWeight: FontWeight.w500,color:ThemeService.textColor),
                           ),
                           Text(
                             '*',
@@ -185,6 +186,7 @@ class _PasswordPageState extends State<PasswordPage> {
                         height: 45,
                       ),
                       TextFormField(
+                        style: TextStyle(color:ThemeService.textColor),
                         obscureText:
                             !_isPasswordVisible, // This hides the entered text
                         controller:
@@ -196,6 +198,9 @@ class _PasswordPageState extends State<PasswordPage> {
                           prefixIcon:
                               Icon(Icons.lock), // Icon for password input
                           hintText: 'Enter your Password',
+                          hintStyle: TextStyle(color:ThemeService.textColor),
+                          prefixStyle: TextStyle(color:ThemeService.textColor),
+                          suffixStyle: TextStyle(color:ThemeService.textColor),
                           suffixIcon: IconButton(
                             icon: Icon(
                               _isPasswordVisible
@@ -231,13 +236,6 @@ class _PasswordPageState extends State<PasswordPage> {
                                 String mobileNO = widget.mobile;
                                 String password =
                                     passwordController.text.trim();
-                                showDialog(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder: (BuildContext context) {
-                                    return Loader();
-                                  },
-                                );
                                 await verifyPassword(
                                     mobileNO, password, context);
                               }
@@ -297,7 +295,16 @@ class _PasswordPageState extends State<PasswordPage> {
             ),
           ),
         ),
-      ),
-    );
+        if (isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.5),
+                child: Center(
+                  child: Loader(),
+                ),
+              ),
+            ),
+      ],
+    ));
   }
 }

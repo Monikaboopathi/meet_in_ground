@@ -307,7 +307,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 10, 8, 0),
               child: Text('Create your Profile',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700,color:ThemeService.textColor)),
             ),
           ],
         ),
@@ -315,7 +315,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
           children: [
             Text(
               'Before you join our safest social Media, let us know who you are',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500),
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.w500,color:ThemeService.textColor),
             ),
             SizedBox(height: 46),
             Stack(
@@ -351,7 +351,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
               children: [
                 Text(
                   'Username',
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.w500,color:ThemeService.textColor),
                 ),
                 Text(
                   '*',
@@ -364,12 +364,14 @@ class _UserOnBoardState extends State<UserOnBoard> {
             ),
             SizedBox(height: 8),
             TextField(
+              style: TextStyle(color:ThemeService.textColor),
               decoration: InputDecoration(
                 border: OutlineInputBorder(
                   borderRadius:
                       BorderRadius.circular(8.0), // Square-like borders
                 ),
                 labelText: 'Username',
+                labelStyle: TextStyle(color:ThemeService.textColor),
                 contentPadding:
                     EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
               ),
@@ -381,7 +383,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
             ),
           ],
         ),
-        'subtitle': Text('This will appear as your username to others'),
+        'subtitle': Text('This will appear as your username to others', style:TextStyle(color:ThemeService.textColor)),
       },
       {
         'header': Column(
@@ -389,7 +391,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 10, 8, 0),
               child: Text('Select Sports',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700,color:ThemeService.textColor)),
             ),
           ],
         ),
@@ -431,7 +433,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
             ),
           ],
         ),
-        'subtitle': Text('Select minimum 1 sport, maximum 5 sports'),
+        'subtitle': Text('Select minimum 1 sport, maximum 5 sports',style:TextStyle(color:ThemeService.textColor)),
       },
       {
         'header': Column(
@@ -439,7 +441,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
             Padding(
               padding: const EdgeInsets.fromLTRB(8.0, 10, 8, 0),
               child: Text('Share Location',
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700)),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.w700,color:ThemeService.textColor)),
             ),
           ],
         ),
@@ -462,7 +464,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
                   child: Text(
                     userCity,
                     style: TextStyle(
-                        fontSize: 18, fontWeight: FontWeight.w600),
+                        fontSize: 18, fontWeight: FontWeight.w600,color:ThemeService.textColor),
                   )),
             SizedBox(height: 20),
             ElevatedButton(
@@ -487,11 +489,12 @@ class _UserOnBoardState extends State<UserOnBoard> {
             SizedBox(height: 20),
           ],
         ),
-        'subtitle': Text('Share your Location for Identity'),
+        'subtitle': Text('Share your Location for Identity',style: TextStyle(color:ThemeService.textColor),),
       },
     ];
 
     return Scaffold(
+      backgroundColor: ThemeService.background,
       body: Padding(
         padding: const EdgeInsets.all(26.0),
         child: Column(
@@ -533,7 +536,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
                   ),
                 ),
                 SizedBox(height: 10),
-                Text('${index + 1} / ${onboarded.length}'),
+                Text('${index + 1} / ${onboarded.length}',style: TextStyle(color:ThemeService.textColor),),
               ],
             ),
           ],

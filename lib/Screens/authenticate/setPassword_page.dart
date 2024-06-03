@@ -119,227 +119,249 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: Scaffold(
-        body: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.fromLTRB(8.0, 100, 8, 50),
-                  child: Image.asset(
-                    'assets/login.png',
-                    width: MediaQuery.of(context).size.width,
-                    height: 280,
-                    fit: BoxFit.fill,
+    return Scaffold(
+      backgroundColor: ThemeService.background,
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            child: Form(
+              key: _formKey,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(8.0, 100, 8, 50),
+                    child: Image.asset(
+                      'assets/login.png',
+                      width: MediaQuery.of(context).size.width,
+                      height: 280,
+                      fit: BoxFit.fill,
+                    ),
                   ),
-                ),
-                SizedBox(height: 10),
-                Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Row(
-                        children: [
-                          Text(
-                            'Password',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.w800),
-                          ),
-                          Text(
-                            '*',
-                            style: TextStyle(
-                                color: Colors.red,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      TextFormField(
-                        obscureText:
-                            !_isPasswordVisible, // This hides the entered text
-                        controller:
-                            passwordController, // Your controller for handling the input
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(color: ThemeService.primary),
-                          ),
-                          prefixIcon:
-                              Icon(Icons.lock), // Icon for password input
-                          hintText: 'Enter Password',
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _isPasswordVisible
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _isPasswordVisible = !_isPasswordVisible;
-                              });
-                            },
-                          ),
-                        ),
-                        validator: (password) {
-                          if (password == null || password.isEmpty) {
-                            return 'Please enter Password';
-                          } else if (password.length < 8) {
-                            return 'Password must be at least 8 characters long';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(height: 20),
-                      Row(
-                        children: [
-                          Text(
-                            'Confirm Password',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.w800),
-                          ),
-                          Text(
-                            '*',
-                            style: TextStyle(
-                                color: Colors.red,
-                                fontSize: 16,
-                                fontWeight: FontWeight.w500),
-                          ),
-                        ],
-                      ),
-                      SizedBox(
-                        height: 20,
-                      ),
-                      TextFormField(
-                        obscureText:
-                            !_isConfirmPasswordVisible, // This hides the entered text
-                        controller:
-                            confirmpasswordController, // Your controller for handling the input
-                        decoration: InputDecoration(
-                          border: OutlineInputBorder(
-                            borderSide: BorderSide(color: ThemeService.primary),
-                          ),
-                          prefixIcon:
-                              Icon(Icons.lock), // Icon for password input
-                          hintText: 'Enter Confirm Password',
-                          suffixIcon: IconButton(
-                            icon: Icon(
-                              _isConfirmPasswordVisible
-                                  ? Icons.visibility
-                                  : Icons.visibility_off,
-                            ),
-                            onPressed: () {
-                              setState(() {
-                                _isConfirmPasswordVisible =
-                                    !_isConfirmPasswordVisible;
-                              });
-                            },
-                          ),
-                        ),
-                        validator: (confirmPassword) {
-                          if (confirmPassword == null ||
-                              confirmPassword.isEmpty) {
-                            return 'Please enter Confirm Password';
-                          } else if (confirmPassword !=
-                              passwordController.text) {
-                            return 'Passwords do not match';
-                          }
-                          return null;
-                        },
-                      ),
-                      SizedBox(
-                        height: 30,
-                      ),
-                      Center(
-                        child: Container(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              if (_formKey.currentState?.validate() ?? false) {
-                                String mobile = widget.mobile;
-                                String hero = widget.hero;
-                                String color = widget.color;
-                                String password = passwordController.text;
-                                String confirmPassword =
-                                    confirmpasswordController.text;
-                                showDialog(
-                                  context: context,
-                                  barrierDismissible: false,
-                                  builder: (BuildContext context) {
-                                    return Loader();
-                                  },
-                                );
-                                if (widget.status == 200) {
-                                  _submitpatchform();
-                                  ;
-                                } else {
-                                  await PreferencesService.saveValue(
-                                      "mobile", mobile);
-                                  await PreferencesService.saveValue(
-                                      "hero", hero);
-                                  await PreferencesService.saveValue(
-                                      "color", color);
-                                  await PreferencesService.saveValue(
-                                      "password", password);
-                                  await PreferencesService.saveValue(
-                                      "confirmPassword", confirmPassword);
-                                  await PreferencesService.saveValue(
-                                      'login', "true");
-
-                                  Navigator.pushAndRemoveUntil(
-                                    context,
-                                    MaterialPageRoute(
-                                        builder: (context) => UserOnBoard(
-                                            mobile: mobile,
-                                            favhero: hero,
-                                            favcolor: color,
-                                            password: password,
-                                            confirmpassword: confirmPassword)),
-                                    (route) => false,
-                                  );
-
-                                  Fluttertoast.showToast(
-                                    msg: 'Favourites  Addded Successfully',
-                                    toastLength: Toast.LENGTH_SHORT,
-                                    gravity: ToastGravity.TOP,
-                                    timeInSecForIosWeb: 2,
-                                    backgroundColor: Colors.green,
-                                    textColor: Colors.white,
-                                  );
-                                }
-                              }
-                            },
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              backgroundColor: ThemeService.buttonBg,
-                            ),
-                            child: const Text(
-                              'Submit',
+                  SizedBox(height: 10),
+                  Padding(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 20, vertical: 5),
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          children: [
+                            Text(
+                              'Password',
                               style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
+                                  fontSize: 18, fontWeight: FontWeight.w800,color:ThemeService.textColor),
+                            ),
+                            Text(
+                              '*',
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        TextFormField(
+                          style: TextStyle(color:ThemeService.textColor),
+                          obscureText:
+                              !_isPasswordVisible, // This hides the entered text
+                          controller:
+                              passwordController, // Your controller for handling the input
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: ThemeService.primary),
+                            ),
+                            prefixStyle: TextStyle(color:ThemeService.textColor),
+                            prefixIcon:
+                                Icon(Icons.lock), // Icon for password input
+                            hintText: 'Enter Password',
+                            hintStyle: TextStyle(color:ThemeService.textColor),
+                            suffixStyle: TextStyle(color:ThemeService.textColor),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isPasswordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isPasswordVisible = !_isPasswordVisible;
+                                });
+                              },
+                            ),
+                          ),
+                          validator: (password) {
+                            if (password == null || password.isEmpty) {
+                              return 'Please enter Password';
+                            } else if (password.length < 8) {
+                              return 'Password must be at least 8 characters long';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(height: 20),
+                        Row(
+                          children: [
+                            Text(
+                              'Confirm Password',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w800,color:ThemeService.textColor),
+                            ),
+                            Text(
+                              '*',
+                              style: TextStyle(
+                                  color: Colors.red,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500),
+                            ),
+                          ],
+                        ),
+                        SizedBox(
+                          height: 20,
+                        ),
+                        TextFormField(
+                          style: TextStyle(color:ThemeService.textColor),
+                          obscureText:
+                              !_isConfirmPasswordVisible, // This hides the entered text
+                          controller:
+                              confirmpasswordController, // Your controller for handling the input
+                          decoration: InputDecoration(
+                            border: OutlineInputBorder(
+                              borderSide:
+                                  BorderSide(color: ThemeService.primary),
+                            ),
+                            prefixStyle: TextStyle(color:ThemeService.textColor),
+                            prefixIcon:
+                                Icon(Icons.lock), // Icon for password input
+                            hintText: 'Enter Confirm Password',
+                            hintStyle: TextStyle(color:ThemeService.textColor),
+                            suffixStyle: TextStyle(color:ThemeService.textColor),
+                            suffixIcon: IconButton(
+                              icon: Icon(
+                                _isConfirmPasswordVisible
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
+                              ),
+                              onPressed: () {
+                                setState(() {
+                                  _isConfirmPasswordVisible =
+                                      !_isConfirmPasswordVisible;
+                                });
+                              },
+                            ),
+                          ),
+                          validator: (confirmPassword) {
+                            if (confirmPassword == null ||
+                                confirmPassword.isEmpty) {
+                              return 'Please enter Confirm Password';
+                            } else if (confirmPassword !=
+                                passwordController.text) {
+                              return 'Passwords do not match';
+                            }
+                            return null;
+                          },
+                        ),
+                        SizedBox(
+                          height: 30,
+                        ),
+                        Center(
+                          child: Container(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (_formKey.currentState?.validate() ??
+                                    false) {
+                                  String mobile = widget.mobile;
+                                  String hero = widget.hero;
+                                  String color = widget.color;
+                                  String password = passwordController.text;
+                                  String confirmPassword =
+                                      confirmpasswordController.text;
+                                  if (widget.status == 200) {
+                                    _submitpatchform();
+                                    ;
+                                  } else {
+                                    setState(() {
+                                      isLoading = true;
+                                    });
+                                    await PreferencesService.saveValue(
+                                        "mobile", mobile);
+                                    await PreferencesService.saveValue(
+                                        "hero", hero);
+                                    await PreferencesService.saveValue(
+                                        "color", color);
+                                    await PreferencesService.saveValue(
+                                        "password", password);
+                                    await PreferencesService.saveValue(
+                                        "confirmPassword", confirmPassword);
+                                    await PreferencesService.saveValue(
+                                        'login', "true");
+
+                                    Navigator.pushAndRemoveUntil(
+                                      context,
+                                      MaterialPageRoute(
+                                          builder: (context) => UserOnBoard(
+                                              mobile: mobile,
+                                              favhero: hero,
+                                              favcolor: color,
+                                              password: password,
+                                              confirmpassword:
+                                                  confirmPassword)),
+                                      (route) => false,
+                                    );
+
+                                    Fluttertoast.showToast(
+                                      msg: 'Favourites  Addded Successfully',
+                                      toastLength: Toast.LENGTH_SHORT,
+                                      gravity: ToastGravity.TOP,
+                                      timeInSecForIosWeb: 2,
+                                      backgroundColor: Colors.green,
+                                      textColor: Colors.white,
+                                    );
+                                    setState(() {
+                                      isLoading = false;
+                                    });
+                                  }
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                backgroundColor: ThemeService.buttonBg,
+                              ),
+                              child: const Text(
+                                'Submit',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
                               ),
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
-        ),
+          if (isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.5),
+                child: Center(
+                  child: Loader(),
+                ),
+              ),
+            ),
+        ],
       ),
     );
   }
