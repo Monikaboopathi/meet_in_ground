@@ -321,7 +321,7 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
-                              backgroundColor: ThemeService.primary,
+                              backgroundColor: ThemeService.buttonBg,
                             ),
                             child: const Text(
                               'Submit',
