@@ -273,6 +273,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: ThemeService.background,
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: ThemeService.background,
         title: Text(
           'Meet In Ground',

@@ -128,7 +128,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     itemCount: messages.length,
                     itemBuilder: (context, index) {
                       final message = messages[index];
-                      final isSender = message.sender == currentMobileNumber;
+                      final isSender =
+                          message.sender == "+91" + currentMobileNumber!;
                       final isMessageTruncated = message.message.length > 100;
                       final isExpanded = isMessageExpanded.containsKey(index)
                           ? isMessageExpanded[index]!

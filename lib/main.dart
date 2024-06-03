@@ -1,13 +1,13 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:meet_in_ground/Screens/onboarding/splashScreen.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
-import 'package:meet_in_ground/util/api/firebase_service.dart'; // Adjust import path as needed
+import 'package:meet_in_ground/util/api/firebase_service.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Initialize Firebase
   await Firebase.initializeApp(
     options: FirebaseOptions(
       apiKey: "AIzaSyCHm5EHrvpNixvs62Hs2hUndezVfBrQs8U",
@@ -19,7 +19,13 @@ Future<void> main() async {
       authDomain: "meetinground-464c9.firebaseapp.com",
     ),
   );
+
   await FirebaseApi().initNotifications();
+
+  FirebaseFirestore.instance.settings = const Settings(
+    persistenceEnabled: true,
+    cacheSizeBytes: Settings.CACHE_SIZE_UNLIMITED,
+  );
 
   runApp(const MyApp());
 }

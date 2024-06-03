@@ -4,18 +4,22 @@ import 'package:flutter/material.dart';
 
 import 'package:meet_in_ground/constant/themes_service.dart';
 
-class DeleteDialog extends StatefulWidget {
+class ConfirmationDialog extends StatefulWidget {
   final Future<void> Function() onDelete;
+  final String description;
+  final Color colors;
 
-  const DeleteDialog({
-    Key? key,
-    required this.onDelete,
-  }) : super(key: key);
+  const ConfirmationDialog(
+      {Key? key,
+      required this.onDelete,
+      required this.description,
+      required this.colors})
+      : super(key: key);
   @override
-  _DeleteDialogState createState() => _DeleteDialogState();
+  _ConfirmationDialogState createState() => _ConfirmationDialogState();
 }
 
-class _DeleteDialogState extends State<DeleteDialog> {
+class _ConfirmationDialogState extends State<ConfirmationDialog> {
   @override
   void initState() {
     super.initState();
@@ -82,7 +86,7 @@ class _DeleteDialogState extends State<DeleteDialog> {
                       height: 16,
                     ),
                     Text(
-                      "Do you want delete this Post?",
+                      widget.description,
                       style: TextStyle(
                           fontWeight: FontWeight.w500,
                           fontSize: 15,
@@ -127,7 +131,7 @@ class _DeleteDialogState extends State<DeleteDialog> {
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
-                              backgroundColor: Colors.red.shade400,
+                              backgroundColor: widget.colors,
                               padding: EdgeInsets.symmetric(vertical: 10),
                             ),
                             child: Container(
@@ -155,12 +159,15 @@ class _DeleteDialogState extends State<DeleteDialog> {
   }
 }
 
-void showDeleteDialog(BuildContext context, final onDelete) {
+void showConfirmationDialog(
+    BuildContext context, final onDelete, String description, Color colors) {
   showDialog(
     context: context,
     barrierDismissible: true,
-    builder: (context) => DeleteDialog(
+    builder: (context) => ConfirmationDialog(
       onDelete: onDelete,
+      description: description,
+      colors: colors,
     ),
   );
 }

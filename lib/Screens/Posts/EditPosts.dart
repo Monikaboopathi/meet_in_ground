@@ -572,10 +572,9 @@ class _EditPostState extends State<EditPost> {
                             return Loader();
                           },
                         );
-                        // Delay for 2 seconds to show the loader
-                        await Future.delayed(Duration(seconds: 2));
 
-                        // Dismiss the loader and return to the previous page
+                        await Future.delayed(Duration(seconds: 1));
+
                         Navigator.pop(context);
                         _handleSubmit();
                       },

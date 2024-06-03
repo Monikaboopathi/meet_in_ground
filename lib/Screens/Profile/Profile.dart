@@ -158,6 +158,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Scaffold(
       appBar: AppBar(
         backgroundColor: ThemeService.background,
+        automaticallyImplyLeading: false,
         title: Text(
           'Profile',
           style: TextStyle(
