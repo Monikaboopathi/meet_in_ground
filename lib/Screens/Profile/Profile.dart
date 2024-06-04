@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:meet_in_ground/Screens/Profile/EditProfilePage.dart';
@@ -59,12 +60,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Future<void> fetchData() async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
     try {
       setState(() {
         isLoading = true;
       });
-      var response = await http.get(Uri.parse(
-          'https://bet-x-new.onrender.com/user/viewUserProfile/$currentMobileNumber'));
+      var response = await http.get(
+          Uri.parse('$Base_url/user/viewUserProfile/$currentMobileNumber'));
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body)['data'];
@@ -185,7 +187,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         Navigator.pushAndRemoveUntil(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => EditProfile(userDetails: userDetails)),
+                              builder: (context) =>
+                                  EditProfile(userDetails: userDetails)),
                           (route) => false,
                         );
                       },

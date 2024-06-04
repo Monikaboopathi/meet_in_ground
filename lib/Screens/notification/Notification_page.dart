@@ -1,6 +1,7 @@
 // ignore_for_file: unnecessary_null_comparison
 
 import 'dart:convert';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
@@ -30,13 +31,13 @@ class _NotificationspageState extends State<Notificationspage> {
   }
 
   fetchData() async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
     try {
       String? userMobileNumber = await MobileNo.getMobilenumber();
       print('User Mobile Number: $userMobileNumber');
 
       final response = await http.get(
-        Uri.parse(
-            'https://bet-x-new.onrender.com/user/viewNotifications/$userMobileNumber'),
+        Uri.parse('$Base_url/user/viewNotifications/$userMobileNumber'),
       );
 
       if (response.statusCode == 200) {

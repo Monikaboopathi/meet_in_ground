@@ -62,10 +62,6 @@ dependencies:
   cloud_firestore: ^4.17.5
   firebase_storage: ^11.7.7
 
-
-
-
-
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -106,7 +102,7 @@ flutter:
     - assets/noData.png
     - assets/loader.json
     - assets/location.json
-
+    - .env
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware

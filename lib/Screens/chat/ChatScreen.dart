@@ -198,7 +198,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                   padding: EdgeInsets.symmetric(
                                       horizontal: 12, vertical: 4),
                                   decoration: BoxDecoration(
-                                    color: Colors.grey[300],
+                                    color: ThemeService.transparent,
                                     borderRadius: BorderRadius.circular(16),
                                   ),
                                   child: Text(

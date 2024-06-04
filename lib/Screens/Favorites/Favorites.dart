@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Models/Post.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
@@ -62,10 +63,11 @@ class _FavoritesState extends State<Favorites> {
   }
 
   Future<List<Post>> fetchPosts({String? query}) async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
     print(currentMobileNumber.toString());
     final url = query != null && query.isNotEmpty
-        ? 'https://bet-x-new.onrender.com/user/viewFavorites/$currentMobileNumber?search=$query'
-        : 'https://bet-x-new.onrender.com/user/viewFavorites/$currentMobileNumber';
+        ? '$Base_url/user/viewFavorites/$currentMobileNumber?search=$query'
+        : '$Base_url/user/viewFavorites/$currentMobileNumber';
 
     final response = await http.get(Uri.parse(url));
 
@@ -94,7 +96,8 @@ class _FavoritesState extends State<Favorites> {
   }
 
   Future<void> deleteFav(String postId) async {
-    final String apiUrl = 'https://bet-x-new.onrender.com/user/removeFavorites';
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
+    final String apiUrl = '$Base_url/user/removeFavorites';
 
     final Map<String, dynamic> requestData = {
       'id': postId,
@@ -135,7 +138,8 @@ class _FavoritesState extends State<Favorites> {
   }
 
   Future<void> toggleFavorite(String postId) async {
-    final String apiUrl = 'https://bet-x-new.onrender.com/user/addFavorites';
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
+    final String apiUrl = '$Base_url/user/addFavorites';
     print(postId);
 
     final Map<String, dynamic> requestData = {
@@ -176,8 +180,8 @@ class _FavoritesState extends State<Favorites> {
   }
 
   Future<void> deleteRequest(String postId) async {
-    final String apiUrl =
-        'https://bet-x-new.onrender.com/post/removeRequest/$currentMobileNumber';
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
+    final String apiUrl = '$Base_url/post/removeRequest/$currentMobileNumber';
 
     final Map<String, dynamic> requestData = {
       'postId': postId,
@@ -217,8 +221,8 @@ class _FavoritesState extends State<Favorites> {
   }
 
   Future<void> toggleRequest(String postId) async {
-    final String apiUrl =
-        'https://bet-x-new.onrender.com/post/makeRequestPost/$currentMobileNumber';
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
+    final String apiUrl = '$Base_url/post/makeRequestPost/$currentMobileNumber';
     print(postId);
 
     final Map<String, dynamic> requestData = {

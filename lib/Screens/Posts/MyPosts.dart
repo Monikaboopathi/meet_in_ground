@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Screens/Posts/EditPosts.dart';
 import 'package:meet_in_ground/Screens/request/request_page.dart';
@@ -64,9 +65,10 @@ class _MyPostsState extends State<MyPosts> {
   }
 
   Future<List> fetchPosts({String? query}) async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
     final url = query != null && query.isNotEmpty
-        ? 'https://bet-x-new.onrender.com/post/viewMyPosts/$currentMobileNumber?search=$query'
-        : 'https://bet-x-new.onrender.com/post/viewMyPosts/$currentMobileNumber';
+        ? '$Base_url/post/viewMyPosts/$currentMobileNumber?search=$query'
+        : '$Base_url/post/viewMyPosts/$currentMobileNumber';
 
     final response = await http.get(Uri.parse(url));
 
@@ -98,8 +100,8 @@ class _MyPostsState extends State<MyPosts> {
   }
 
   Future<void> deletePost(String postId) async {
-    final String apiUrl =
-        'https://bet-x-new.onrender.com/post/deletePost/${postId}';
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
+    final String apiUrl = '$Base_url/post/deletePost/${postId}';
 
     final response = await http.delete(
       Uri.parse(apiUrl),

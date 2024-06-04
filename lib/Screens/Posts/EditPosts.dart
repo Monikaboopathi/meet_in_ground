@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:meet_in_ground/Screens/Posts/MyPosts.dart';
@@ -89,8 +90,8 @@ class _EditPostState extends State<EditPost> {
   }
 
   Future<void> fetchPostData() async {
-    String Base_url =
-        "https://bet-x-new.onrender.com/post/viewMyPostById/${widget.postId}";
+    String BaseUrl = dotenv.get("BASE_URL", fallback: null);
+    String Base_url = "$BaseUrl/post/viewMyPostById/${widget.postId}";
     setState(() {
       isLoading = true;
     });
@@ -123,6 +124,7 @@ class _EditPostState extends State<EditPost> {
   }
 
   Future<void> _handleSubmit() async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
     if (_validateFields()) {
       String? userMobileNumber = await MobileNo.getMobilenumber();
       print(userMobileNumber);
@@ -161,8 +163,7 @@ class _EditPostState extends State<EditPost> {
       try {
         http.MultipartRequest request = http.MultipartRequest(
           'PATCH',
-          Uri.parse(
-              'https://bet-x-new.onrender.com/post/updatePost/${widget.postId}'),
+          Uri.parse('$Base_url/post/updatePost/${widget.postId}'),
         );
         request.headers['Content-Type'] = 'application/json';
         request.fields.addAll(postData);

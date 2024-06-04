@@ -3,6 +3,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
@@ -43,14 +44,14 @@ class _RateUsDialogState extends State<RateUsDialog> {
   }
 
   Future<void> handleRateUs() async {
-    // String Base_url = dotenv.get("BASE_URL", fallback: null);
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
 
     setState(() {
       isLoading = true;
     });
     try {
       final response = await http.post(
-        Uri.parse('https://bet-x-new.onrender.com/user/addRating/8072974576'),
+        Uri.parse('$Base_url/user/addRating/8072974576'),
         body: jsonEncode(
             {"rating": ratings, "comments": feedbackController.text}),
         headers: {
@@ -394,7 +395,6 @@ void showDialogRateUs(BuildContext context) {
   showDialog(
     context: context,
     barrierDismissible: true,
-  
     builder: (context) => RateUsDialog(),
   );
 }

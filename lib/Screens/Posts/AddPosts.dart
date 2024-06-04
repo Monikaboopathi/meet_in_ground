@@ -1,5 +1,6 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:meet_in_ground/Screens/Posts/MyPosts.dart';
@@ -69,6 +70,7 @@ class _AddpostsState extends State<Addposts> {
   }
 
   Future<void> _handleSubmit() async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
     if (_validateFields()) {
       String? userMobileNumber = await MobileNo.getMobilenumber();
       String? userName = await UsernameService.getUserName();
@@ -87,8 +89,7 @@ class _AddpostsState extends State<Addposts> {
       try {
         var request = http.MultipartRequest(
           'POST',
-          Uri.parse(
-              'https://bet-x-new.onrender.com/post/addPost/$userMobileNumber'),
+          Uri.parse('$Base_url/post/addPost/$userMobileNumber'),
         );
 
         request.fields.addAll(formData);
