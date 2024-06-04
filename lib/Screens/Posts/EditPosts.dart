@@ -2,8 +2,13 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
+import 'package:meet_in_ground/Ads/BannerAd.dart';
+import 'package:meet_in_ground/Ads/InterstitialAd.dart';
+import 'package:meet_in_ground/Ads/NativeAd.dart';
+import 'package:meet_in_ground/Ads/RewardAds.dart';
 import 'package:meet_in_ground/Screens/Posts/MyPosts.dart';
 import 'package:meet_in_ground/constant/results.dart';
 import 'package:meet_in_ground/constant/sports_names.dart';
@@ -44,10 +49,13 @@ class _EditPostState extends State<EditPost> {
   TextEditingController locationController = TextEditingController();
   TextEditingController priceController = TextEditingController();
   TextEditingController matchDetailsController = TextEditingController();
+  final NativeAdsController nativeAdController = Get.put(NativeAdsController());
+
   @override
   void initState() {
     super.initState();
     fetchPostData();
+    nativeAdController.loadAd();
   }
 
   bool _validateFields() {
@@ -594,6 +602,9 @@ class _EditPostState extends State<EditPost> {
                       ),
                     ),
                   ),
+                  AdMobBanner(),
+                  AdMobInterstitial(),
+                  AdMobReward(),
                 ],
               ),
             ),

@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
+import 'package:meet_in_ground/Ads/NativeAd.dart';
 import 'package:meet_in_ground/Models/Post.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/Confirmation_Dialog.dart';
@@ -26,9 +28,12 @@ class _HomeScreenState extends State<HomeScreen> {
   Map<String, bool> showMoreMap = {};
   String? currentMobileNumber;
 
+  final NativeAdsController nativeAdController = Get.put(NativeAdsController());
+
   @override
   void initState() {
     super.initState();
+    nativeAdController.loadAd();
     initializeData().then((mobileNumber) {
       if (mounted) {
         setState(() {
@@ -477,7 +482,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 itemBuilder: (context, index) {
                   Post post = snapshot.data![index];
                   bool isShowMore = showMoreMap[post.id] ?? false;
-              
+
                   return Post_Widget(
                     userName: post.userName,
                     placeOfMatch: post.placeOfMatch,
