@@ -431,7 +431,8 @@ class _WalletPageState extends State<WalletPage> {
             padding: EdgeInsets.all(5.0),
             margin: EdgeInsets.symmetric(horizontal: 20.0),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Colors.grey.shade200,
+              border: Border.all(color: ThemeService.primary,width: 3),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(

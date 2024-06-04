@@ -369,6 +369,10 @@ class _LoginPageState extends State<LoginPage> {
                               },
                             );
                             await referralPost(refferal);
+                            setState(() {
+                              referralController.clear();
+                              Navigator.pop(context);
+                            });
                           }
                         },
                         style: ElevatedButton.styleFrom(
