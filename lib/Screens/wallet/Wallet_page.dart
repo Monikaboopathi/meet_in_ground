@@ -104,6 +104,9 @@ class _WalletPageState extends State<WalletPage> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'upiID': trimmedText}),
       );
+final Map<String, dynamic> responseData = jsonDecode(response.body);
+
+      print(responseData);
 
       if (response.statusCode == 200) {
         // Handle success
@@ -115,7 +118,7 @@ class _WalletPageState extends State<WalletPage> {
         });
         // Show success message or handle UI update
         Fluttertoast.showToast(
-          msg: "Withdraw request submitted successfully",
+          msg: responseData['message'],
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 2,
@@ -125,7 +128,7 @@ class _WalletPageState extends State<WalletPage> {
       } else {
         // Handle error
         Fluttertoast.showToast(
-          msg: "Failed to submit withdraw request",
+          msg:responseData['error'] ,
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 2,
