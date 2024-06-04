@@ -472,54 +472,50 @@ class _HomeScreenState extends State<HomeScreen> {
                 snapshot.data!.isEmpty) {
               return Center(child: NoDataFoundWidget());
             } else {
-              return Column(
-                children: [
-                  ListView.builder(
-                    itemCount: snapshot.data!.length,
-                    itemBuilder: (context, index) {
-                      Post post = snapshot.data![index];
-                      bool isShowMore = showMoreMap[post.id] ?? false;
-
-                      return Post_Widget(
-                        userName: post.userName,
-                        placeOfMatch: post.placeOfMatch,
-                        likes: post.likes,
-                        comments: post.comments,
-                        betAmount: post.betAmount,
-                        id: post.id,
-                        image: post.image,
-                        postOwnerImage: post.postOwnerImage,
-                        matchDate: post.matchDate,
-                        matchDetails: post.matchDetails,
-                        phoneNumber: post.phoneNumber,
-                        sport: post.sport,
-                        status: post.status,
-                        createdAt: post.createdAt,
-                        isShowMore: isShowMore,
-                        onToggleShowMore: _toggleShowMore,
-                        isFavorite: post.favorites.any((favorite) =>
-                            favorite['phoneNumber'] ==
-                            "+91" + currentMobileNumber!),
-                        onDeleteFav: () => deleteFav(post.id),
-                        onFavoriteToggle: () => toggleFavorite(post.id),
-                        isRequest: post.requests.any((requuest) =>
-                            requuest['phoneNumber'] ==
-                            "+91" + currentMobileNumber!),
-                        onDeleteRequest: () => showConfirmationDialog(
-                            context,
-                            () => deleteRequest(post.id),
-                            "Do you want Delete this Post Request?",
-                            Colors.red.shade400),
-                        onRequestToggle: () => showConfirmationDialog(
-                            context,
-                            () => toggleRequest(post.id),
-                            "Do you want Request this Post?",
-                            Colors.green.shade400),
-                        currentMobileNumber: "+91" + currentMobileNumber!,
-                      );
-                    },
-                  ),
-                ],
+              return ListView.builder(
+                itemCount: snapshot.data!.length,
+                itemBuilder: (context, index) {
+                  Post post = snapshot.data![index];
+                  bool isShowMore = showMoreMap[post.id] ?? false;
+              
+                  return Post_Widget(
+                    userName: post.userName,
+                    placeOfMatch: post.placeOfMatch,
+                    likes: post.likes,
+                    comments: post.comments,
+                    betAmount: post.betAmount,
+                    id: post.id,
+                    image: post.image,
+                    postOwnerImage: post.postOwnerImage,
+                    matchDate: post.matchDate,
+                    matchDetails: post.matchDetails,
+                    phoneNumber: post.phoneNumber,
+                    sport: post.sport,
+                    status: post.status,
+                    createdAt: post.createdAt,
+                    isShowMore: isShowMore,
+                    onToggleShowMore: _toggleShowMore,
+                    isFavorite: post.favorites.any((favorite) =>
+                        favorite['phoneNumber'] ==
+                        "+91" + currentMobileNumber!),
+                    onDeleteFav: () => deleteFav(post.id),
+                    onFavoriteToggle: () => toggleFavorite(post.id),
+                    isRequest: post.requests.any((requuest) =>
+                        requuest['phoneNumber'] ==
+                        "+91" + currentMobileNumber!),
+                    onDeleteRequest: () => showConfirmationDialog(
+                        context,
+                        () => deleteRequest(post.id),
+                        "Do you want Delete this Post Request?",
+                        Colors.red.shade400),
+                    onRequestToggle: () => showConfirmationDialog(
+                        context,
+                        () => toggleRequest(post.id),
+                        "Do you want Request this Post?",
+                        Colors.green.shade400),
+                    currentMobileNumber: "+91" + currentMobileNumber!,
+                  );
+                },
               );
             }
           },
