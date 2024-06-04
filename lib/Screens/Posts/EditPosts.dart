@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:intl/intl.dart';
 import 'package:meet_in_ground/Ads/BannerAd.dart';
 import 'package:meet_in_ground/Ads/InterstitialAd.dart';
 import 'package:meet_in_ground/Ads/NativeAd.dart';
@@ -598,8 +597,10 @@ class _EditPostState extends State<EditPost> {
                       ),
                     ),
                   ),
-
                 ),
+                AdMobBanner(),
+                AdMobInterstitial(),
+                AdMobReward(),
               ],
             ),
           ),
@@ -610,12 +611,8 @@ class _EditPostState extends State<EditPost> {
                 child: Center(
                   child: Loader(),
                 ),
-
               ),
             ),
-           AdMobBanner(),
-           AdMobInterstitial(),
-           AdMobReward(),
         ],
       ),
     );

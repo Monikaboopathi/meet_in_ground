@@ -454,6 +454,9 @@ class _AddpostsState extends State<Addposts> {
                     ),
                   ),
                 ),
+                AdMobBanner(),
+                AdMobInterstitial(),
+                AdMobReward(),
               ],
             ),
           ),
@@ -466,11 +469,7 @@ class _AddpostsState extends State<Addposts> {
                 ),
               ),
             ),
-            AdMobBanner(),
-            AdMobInterstitial(),
-            AdMobReward(),
         ],
-
       ),
     );
   }
