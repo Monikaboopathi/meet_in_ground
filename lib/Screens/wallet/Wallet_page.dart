@@ -8,6 +8,8 @@ import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:http/http.dart' as http;
 import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
+import 'package:meet_in_ground/widgets/ShareMethods.dart';
+
 
 class WalletPage extends StatefulWidget {
   @override
@@ -221,7 +223,9 @@ class _WalletPageState extends State<WalletPage> {
                               fontWeight: FontWeight.bold),
                         ),
                         ElevatedButton(
-                          onPressed: () {},
+                          onPressed: () {
+                            shareApp();
+                          },
                           style: ElevatedButton.styleFrom(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(8.0),
