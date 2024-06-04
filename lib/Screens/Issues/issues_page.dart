@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:image_picker/image_picker.dart';
 import 'dart:io';
@@ -36,6 +37,8 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
   }
 
   Future<void> _handleSubmit() async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
+
     setState(() {
       _subjectError = _subjectController.text.trim().isEmpty
           ? 'Subject cannot be empty'
@@ -52,8 +55,7 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
 
     if (_subjectError.isEmpty && _messageError.isEmpty) {
       try {
-        var uri = Uri.parse(
-            'https://bet-x-new.onrender.com/user/addIssues/$userMobileNumber');
+        var uri = Uri.parse('$Base_url/user/addIssues/$userMobileNumber');
         var request = http.MultipartRequest('POST', uri);
         request.fields['subject'] = subject;
         request.fields['message'] = message;

@@ -1,6 +1,7 @@
 // ignore_for_file: unused_local_variable
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:meet_in_ground/Screens/chat/ChatScreen.dart';
 import 'dart:convert';
@@ -36,11 +37,11 @@ class _RequestsScreenState extends State<RequestsScreen> {
   }
 
   fetchData() async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
     setState(() {
       isLoading = true;
     });
-    final url =
-        'https://bet-x-new.onrender.com/post/viewMyPostRequests/${widget.postId}';
+    final url = '$Base_url/post/viewMyPostRequests/${widget.postId}';
     try {
       final response = await http.get(Uri.parse(url));
       if (response.statusCode == 200) {
@@ -69,8 +70,8 @@ class _RequestsScreenState extends State<RequestsScreen> {
   }
 
   handleAccept(String userId) async {
-    final url =
-        'https://bet-x-new.onrender.com/post/updateMyPostRequest/${widget.postId}/$userId';
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
+    final url = '$Base_url/post/updateMyPostRequest/${widget.postId}/$userId';
     try {
       final response = await http.patch(
         Uri.parse(url),
@@ -95,8 +96,8 @@ class _RequestsScreenState extends State<RequestsScreen> {
   }
 
   handleRequest(String userId) async {
-    final url =
-        'https://bet-x-new.onrender.com/post/updateMyPostRequest/${widget.postId}/$userId';
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
+    final url = '$Base_url/post/updateMyPostRequest/${widget.postId}/$userId';
     try {
       final response = await http.patch(
         Uri.parse(url),

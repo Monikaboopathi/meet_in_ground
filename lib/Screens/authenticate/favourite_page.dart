@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
@@ -27,11 +28,12 @@ class _FavouritePageState extends State<FavouritePage> {
 
   Future<void> submitUserData(
       String phoneNumber, String favoriteHero, String favoriteColor) async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
     setState(() {
       isLoading = true;
     });
 
-    String apiUrl = 'https://bet-x-new.onrender.com/user/forgotPassword';
+    String apiUrl = '$Base_url/user/forgotPassword';
     print(phoneNumber);
     print(favoriteHero);
     print(favoriteColor);
@@ -128,7 +130,9 @@ class _FavouritePageState extends State<FavouritePage> {
                             Text(
                               'Favourite Hero',
                               style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w800,color:ThemeService.textColor),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  color: ThemeService.textColor),
                             ),
                             Text(
                               '*',
@@ -143,20 +147,21 @@ class _FavouritePageState extends State<FavouritePage> {
                           height: 20,
                         ),
                         TextFormField(
-                          style:TextStyle(color:ThemeService.textColor),
+                          style: TextStyle(color: ThemeService.textColor),
                           controller:
                               heroController, // Your controller for handling the input
                           decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: ThemeService.primary),
-                            ),
-                            prefixStyle: TextStyle(color:ThemeService.textColor),
-                            prefixIcon:
-                                Icon(Icons.star), // Icon for password input
-                            hintText: 'Enter Favourite Hero',
-                            hintStyle: TextStyle(color:ThemeService.textColor)
-                          ),
+                              border: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: ThemeService.primary),
+                              ),
+                              prefixStyle:
+                                  TextStyle(color: ThemeService.textColor),
+                              prefixIcon:
+                                  Icon(Icons.star), // Icon for password input
+                              hintText: 'Enter Favourite Hero',
+                              hintStyle:
+                                  TextStyle(color: ThemeService.textColor)),
                           validator: (hero) {
                             if (hero == null || hero.isEmpty) {
                               return 'Please your favourite hero name';
@@ -174,7 +179,9 @@ class _FavouritePageState extends State<FavouritePage> {
                             Text(
                               'Favourite Color',
                               style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w800,color:ThemeService.textColor),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  color: ThemeService.textColor),
                             ),
                             Text(
                               '*',
@@ -189,20 +196,21 @@ class _FavouritePageState extends State<FavouritePage> {
                           height: 20,
                         ),
                         TextFormField(
-                          style: TextStyle(color:ThemeService.textColor),
+                          style: TextStyle(color: ThemeService.textColor),
                           controller:
                               colorController, // Your controller for handling the input
                           decoration: InputDecoration(
-                            border: OutlineInputBorder(
-                              borderSide:
-                                  BorderSide(color: ThemeService.primary),
-                            ),
-                            prefixStyle: TextStyle(color:ThemeService.textColor),
-                            prefixIcon: Icon(
-                                Icons.color_lens), // Icon for password input
-                            hintText: 'Enter Favourite Color',
-                            hintStyle: TextStyle(color:ThemeService.textColor)
-                          ),
+                              border: OutlineInputBorder(
+                                borderSide:
+                                    BorderSide(color: ThemeService.primary),
+                              ),
+                              prefixStyle:
+                                  TextStyle(color: ThemeService.textColor),
+                              prefixIcon: Icon(
+                                  Icons.color_lens), // Icon for password input
+                              hintText: 'Enter Favourite Color',
+                              hintStyle:
+                                  TextStyle(color: ThemeService.textColor)),
                           validator: (color) {
                             if (color == null || color.isEmpty) {
                               return 'Enter your favourite color';

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
@@ -32,11 +33,11 @@ class _WalletPageState extends State<WalletPage> {
   }
 
   Future<void> _fetchData() async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
     String? userMobileNumber = await MobileNo.getMobilenumber();
     print(userMobileNumber);
 
-    final url = Uri.parse(
-        'https://bet-x-new.onrender.com/user/walletDetails/$userMobileNumber');
+    final url = Uri.parse('$Base_url/user/walletDetails/$userMobileNumber');
 
     try {
       final response = await http.get(url);
@@ -54,6 +55,7 @@ class _WalletPageState extends State<WalletPage> {
   }
 
   void _handleSubmit() async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
     setState(() {
       _textError = '';
     });
@@ -92,8 +94,7 @@ class _WalletPageState extends State<WalletPage> {
 
     String? userMobileNumber = await MobileNo.getMobilenumber();
 
-    final url = Uri.parse(
-        'https://bet-x-new.onrender.com/user/withdrawRequest/$userMobileNumber');
+    final url = Uri.parse('$Base_url/user/withdrawRequest/$userMobileNumber');
 
     try {
       final response = await http.post(
@@ -136,9 +137,10 @@ class _WalletPageState extends State<WalletPage> {
   }
 
   Future<void> _fetchWithdrawalHistory() async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
     String? userMobileNumber = await MobileNo.getMobilenumber();
-    final url = Uri.parse(
-        'https://bet-x-new.onrender.com/user/viewMyWithdrawRequests/$userMobileNumber');
+    final url =
+        Uri.parse('$Base_url/user/viewMyWithdrawRequests/$userMobileNumber');
 
     try {
       final response = await http.get(url);
@@ -169,10 +171,10 @@ class _WalletPageState extends State<WalletPage> {
     });
   }
 
- Future<void> _refresh() async {
-  await _fetchData();
-  await _fetchWithdrawalHistory();
-}
+  Future<void> _refresh() async {
+    await _fetchData();
+    await _fetchWithdrawalHistory();
+  }
 
   @override
   Widget build(BuildContext context) {

@@ -1,6 +1,7 @@
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Screens/authenticate/login_page.dart';
 import 'package:meet_in_ground/util/Services/PreferencesService.dart';
@@ -42,6 +43,7 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
   bool isLoading = false;
 
   void _submitpatchform() async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
     setState(() {
       isLoading = true;
     });
@@ -58,7 +60,7 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
     };
 
     // API endpoint
-    final String apiUrl = 'https://bet-x-new.onrender.com/user/resetPassword';
+    final String apiUrl = '$Base_url/user/resetPassword';
 
     try {
       // Make PATCH request
@@ -151,7 +153,9 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                             Text(
                               'Password',
                               style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w800,color:ThemeService.textColor),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  color: ThemeService.textColor),
                             ),
                             Text(
                               '*',
@@ -166,7 +170,7 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                           height: 20,
                         ),
                         TextFormField(
-                          style: TextStyle(color:ThemeService.textColor),
+                          style: TextStyle(color: ThemeService.textColor),
                           obscureText:
                               !_isPasswordVisible, // This hides the entered text
                           controller:
@@ -176,12 +180,14 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                               borderSide:
                                   BorderSide(color: ThemeService.primary),
                             ),
-                            prefixStyle: TextStyle(color:ThemeService.textColor),
+                            prefixStyle:
+                                TextStyle(color: ThemeService.textColor),
                             prefixIcon:
                                 Icon(Icons.lock), // Icon for password input
                             hintText: 'Enter Password',
-                            hintStyle: TextStyle(color:ThemeService.textColor),
-                            suffixStyle: TextStyle(color:ThemeService.textColor),
+                            hintStyle: TextStyle(color: ThemeService.textColor),
+                            suffixStyle:
+                                TextStyle(color: ThemeService.textColor),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _isPasswordVisible
@@ -210,7 +216,9 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                             Text(
                               'Confirm Password',
                               style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w800,color:ThemeService.textColor),
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.w800,
+                                  color: ThemeService.textColor),
                             ),
                             Text(
                               '*',
@@ -225,7 +233,7 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                           height: 20,
                         ),
                         TextFormField(
-                          style: TextStyle(color:ThemeService.textColor),
+                          style: TextStyle(color: ThemeService.textColor),
                           obscureText:
                               !_isConfirmPasswordVisible, // This hides the entered text
                           controller:
@@ -235,12 +243,14 @@ class _SetPasswordPageState extends State<SetPasswordPage> {
                               borderSide:
                                   BorderSide(color: ThemeService.primary),
                             ),
-                            prefixStyle: TextStyle(color:ThemeService.textColor),
+                            prefixStyle:
+                                TextStyle(color: ThemeService.textColor),
                             prefixIcon:
                                 Icon(Icons.lock), // Icon for password input
                             hintText: 'Enter Confirm Password',
-                            hintStyle: TextStyle(color:ThemeService.textColor),
-                            suffixStyle: TextStyle(color:ThemeService.textColor),
+                            hintStyle: TextStyle(color: ThemeService.textColor),
+                            suffixStyle:
+                                TextStyle(color: ThemeService.textColor),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _isConfirmPasswordVisible
