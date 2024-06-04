@@ -9,6 +9,8 @@ import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
+import 'package:mime/mime.dart';
+import 'package:http_parser/http_parser.dart';
 
 class ReportIssuesPage extends StatefulWidget {
   @override
@@ -30,16 +32,10 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
       setState(() {
         _selectedImage = File(pickedFile.path);
       });
-
-      // Convert image path to a File object
-      String filePath = pickedFile.path;
-
-      // Call handleProfile with the File object
-      _handleSubmit(File(filePath));
     }
   }
 
-  Future<void> _handleSubmit([File? file]) async {
+  Future<void> _handleSubmit() async {
     setState(() {
       _subjectError = _subjectController.text.trim().isEmpty
           ? 'Subject cannot be empty'
@@ -48,9 +44,9 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
           ? 'Message cannot be empty'
           : '';
     });
+
     String message = _messageController.text;
     String subject = _subjectController.text;
-
     String? userMobileNumber = await MobileNo.getMobilenumber();
     print(userMobileNumber);
 
@@ -63,10 +59,24 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
         request.fields['message'] = message;
 
         if (_selectedImage != null) {
-          request.files.add(await http.MultipartFile.fromPath(
+          final mimeTypeData =
+              lookupMimeType(_selectedImage!.path, headerBytes: [0xFF, 0xD8])
+                  ?.split('/');
+          final file = await http.MultipartFile.fromPath(
             'screenshotImg',
             _selectedImage!.path,
-          ));
+            contentType: mimeTypeData != null
+                ? MediaType(mimeTypeData[0], mimeTypeData[1])
+                : MediaType('image', 'jpeg'),
+          );
+
+          // Debug prints
+          print('--------------------------------------------------------');
+          print('File path: ${_selectedImage!.path}');
+          print('File size: ${await _selectedImage!.length()}');
+          print('MIME type: ${file.contentType}');
+
+          request.files.add(file);
         }
 
         var response = await request.send();
@@ -77,8 +87,14 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
         print(responseData);
 
         if (response.statusCode == 200) {
+
           _messageController.clear();
           _subjectController.clear();
+
+           setState(() {
+          _selectedImage = null; // Clear the selected image
+        });
+        
           Fluttertoast.showToast(
             msg: responseData['message'],
             toastLength: Toast.LENGTH_SHORT,
@@ -90,7 +106,7 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
           print('Issue reported successfully');
         } else {
           Fluttertoast.showToast(
-            msg:responseData['error'],
+            msg: responseData['error'],
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.TOP,
             timeInSecForIosWeb: 2,
@@ -101,7 +117,7 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
         }
       } catch (e) {
         print('Error reporting issue: $e');
-      } finally {}
+      }
     }
   }
 
