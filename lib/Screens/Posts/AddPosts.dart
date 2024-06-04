@@ -27,6 +27,7 @@ class _AddpostsState extends State<Addposts> {
   DateTime date = DateTime.now();
   bool showPicker = false;
   final picker = ImagePicker();
+  bool isLoading = false;
 
   String? sportError;
   String? dateError;
@@ -170,7 +171,7 @@ class _AddpostsState extends State<Addposts> {
   }
 
   String _formatDate(DateTime date) {
-    return DateFormat('dd-MM-yyyy').format(date);
+    return '${date.day.toString().padLeft(2, '0')}/${date.month.toString().padLeft(2, '0')}/${date.year}';
   }
 
   @override
@@ -190,261 +191,270 @@ class _AddpostsState extends State<Addposts> {
         centerTitle: true,
       ),
       backgroundColor: ThemeService.background,
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            GestureDetector(
-              onTap: pickImage,
-              child: Center(
-                child: Container(
-                  height: 200,
-                  width: 200,
-                  decoration: BoxDecoration(
-                    color: Colors.grey[300],
-                    borderRadius: BorderRadius.circular(10),
-                    border: Border.all(color: ThemeService.buttonBg, width: 3),
-                  ),
-                  child: selectedImage == null
-                      ? Center(
-                          child: Icon(Icons.add_a_photo,
-                              color: Colors.grey[800], size: 100),
-                        )
-                      : ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Image.file(selectedImage!, fit: BoxFit.cover),
-                        ),
-                ),
-              ),
-            ),
-            SizedBox(height: 40),
-            Row(
+      body: Stack(
+        children: [
+          SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text('Sport*',
-                          style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w800,
-                              color: ThemeService.textColor)),
-                      SizedBox(height: 5),
-                      Container(
-                        decoration: BoxDecoration(
-                          borderRadius: BorderRadius.circular(10),
-                          border: Border.all(color: Colors.grey),
-                        ),
-                        child: DropdownButton<String>(
-                          isExpanded: true,
-                          value: selectedValue,
-                          underline: Container(), // Remove the underline
-                          items: sportNames.map((sport) {
-                            return DropdownMenuItem<String>(
-                              value: sport,
-                              child: Padding(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 10, vertical: 15),
+                GestureDetector(
+                  onTap: pickImage,
+                  child: Center(
+                    child: Container(
+                      height: 200,
+                      width: 200,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[300],
+                        borderRadius: BorderRadius.circular(10),
+                        border:
+                            Border.all(color: ThemeService.buttonBg, width: 3),
+                      ),
+                      child: selectedImage == null
+                          ? Center(
+                              child: Icon(Icons.add_a_photo,
+                                  color: Colors.grey[800], size: 100),
+                            )
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(10),
+                              child:
+                                  Image.file(selectedImage!, fit: BoxFit.cover),
+                            ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 40),
+                Row(
+                  children: <Widget>[
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text('Sport*',
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w800,
+                                  color: ThemeService.textColor)),
+                          SizedBox(height: 5),
+                          Container(
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(10),
+                              border: Border.all(color: Colors.grey),
+                            ),
+                            child: DropdownButton<String>(
+                              isExpanded: true,
+                              value: selectedValue,
+                              underline: Container(), // Remove the underline
+                              items: sportNames.map((sport) {
+                                return DropdownMenuItem<String>(
+                                  value: sport,
+                                  child: Padding(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 10, vertical: 15),
+                                    child: Text(
+                                      sport,
+                                      style: TextStyle(
+                                          color: ThemeService.textColor),
+                                    ),
+                                  ),
+                                );
+                              }).toList(),
+                              onChanged: (value) {
+                                setState(() {
+                                  selectedValue = value;
+                                  sportError = null;
+                                });
+                              },
+                              hint: Padding(
+                                padding: EdgeInsets.symmetric(horizontal: 10),
                                 child: Text(
-                                  sport,
+                                  'Select Sport',
                                   style:
                                       TextStyle(color: ThemeService.textColor),
                                 ),
                               ),
-                            );
-                          }).toList(),
-                          onChanged: (value) {
-                            setState(() {
-                              selectedValue = value;
-                              sportError = null;
-                            });
-                          },
-                          hint: Padding(
-                            padding: EdgeInsets.symmetric(horizontal: 10),
-                            child: Text(
-                              'Select Sport',
-                              style: TextStyle(color: ThemeService.textColor),
                             ),
                           ),
-                        ),
+                          if (sportError != null)
+                            Text(sportError!,
+                                style: TextStyle(color: Colors.red)),
+                        ],
                       ),
-                      if (sportError != null)
-                        Text(sportError!, style: TextStyle(color: Colors.red)),
-                    ],
+                    ),
+                    SizedBox(width: 20),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Text('Date*',
+                              style: TextStyle(
+                                  fontSize: 15,
+                                  fontWeight: FontWeight.w800,
+                                  color: ThemeService.textColor)),
+                          SizedBox(height: 5),
+                          GestureDetector(
+                            onTap: () {
+                              _selectDate(context);
+                            },
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 15, horizontal: 10),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                              child: Row(
+                                mainAxisAlignment:
+                                    MainAxisAlignment.spaceBetween,
+                                children: <Widget>[
+                                  Text(
+                                    _formatDate(date),
+                                    style: TextStyle(
+                                        color: ThemeService.textColor),
+                                  ),
+                                  Icon(Icons.calendar_today,
+                                      color: ThemeService.textColor),
+                                ],
+                              ),
+                            ),
+                          ),
+                          if (dateError != null)
+                            Text(dateError!,
+                                style: TextStyle(color: Colors.red)),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+                SizedBox(height: 20),
+                Text('Location*',
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: ThemeService.textColor)),
+                SizedBox(height: 5),
+                TextField(
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'Type your Location here',
+                    hintStyle: TextStyle(color: ThemeService.textColor),
+                  ),
+                  onChanged: (text) {
+                    setState(() {
+                      location = text;
+                      locationError = null;
+                    });
+                  },
+                ),
+                if (locationError != null)
+                  Text(locationError!, style: TextStyle(color: Colors.red)),
+                SizedBox(height: 20),
+                Text('Bet Amount*',
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: ThemeService.textColor)),
+                SizedBox(height: 5),
+                TextField(
+                  keyboardType: TextInputType.number,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'Type your Bet Amount here',
+                    hintStyle: TextStyle(color: ThemeService.textColor),
+                  ),
+                  onChanged: (text) {
+                    setState(() {
+                      price = double.tryParse(text);
+                      priceError = null;
+                    });
+                  },
+                ),
+                if (priceError != null)
+                  Text(priceError!, style: TextStyle(color: Colors.red)),
+                SizedBox(height: 20),
+                Text('Match details*',
+                    style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w800,
+                        color: ThemeService.textColor)),
+                SizedBox(height: 5),
+                TextField(
+                  maxLines: 5,
+                  decoration: InputDecoration(
+                    border: OutlineInputBorder(),
+                    hintText: 'Write your post here...',
+                    hintStyle: TextStyle(color: ThemeService.textColor),
+                  ),
+                  onChanged: (text) {
+                    setState(() {
+                      postText = text;
+                      matchDetailsError = null;
+                    });
+                  },
+                ),
+                if (matchDetailsError != null)
+                  Text(matchDetailsError!, style: TextStyle(color: Colors.red)),
+                SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pushReplacement(
+                        MaterialPageRoute(builder: (context) => MyPosts()),
+                      );
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.grey[100],
+                      side: BorderSide(
+                        color: ThemeService.buttonBg,
+                      ),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                    ),
+                    child: Text(
+                      'My Post',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: ThemeService.buttonBg,
+                      ),
+                    ),
                   ),
                 ),
-                SizedBox(width: 20),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: <Widget>[
-                      Text('Date*',
-                          style: TextStyle(
-                              fontSize: 15,
-                              fontWeight: FontWeight.w800,
-                              color: ThemeService.textColor)),
-                      SizedBox(height: 5),
-                      GestureDetector(
-                        onTap: () {
-                          _selectDate(context);
-                        },
-                        child: Container(
-                          padding: EdgeInsets.symmetric(
-                              vertical: 15, horizontal: 10),
-                          decoration: BoxDecoration(
-                            border: Border.all(color: Colors.grey),
-                            borderRadius: BorderRadius.circular(5),
-                          ),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                            children: <Widget>[
-                              Text(
-                                _formatDate(date),
-                                style: TextStyle(color: ThemeService.textColor),
-                              ),
-                              Icon(Icons.calendar_today,
-                                  color: ThemeService.textColor),
-                            ],
-                          ),
-                        ),
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      _handleSubmit();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
                       ),
-                      if (dateError != null)
-                        Text(dateError!, style: TextStyle(color: Colors.red)),
-                    ],
+                      backgroundColor: ThemeService.buttonBg,
+                    ),
+                    child: const Text(
+                      'Submit',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
+                    ),
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20),
-            Text('Location*',
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    color: ThemeService.textColor)),
-            SizedBox(height: 5),
-            TextField(
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Type your Location here',
-                hintStyle: TextStyle(color: ThemeService.textColor),
-              ),
-              onChanged: (text) {
-                setState(() {
-                  location = text;
-                  locationError = null;
-                });
-              },
-            ),
-            if (locationError != null)
-              Text(locationError!, style: TextStyle(color: Colors.red)),
-            SizedBox(height: 20),
-            Text('Bet Amount*',
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    color: ThemeService.textColor)),
-            SizedBox(height: 5),
-            TextField(
-              keyboardType: TextInputType.number,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Type your Bet Amount here',
-                hintStyle: TextStyle(color: ThemeService.textColor),
-              ),
-              onChanged: (text) {
-                setState(() {
-                  price = double.tryParse(text);
-                  priceError = null;
-                });
-              },
-            ),
-            if (priceError != null)
-              Text(priceError!, style: TextStyle(color: Colors.red)),
-            SizedBox(height: 20),
-            Text('Match details*',
-                style: TextStyle(
-                    fontSize: 15,
-                    fontWeight: FontWeight.w800,
-                    color: ThemeService.textColor)),
-            SizedBox(height: 5),
-            TextField(
-              maxLines: 5,
-              decoration: InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Write your post here...',
-                hintStyle: TextStyle(color: ThemeService.textColor),
-              ),
-              onChanged: (text) {
-                setState(() {
-                  postText = text;
-                  matchDetailsError = null;
-                });
-              },
-            ),
-            if (matchDetailsError != null)
-              Text(matchDetailsError!, style: TextStyle(color: Colors.red)),
-            SizedBox(height: 20),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(builder: (context) => MyPosts()),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.grey[100],
-                  side: BorderSide(
-                    color: ThemeService.buttonBg,
-                  ),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-                child: Text(
-                  'My Post',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: ThemeService.buttonBg,
-                  ),
+          ),
+          if (isLoading)
+            Positioned.fill(
+              child: Container(
+                color: Colors.black.withOpacity(0.5),
+                child: Center(
+                  child: Loader(),
                 ),
               ),
             ),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: () async {
-                  showDialog(
-                    context: context,
-                    barrierDismissible: false,
-                    builder: (BuildContext context) {
-                      return Loader();
-                    },
-                  );
-
-                  await Future.delayed(Duration(seconds: 1));
-
-                  Navigator.pop(context);
-                  _handleSubmit();
-                },
-                style: ElevatedButton.styleFrom(
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                  backgroundColor: ThemeService.buttonBg,
-                ),
-                child: const Text(
-                  'Submit',
-                  style: TextStyle(
-                    fontSize: 20,
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+        ],
       ),
     );
   }
