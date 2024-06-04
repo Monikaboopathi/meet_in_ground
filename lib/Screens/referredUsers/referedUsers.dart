@@ -1,6 +1,7 @@
 import 'dart:async';
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:http/http.dart' as http;
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
@@ -43,8 +44,9 @@ class _ReferredUsersState extends State<ReferredUsers> {
   }
 
   Future<void> refetchUserDetails() async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
     final response = await http.get(
-      Uri.parse('https://bet-x-new.onrender.com/user/referredUsers/$userPhone'),
+      Uri.parse('$Base_url/user/referredUsers/$userPhone'),
     );
 
     if (response.statusCode == 200) {
@@ -100,7 +102,8 @@ class _ReferredUsersState extends State<ReferredUsers> {
                           decoration: BoxDecoration(
                             color: Colors.white,
                             borderRadius: BorderRadius.circular(8),
-                            border: Border.all(color: ThemeService.buttonBg,width: 2),
+                            border: Border.all(
+                                color: ThemeService.buttonBg, width: 2),
                             boxShadow: [
                               BoxShadow(
                                 color: Colors.black12,
@@ -113,14 +116,20 @@ class _ReferredUsersState extends State<ReferredUsers> {
                             children: [
                               CircleAvatar(
                                 radius: 20,
-                                backgroundImage: referral['profileImage'] != null
-                                    ? NetworkImage(referral['profileImage']) as ImageProvider
+                                backgroundImage: referral['profileImage'] !=
+                                        null
+                                    ? NetworkImage(referral['profileImage'])
+                                        as ImageProvider
                                     : AssetImage('assets/images/empty-img.jpg'),
                               ),
                               SizedBox(width: 15),
                               Text(
-                                referral['userName'][0].toUpperCase() + referral['userName'].substring(1),
-                                style: TextStyle(color: ThemeService.textColor,fontSize: 18,fontWeight: FontWeight.w900),
+                                referral['userName'][0].toUpperCase() +
+                                    referral['userName'].substring(1),
+                                style: TextStyle(
+                                    color: ThemeService.textColor,
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.w900),
                               ),
                             ],
                           ),

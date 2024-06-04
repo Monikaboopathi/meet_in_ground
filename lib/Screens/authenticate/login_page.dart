@@ -2,6 +2,7 @@ import 'dart:convert';
 
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/Screens/authenticate/favourite_page.dart';
 import 'package:meet_in_ground/Screens/authenticate/password_page.dart';
@@ -43,12 +44,13 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> loginUser(String phoneNumber) async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
     setState(() {
       isLoading = true;
     });
     try {
       final response = await http.post(
-        Uri.parse('https://bet-x-new.onrender.com/user/login'),
+        Uri.parse('$Base_url/user/login'),
         body: jsonEncode({'phoneNumber': phoneNumber}),
         headers: {
           'Content-Type': 'application/json',
@@ -145,15 +147,14 @@ class _LoginPageState extends State<LoginPage> {
                         disableLengthCheck: false,
                         decoration: InputDecoration(
                           labelText: 'Mobile Number',
-                          labelStyle: TextStyle(color:ThemeService.textColor),
+                          labelStyle: TextStyle(color: ThemeService.textColor),
                           border: OutlineInputBorder(
                             borderRadius: BorderRadius.circular(10),
                           ),
                           counterText: "",
                         ),
                         initialCountryCode: 'IN',
-
-                        style: TextStyle(color:ThemeService.textColor),
+                        style: TextStyle(color: ThemeService.textColor),
                         validator: (phone) {
                           if (phone == null || phone.number.isEmpty) {
                             return 'Please enter a valid mobile number';
@@ -227,14 +228,14 @@ class _LoginPageState extends State<LoginPage> {
   }
 
   Future<void> referralPost(String referralId) async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
     setState(() {
       isLoading = true;
     });
 
     try {
       final response = await http.post(
-        Uri.parse(
-            'https://bet-x-new.onrender.com/user/verifyReferralID/$referralId'),
+        Uri.parse('$Base_url/user/verifyReferralID/$referralId'),
         body: jsonEncode({
           "referralId": referralId,
         }),

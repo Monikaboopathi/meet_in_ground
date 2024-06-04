@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:location/location.dart';
 import 'package:http/http.dart' as http;
@@ -72,6 +73,7 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   Future<void> handleLocation() async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
     setState(() {
       _isLocationLoading = true;
     });
@@ -93,6 +95,7 @@ class _EditProfileState extends State<EditProfile> {
   }
 
   Future<void> handleSave() async {
+    String Base_url = dotenv.get("BASE_URL", fallback: null);
     if (_usernameController.text.trim().isEmpty) {
       Fluttertoast.showToast(msg: 'Please enter your username.');
       return;
@@ -131,8 +134,7 @@ class _EditProfileState extends State<EditProfile> {
     // Convert the data to JSON
 
     try {
-      String url =
-          'https://bet-x-new.onrender.com/user/updateUser/$userMobileNumber';
+      String url = '$Base_url/user/updateUser/$userMobileNumber';
       String username = _usernameController.text.trim();
       String sports = _selectedSports.join(',');
       String location = _locationController.text.trim();
