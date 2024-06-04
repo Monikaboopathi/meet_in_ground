@@ -105,7 +105,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(
-            'Location permission denied forever. Please enable it in app settings.'),
+          'Location permission denied forever. Please enable it in app settings.'),
       ));
     }
   }
@@ -130,10 +130,10 @@ class _UserOnBoardState extends State<UserOnBoard> {
 
     setState(() {
       locationLoader = false;
+      // Disable the button after obtaining location
       loadingLocation = false;
     });
   }
-
   Future<void> pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
@@ -490,14 +490,13 @@ class _UserOnBoardState extends State<UserOnBoard> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                if (locationLoading) CircularProgressIndicator();
-                handleAddLocation();
+                loadingLocation ? null : handleAddLocation();
               },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
-                backgroundColor: ThemeService.buttonBg,
+                backgroundColor: loadingLocation ? Colors.grey :ThemeService.buttonBg,
               ),
               child: const Text(
                 'Share Location',

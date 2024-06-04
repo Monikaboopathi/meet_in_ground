@@ -72,14 +72,7 @@ class _LoginPageState extends State<LoginPage> {
 
         await MobileNo.clearMobilenumber();
       } else {
-        Fluttertoast.showToast(
-          msg: responseData['message'] ?? "New User",
-          toastLength: Toast.LENGTH_SHORT,
-          gravity: ToastGravity.TOP,
-          timeInSecForIosWeb: 2,
-          backgroundColor: Colors.green,
-          textColor: Colors.white,
-        );
+       
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => FavouritePage(
@@ -369,6 +362,10 @@ class _LoginPageState extends State<LoginPage> {
                               },
                             );
                             await referralPost(refferal);
+                            setState(() {
+                              referralController.clear();
+                              Navigator.pop(context);
+                            });
                           }
                         },
                         style: ElevatedButton.styleFrom(

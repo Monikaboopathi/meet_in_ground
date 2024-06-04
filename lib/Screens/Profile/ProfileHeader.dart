@@ -15,7 +15,7 @@ class ProfileHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final profileImg =
-        userDetails['profileImg'] ?? 'assets/images/empty-img.jpg';
+        userDetails['profileImg'] ?? 'assets/noData.png';
     final userName = userDetails['userName'] ?? 'Unknown User';
 
     return Container(
