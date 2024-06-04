@@ -2,6 +2,8 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:get/get.dart';
+import 'package:meet_in_ground/Ads/NativeAd.dart';
 import 'package:meet_in_ground/Screens/Posts/EditPosts.dart';
 import 'package:meet_in_ground/Screens/request/request_page.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
@@ -27,10 +29,12 @@ class _MyPostsState extends State<MyPosts> {
   String selectedSport = '';
   Map<String, bool> showMoreMap = {};
   String? currentMobileNumber;
+  final NativeAdsController nativeAdController = Get.put(NativeAdsController());
 
   @override
   void initState() {
     super.initState();
+    nativeAdController.loadAd();
     initializeData().then((mobileNumber) {
       if (mounted) {
         setState(() {
