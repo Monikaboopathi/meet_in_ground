@@ -2,6 +2,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:google_mobile_ads/google_mobile_ads.dart';
 import 'package:meet_in_ground/Screens/onboarding/splashScreen.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:meet_in_ground/util/api/firebase_service.dart';
@@ -30,6 +31,7 @@ Future<void> main() async {
   );
 
   await FirebaseApi().initNotifications();
+  await MobileAds.instance.initialize();
 
   FirebaseFirestore.instance.settings = const Settings(
     persistenceEnabled: true,
