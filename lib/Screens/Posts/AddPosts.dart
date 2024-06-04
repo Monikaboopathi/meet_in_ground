@@ -159,6 +159,35 @@ class _AddpostsState extends State<Addposts> {
     }
   }
 
+  // Future<List<String>> placeAutocomplete(String query) async {
+  //   final String url =
+  //       'https://maps.googleapis.com/maps/api/place/autocomplete/json';
+  //   final Uri uri = Uri.https(
+  //     'maps.googleapis.com',
+  //     '/maps/api/place/autocomplete/json',
+  //     {
+  //       'input': query,
+  //       'key': 'AIzaSyDtceUAXXYeNr95KedulYGhuM-izzY4kXU',
+  //     },
+  //   );
+
+  //   final http.Response response = await http.get(uri);
+
+  //   if (response.statusCode == 200) {
+  //     final Map<String, dynamic> data = json.decode(response.body);
+  //     final List<dynamic> predictions = data['predictions'];
+  //     print('Predictions: $predictions'); // Log predictions for debugging
+  //     return predictions
+  //         .map((prediction) => prediction['description'] as String)
+  //         .toList();
+  //   } else {
+  //     print(
+  //         'Failed to fetch autocomplete suggestions with status code: ${response.statusCode}');
+  //     print('Response body: ${response.body}');
+  //     throw Exception('Failed to fetch autocomplete suggestions');
+  //   }
+  // }
+
   Future<void> pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
@@ -351,11 +380,14 @@ class _AddpostsState extends State<Addposts> {
                     hintText: 'Type your Location here',
                     hintStyle: TextStyle(color: ThemeService.textColor),
                   ),
-                  onChanged: (text) {
+                  onChanged: (text) async {
                     setState(() {
                       location = text;
                       locationError = null;
                     });
+                    // final List<String> suggestions =
+                    //     await placeAutocomplete(text);
+                    // print('Predictions: $suggestions');
                   },
                 ),
                 if (locationError != null)
