@@ -25,6 +25,12 @@ class _MessagesState extends State<Messages> {
     _futureChatRooms = _chatservice.getAllMessagesAndRooms();
   }
 
+  Future<void> _refreshChatRooms() async {
+    setState(() {
+      _futureChatRooms = _chatservice.getAllMessagesAndRooms();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,87 +59,90 @@ class _MessagesState extends State<Messages> {
           }
 
           List<Map<String, dynamic>> chatRooms = snapshot.data!;
-          return ListView.builder(
-            itemCount: chatRooms.length,
-            itemBuilder: (context, index) {
-              var chatRoom = chatRooms[index];
+          return RefreshIndicator(
+            onRefresh: _refreshChatRooms,
+            child: ListView.builder(
+              itemCount: chatRooms.length,
+              itemBuilder: (context, index) {
+                var chatRoom = chatRooms[index];
 
-              return ListTile(
-                onTap: () {
-                  Navigator.of(context).pushReplacement(
-                    MaterialPageRoute(
-                      builder: (context) => ChatScreen(
-                        recieverName:
-                            chatRoom['sender'] == chatRoom['currentUserId']
-                                ? chatRoom['receiverName']
-                                : chatRoom['senderName'],
-                        recieverImage:
-                            chatRoom['sender'] == chatRoom['currentUserId']
-                                ? chatRoom['receiverImage']
-                                : chatRoom['senderImage'],
-                        receiverId:
-                            chatRoom['sender'] == chatRoom['currentUserId']
-                                ? chatRoom['receiver']
-                                : chatRoom['sender'],
+                return ListTile(
+                  onTap: () {
+                    Navigator.of(context).pushReplacement(
+                      MaterialPageRoute(
+                        builder: (context) => ChatScreen(
+                          recieverName:
+                              chatRoom['sender'] == chatRoom['currentUserId']
+                                  ? chatRoom['receiverName']
+                                  : chatRoom['senderName'],
+                          recieverImage:
+                              chatRoom['sender'] == chatRoom['currentUserId']
+                                  ? chatRoom['receiverImage']
+                                  : chatRoom['senderImage'],
+                          receiverId:
+                              chatRoom['sender'] == chatRoom['currentUserId']
+                                  ? chatRoom['receiver']
+                                  : chatRoom['sender'],
+                        ),
                       ),
-                    ),
-                  );
-                },
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Text(
-                      chatRoom['sender'] == chatRoom['currentUserId']
-                          ? chatRoom['receiverName']
-                          : chatRoom['senderName'],
-                      style: TextStyle(
-                        fontSize: 15,
-                        color: ThemeService.textColor,
-                        fontWeight: FontWeight.w800,
+                    );
+                  },
+                  title: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        chatRoom['sender'] == chatRoom['currentUserId']
+                            ? chatRoom['receiverName']
+                            : chatRoom['senderName'],
+                        style: TextStyle(
+                          fontSize: 15,
+                          color: ThemeService.textColor,
+                          fontWeight: FontWeight.w800,
+                        ),
                       ),
-                    ),
-                    Text(
-                      chatRoom['timestamp'] != null
-                          ? formatDate(chatRoom['timestamp'])
-                          : "",
-                      style: TextStyle(
-                        fontSize: 13,
-                        color: ThemeService.placeHolder,
+                      Text(
+                        chatRoom['timestamp'] != null
+                            ? formatDateTime(chatRoom['timestamp'])
+                            : "",
+                        style: TextStyle(
+                          fontSize: 13,
+                          color: ThemeService.placeHolder,
+                        ),
                       ),
-                    ),
-                  ],
-                ),
-                subtitle: Padding(
-                  padding: const EdgeInsets.only(top: 3),
-                  child: Text(
-                    chatRoom['message'] ?? "",
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
-                    style: TextStyle(color: ThemeService.placeHolder),
+                    ],
                   ),
-                ),
-                leading: Container(
-                  width: 50.0,
-                  height: 50.0,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    border: Border.all(
-                      color: ThemeService.primary,
-                      width: 1.0,
+                  subtitle: Padding(
+                    padding: const EdgeInsets.only(top: 3),
+                    child: Text(
+                      chatRoom['message'] ?? "",
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: TextStyle(color: ThemeService.placeHolder),
                     ),
                   ),
-                  child: CircleAvatar(
-                    backgroundImage: NetworkImage(
-                      chatRoom['sender'] == chatRoom['currentUserId']
-                          ? chatRoom['receiverImage']
-                          : chatRoom['senderImage'],
+                  leading: Container(
+                    width: 50.0,
+                    height: 50.0,
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(
+                        color: ThemeService.primary,
+                        width: 1.0,
+                      ),
                     ),
-                    backgroundColor: ThemeService.textColor,
-                    foregroundColor: ThemeService.textColor,
+                    child: CircleAvatar(
+                      backgroundImage: NetworkImage(
+                        chatRoom['sender'] == chatRoom['currentUserId']
+                            ? chatRoom['receiverImage']
+                            : chatRoom['senderImage'],
+                      ),
+                      backgroundColor: ThemeService.textColor,
+                      foregroundColor: ThemeService.textColor,
+                    ),
                   ),
-                ),
-              );
-            },
+                );
+              },
+            ),
           );
         },
       ),

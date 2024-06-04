@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:emoji_picker_flutter/emoji_picker_flutter.dart';
 import 'package:flutter/foundation.dart' as foundation;
+import 'package:intl/intl.dart';
 import 'package:meet_in_ground/Models/Message.dart';
 import 'package:meet_in_ground/constant/format_time.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
@@ -11,9 +12,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 
 class ChatScreen extends StatefulWidget {
-  String recieverName;
-  String recieverImage;
-  String receiverId;
+  final String recieverName;
+  final String recieverImage;
+  final String receiverId;
 
   ChatScreen({
     Key? key,
@@ -29,12 +30,13 @@ class ChatScreen extends StatefulWidget {
 class _ChatScreenState extends State<ChatScreen> {
   TextEditingController messageController = TextEditingController();
   ScrollController _emojiScroll = ScrollController();
-  ScrollController _messageScroll = ScrollController(); // Add this
+  ScrollController _messageScroll = ScrollController();
   bool showEmojiPicker = false;
   final Chatservice _chatservice = Chatservice();
   String? currentMobileNumber;
 
   Map<int, bool> isMessageExpanded = {};
+
   @override
   void initState() {
     super.initState();
@@ -71,6 +73,21 @@ class _ChatScreenState extends State<ChatScreen> {
   void scrollToBottom() {
     if (_messageScroll.hasClients) {
       _messageScroll.jumpTo(_messageScroll.position.maxScrollExtent);
+    }
+  }
+
+  String getMessageDate(DateTime timestamp) {
+    DateTime messageDate = timestamp;
+    DateTime now = DateTime.now();
+    DateTime today = DateTime(now.year, now.month, now.day);
+    DateTime yesterday = today.subtract(Duration(days: 1));
+
+    if (messageDate.isAfter(today)) {
+      return 'Today';
+    } else if (messageDate.isAfter(yesterday)) {
+      return 'Yesterday';
+    } else {
+      return DateFormat('dd MMM yyyy').format(messageDate);
     }
   }
 
@@ -146,6 +163,8 @@ class _ChatScreenState extends State<ChatScreen> {
                     scrollToBottom();
                   });
 
+                  DateTime? lastDisplayedDate;
+
                   return ListView.builder(
                     controller: _messageScroll,
                     padding: EdgeInsets.symmetric(vertical: 8),
@@ -158,9 +177,40 @@ class _ChatScreenState extends State<ChatScreen> {
                       final isExpanded = isMessageExpanded.containsKey(index)
                           ? isMessageExpanded[index]!
                           : false;
+                      final messageDate = message.timestamp.toDate();
+                      bool showDate = false;
+
+                      if (lastDisplayedDate == null ||
+                          messageDate.day != lastDisplayedDate!.day ||
+                          messageDate.month != lastDisplayedDate!.month ||
+                          messageDate.year != lastDisplayedDate!.year) {
+                        showDate = true;
+                        lastDisplayedDate = messageDate;
+                      }
 
                       return Column(
                         children: [
+                          if (showDate)
+                            Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8),
+                              child: Center(
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 12, vertical: 4),
+                                  decoration: BoxDecoration(
+                                    color: Colors.grey[300],
+                                    borderRadius: BorderRadius.circular(16),
+                                  ),
+                                  child: Text(
+                                    getMessageDate(messageDate),
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: ThemeService.textColor,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
                           Row(
                             mainAxisAlignment: isSender
                                 ? MainAxisAlignment.end
@@ -217,7 +267,7 @@ class _ChatScreenState extends State<ChatScreen> {
                                             padding: EdgeInsets.only(
                                                 right: 12, bottom: 4),
                                             child: Text(
-                                              formatDate(message.timestamp),
+                                              formatTime(message.timestamp),
                                               style: TextStyle(
                                                 fontSize: 12,
                                                 color: Colors.grey,
