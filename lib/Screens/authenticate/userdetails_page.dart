@@ -490,16 +490,20 @@ class _UserOnBoardState extends State<UserOnBoard> {
             SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
-                if (locationLoading) CircularProgressIndicator();
-                handleAddLocation();
+                if (loadingLocation) {
+                  return null;
+                } else {
+                  handleAddLocation();
+                }
               },
               style: ElevatedButton.styleFrom(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
-                backgroundColor: ThemeService.buttonBg,
+                backgroundColor:
+                    loadingLocation ? Colors.grey : ThemeService.buttonBg,
               ),
-              child: const Text(
+              child: Text(
                 'Share Location',
                 style: TextStyle(
                   fontSize: 18,
