@@ -15,6 +15,8 @@ import 'package:meet_in_ground/constant/sports_names.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
 
+DateTime? currentBackPressTime;
+
 class Favorites extends StatefulWidget {
   @override
   _FavoritesState createState() => _FavoritesState();
@@ -461,70 +463,87 @@ class _FavoritesState extends State<Favorites> {
           ),
         ),
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          setState(() {
-            futurePosts = fetchPosts();
-            _searchController.text = "";
-          });
+      body: WillPopScope(
+           onWillPop: () async {
+          DateTime now = DateTime.now();
+          if (currentBackPressTime == null ||
+              now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
+            currentBackPressTime = now;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Press back again to exit'),
+              ),
+            );
+            return false;
+          }
+          return true;
         },
-        child: FutureBuilder<List<Post>>(
-          future: futurePosts,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: Loader());
-            } else if (snapshot.hasError ||
-                !snapshot.hasData ||
-                snapshot.data!.isEmpty) {
-              return Center(child: NoDataFoundWidget());
-            } else {
-              return ListView.builder(
-                itemCount: snapshot.data!.length,
-                itemBuilder: (context, index) {
-                  Post post = snapshot.data![index];
-                  bool isShowMore = showMoreMap[post.id] ?? false;
-
-                  return Post_Widget(
-                    userName: post.userName,
-                    placeOfMatch: post.placeOfMatch,
-                    likes: post.likes,
-                    comments: post.comments,
-                    betAmount: post.betAmount,
-                    id: post.id,
-                    image: post.image,
-                    postOwnerImage: post.postOwnerImage,
-                    matchDate: post.matchDate,
-                    matchDetails: post.matchDetails,
-                    phoneNumber: post.phoneNumber,
-                    sport: post.sport,
-                    status: post.status,
-                    createdAt: post.createdAt,
-                    isShowMore: isShowMore,
-                    onToggleShowMore: _toggleShowMore,
-                    isFavorite: post.favorites.any((favorite) =>
-                        favorite['phoneNumber'] ==
-                        "+91" + currentMobileNumber!),
-                    onDeleteFav: () => deleteFav(post.id),
-                    onFavoriteToggle: () => toggleFavorite(post.id),
-                    isRequest: post.requests.any((requuest) =>
-                        requuest['phoneNumber'] ==
-                        "+91" + currentMobileNumber!),
-                    onDeleteRequest: () => showConfirmationDialog(
-                        context,
-                        () => deleteRequest(post.id),
-                        "Do you want Delete this Post Request?",
-                        Colors.red.shade400),
-                    onRequestToggle: () => showConfirmationDialog(
-                        context,
-                        () => toggleRequest(post.id),
-                        "Do you want Request this Post?",
-                        Colors.green.shade400),
-                    currentMobileNumber: "+91" + currentMobileNumber!,
-                  );
-                },
-              );
-            }
+      
+        child: RefreshIndicator(
+          onRefresh: () async {
+            setState(() {
+              futurePosts = fetchPosts();
+              _searchController.text = "";
+            });
           },
+          child: FutureBuilder<List<Post>>(
+            future: futurePosts,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: Loader());
+              } else if (snapshot.hasError ||
+                  !snapshot.hasData ||
+                  snapshot.data!.isEmpty) {
+                return Center(child: NoDataFoundWidget());
+              } else {
+                return ListView.builder(
+                  itemCount: snapshot.data!.length,
+                  itemBuilder: (context, index) {
+                    Post post = snapshot.data![index];
+                    bool isShowMore = showMoreMap[post.id] ?? false;
+        
+                    return Post_Widget(
+                      userName: post.userName,
+                      placeOfMatch: post.placeOfMatch,
+                      likes: post.likes,
+                      comments: post.comments,
+                      betAmount: post.betAmount,
+                      id: post.id,
+                      image: post.image,
+                      postOwnerImage: post.postOwnerImage,
+                      matchDate: post.matchDate,
+                      matchDetails: post.matchDetails,
+                      phoneNumber: post.phoneNumber,
+                      sport: post.sport,
+                      status: post.status,
+                      createdAt: post.createdAt,
+                      isShowMore: isShowMore,
+                      onToggleShowMore: _toggleShowMore,
+                      isFavorite: post.favorites.any((favorite) =>
+                          favorite['phoneNumber'] ==
+                          "+91" + currentMobileNumber!),
+                      onDeleteFav: () => deleteFav(post.id),
+                      onFavoriteToggle: () => toggleFavorite(post.id),
+                      isRequest: post.requests.any((requuest) =>
+                          requuest['phoneNumber'] ==
+                          "+91" + currentMobileNumber!),
+                      onDeleteRequest: () => showConfirmationDialog(
+                          context,
+                          () => deleteRequest(post.id),
+                          "Do you want Delete this Post Request?",
+                          Colors.red.shade400),
+                      onRequestToggle: () => showConfirmationDialog(
+                          context,
+                          () => toggleRequest(post.id),
+                          "Do you want Request this Post?",
+                          Colors.green.shade400),
+                      currentMobileNumber: "+91" + currentMobileNumber!,
+                    );
+                  },
+                );
+              }
+            },
+          ),
         ),
       ),
     );

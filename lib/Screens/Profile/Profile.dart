@@ -22,6 +22,7 @@ import 'package:meet_in_ground/util/Services/PreferencesService.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/ShareMethods.dart';
+DateTime? currentBackPressTime;
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -183,71 +184,88 @@ class _ProfileScreenState extends State<ProfileScreen> {
         centerTitle: true,
       ),
       backgroundColor: ThemeService.background,
-      body: RefreshIndicator(
-        onRefresh: _refresh,
-        child: isLoading
-            ? Loader()
-            : SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    ProfileHeader(
-                      userDetails: userDetails,
-                      userCity: userCity,
-                      onEditProfile: () {
-                        Navigator.pushAndRemoveUntil(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) =>
-                                  EditProfile(userDetails: userDetails)),
-                          (route) => false,
-                        );
-                      },
-                    ),
-                    ProfileDetails(userDetails: userDetails),
-                    FeaturesSection(
-                      balance: balance.toString(),
-                      notificationCount: notificationData.length,
-                      referredPost: referredPost,
-                      referralDetails: referralDetails,
-                      onRateUs: () {
-                        setState(() {
-                          modalVisible = true;
-                        });
-                      },
-                      onShareUs: () {
-                        shareApp();
-                      },
-                    ),
-                    SizedBox(height: 20),
-                    AdMobBanner(),
-                    AdMobInterstitial(),
-                    AdMobReward(),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Container(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: handleLogout,
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
+      body: WillPopScope(
+           onWillPop: () async {
+          DateTime now = DateTime.now();
+          if (currentBackPressTime == null ||
+              now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
+            currentBackPressTime = now;
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('Press back again to exit'),
+              ),
+            );
+            return false;
+          }
+          return true;
+        },
+      
+        child: RefreshIndicator(
+          onRefresh: _refresh,
+          child: isLoading
+              ? Loader()
+              : SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      ProfileHeader(
+                        userDetails: userDetails,
+                        userCity: userCity,
+                        onEditProfile: () {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    EditProfile(userDetails: userDetails)),
+                            (route) => false,
+                          );
+                        },
+                      ),
+                      ProfileDetails(userDetails: userDetails),
+                      FeaturesSection(
+                        balance: balance.toString(),
+                        notificationCount: notificationData.length,
+                        referredPost: referredPost,
+                        referralDetails: referralDetails,
+                        onRateUs: () {
+                          setState(() {
+                            modalVisible = true;
+                          });
+                        },
+                        onShareUs: () {
+                          shareApp();
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      AdMobBanner(),
+                      AdMobInterstitial(),
+                      AdMobReward(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Container(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: handleLogout,
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              backgroundColor: ThemeService.buttonBg,
                             ),
-                            backgroundColor: ThemeService.buttonBg,
-                          ),
-                          child: Text(
-                            'Logout',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
+                            child: Text(
+                              'Logout',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+        ),
       ),
     );
   }
