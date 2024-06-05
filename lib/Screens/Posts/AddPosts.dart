@@ -1,12 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:meet_in_ground/Ads/BannerAd.dart';
-import 'package:meet_in_ground/Ads/InterstitialAd.dart';
-import 'package:meet_in_ground/Ads/NativeAd.dart';
 import 'package:meet_in_ground/Ads/RewardAds.dart';
 import 'package:meet_in_ground/Screens/Posts/MyPosts.dart';
 import 'package:meet_in_ground/constant/sports_names.dart';
@@ -41,10 +38,8 @@ class _AddpostsState extends State<Addposts> {
   String? locationError;
   String? matchDetailsError;
   String? priceError;
-  final NativeAdsController nativeAdController = Get.put(NativeAdsController());
   @override
   void initState() {
-    nativeAdController.loadAd();
     super.initState();
   }
 
@@ -498,7 +493,6 @@ class _AddpostsState extends State<Addposts> {
                     ),
                   ),
                   AdMobBanner(),
-                  AdMobInterstitial(),
                   AdMobReward(),
                 ],
               ),
