@@ -22,7 +22,6 @@ import 'package:meet_in_ground/util/Services/PreferencesService.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/ShareMethods.dart';
-DateTime? currentBackPressTime;
 
 class ProfileScreen extends StatefulWidget {
   @override
@@ -38,6 +37,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String balance = "";
   List<dynamic> notificationData = [];
   double rating = 0.0;
+  double lat = 0.0;
+  double lng = 0.0;
   bool isLoading = false;
   bool modalVisible = false;
   String? currentMobileNumber;
@@ -77,15 +78,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body)['data'];
-     print('Fetched Data: $data'); // Debugging line
-
-      var userDetailsData = data['userDetails'];
-      print('User Details Data: $userDetailsData'); // Debugging line
-
-      List<String> latlog = userDetailsData['location'].toString().split(",");
-      double lat = double.parse(latlog[0].split(":")[1].trim());
-      double lng = double.parse(latlog[1].split(":")[1].trim());
-
+        List<String> latlog =
+            data['userDetails']['location'].toString().split(",");
+        setState(() {
+          lat = double.parse(latlog[0]);
+          lng = double.parse(latlog[1]);
+        });
         String location = await getAddressFromLatLng(lat, lng);
         setState(() {
           userDetails = {
@@ -96,8 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             'sport': data['userDetails']['sport'],
             'referralId': data['userDetails']['referralId']
           };
-          print(userDetails);
-          print('Parsed User Details: $userDetails'); 
+
           referralDetails = {
             'registeredUserCount': data['totalReferredUsers'] == null
                 ? "0"
@@ -184,88 +181,72 @@ class _ProfileScreenState extends State<ProfileScreen> {
         centerTitle: true,
       ),
       backgroundColor: ThemeService.background,
-      body: WillPopScope(
-           onWillPop: () async {
-          DateTime now = DateTime.now();
-          if (currentBackPressTime == null ||
-              now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
-            currentBackPressTime = now;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Press back again to exit'),
-              ),
-            );
-            return false;
-          }
-          return true;
-        },
-      
-        child: RefreshIndicator(
-          onRefresh: _refresh,
-          child: isLoading
-              ? Loader()
-              : SingleChildScrollView(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      ProfileHeader(
-                        userDetails: userDetails,
-                        userCity: userCity,
-                        onEditProfile: () {
-                          Navigator.pushAndRemoveUntil(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) =>
-                                    EditProfile(userDetails: userDetails)),
-                            (route) => false,
-                          );
-                        },
-                      ),
-                      ProfileDetails(userDetails: userDetails),
-                      FeaturesSection(
-                        balance: balance.toString(),
-                        notificationCount: notificationData.length,
-                        referredPost: referredPost,
-                        referralDetails: referralDetails,
-                        onRateUs: () {
-                          setState(() {
-                            modalVisible = true;
-                          });
-                        },
-                        onShareUs: () {
-                          shareApp();
-                        },
-                      ),
-                      SizedBox(height: 20),
-                      AdMobBanner(),
-                      AdMobInterstitial(),
-                      AdMobReward(),
-                      Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        child: Container(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: handleLogout,
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              backgroundColor: ThemeService.buttonBg,
+      body: RefreshIndicator(
+        onRefresh: _refresh,
+        child: isLoading
+            ? Loader()
+            : SingleChildScrollView(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    ProfileHeader(
+                      userDetails: userDetails,
+                      userCity: userCity,
+                      onEditProfile: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => EditProfile(
+                                  userDetails: userDetails,
+                                  lat: lat,
+                                  lng: lng)),
+                        );
+                      },
+                    ),
+                    ProfileDetails(userDetails: userDetails),
+                    FeaturesSection(
+                      balance: balance.toString(),
+                      notificationCount: notificationData.length,
+                      referredPost: referredPost,
+                      referralDetails: referralDetails,
+                      onRateUs: () {
+                        setState(() {
+                          modalVisible = true;
+                        });
+                      },
+                      onShareUs: () {
+                        shareApp();
+                      },
+                    ),
+                    SizedBox(height: 20),
+                    AdMobBanner(),
+                    AdMobInterstitial(),
+                    AdMobReward(),
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Container(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: handleLogout,
+                          style: ElevatedButton.styleFrom(
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8.0),
                             ),
-                            child: Text(
-                              'Logout',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
-                              ),
+                            backgroundColor: ThemeService.buttonBg,
+                          ),
+                          child: Text(
+                            'Logout',
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
                             ),
                           ),
                         ),
                       ),
-                    ],
-                  ),
+                    ),
+                  ],
                 ),
-        ),
+              ),
       ),
     );
   }

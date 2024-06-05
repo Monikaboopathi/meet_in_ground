@@ -2,20 +2,28 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:geocoding/geocoding.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:location/location.dart';
+import 'package:location/location.dart' as Location;
 import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:location/location.dart';
+import 'package:meet_in_ground/constant/sports_names.dart';
+
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
+import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
 
 class EditProfile extends StatefulWidget {
   final Map<String, dynamic> userDetails;
+  double lat;
+  double lng;
 
-  EditProfile({required this.userDetails});
+  EditProfile(
+      {required this.userDetails, required this.lat, required this.lng});
 
   @override
   _EditProfileState createState() => _EditProfileState();
@@ -29,23 +37,13 @@ class _EditProfileState extends State<EditProfile> {
   String? imageUrl;
   List<String> _selectedSports = [];
   bool _isLocationLoading = false;
-
-  List<Map<String, dynamic>> sportNames = [
-    {'id': 1, 'name': 'Football'},
-    {'id': 2, 'name': 'Basketball'},
-    {'id': 3, 'name': 'Tennis'},
-    {'id': 4, 'name': 'Cricket'},
-    {'id': 5, 'name': 'Rugby'},
-    {'id': 6, 'name': 'Soccer'},
-    {'id': 7, 'name': 'Golf'},
-    {'id': 8, 'name': 'Swimming'},
-    {'id': 9, 'name': 'Baseball'},
-  ];
+  Location.LocationData? userLocation;
+  final location = Location.Location();
+  bool isLoading = false;
 
   @override
   void initState() {
     super.initState();
-    // Initialize controllers with default values from userDetails
     _usernameController =
         TextEditingController(text: widget.userDetails['userName']);
     _locationController =
@@ -78,16 +76,18 @@ class _EditProfileState extends State<EditProfile> {
       _isLocationLoading = true;
     });
 
-    Location location = Location();
-    LocationData? locationData;
+    Location.Location location = Location.Location();
+    Location.LocationData? locationData;
 
     try {
       locationData = await location.getLocation();
-      _locationController.text =
-          'Lat: ${locationData.latitude}, Long: ${locationData.longitude}';
+      setState(() {
+        widget.lat = locationData!.latitude!;
+        widget.lng = locationData.longitude!;
+        _isLocationLoading = false;
+      });
     } catch (error) {
       print('Error getting location: $error');
-    } finally {
       setState(() {
         _isLocationLoading = false;
       });
@@ -109,7 +109,9 @@ class _EditProfileState extends State<EditProfile> {
       return;
     }
 
-    setState(() {});
+    setState(() {
+      isLoading = true;
+    });
     String? userMobileNumber = await MobileNo.getMobilenumber();
     print(userMobileNumber);
 
@@ -146,7 +148,7 @@ class _EditProfileState extends State<EditProfile> {
       Map<String, dynamic> body = {
         'userName': username,
         'sport': sports,
-        'location': location,
+        'location': '${widget.lat},${widget.lng}',
       };
       print(username);
       print(sports);
@@ -202,7 +204,70 @@ class _EditProfileState extends State<EditProfile> {
     } catch (error) {
       print(error);
     } finally {
-      setState(() {});
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  void handleAddLocation() async {
+    final hasPermission = await location.hasPermission();
+    if (hasPermission == PermissionStatus.granted) {
+      await getLocationAsync();
+    } else if (hasPermission == PermissionStatus.denied) {
+      // Request location permission
+      final status = await location.requestPermission();
+      if (status == PermissionStatus.granted) {
+        await getLocationAsync();
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+          content: Text('Location permission denied.'),
+        ));
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text(
+            'Location permission denied forever. Please enable it in app settings.'),
+      ));
+    }
+  }
+
+  Future<void> getLocationAsync() async {
+    // final hasPermission = await location.hasPermission();
+    // if (hasPermission == PermissionStatus.denied) {
+    //   await location.requestPermission();
+    // }
+
+    // final hasService = await location.serviceEnabled();
+    // if (!hasService) {
+    //   await location.requestService();
+    // }
+
+    try {
+      userLocation = await location.getLocation();
+      _locationController.text = await getAddressFromLatLng(
+          userLocation!.latitude!, userLocation!.longitude!);
+    } catch (e) {
+      print("Error fetching location: $e");
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+        content: Text('Failed to fetch location. Please try again.'),
+      ));
+    }
+  }
+
+  Future<String> getAddressFromLatLng(double lat, double lng) async {
+    print(lat);
+    print(lng);
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+
+      Placemark place = placemarks[0];
+      print(
+          "======================================================1===========");
+
+      return "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
+    } catch (e) {
+      return 'Error getting address';
     }
   }
 
@@ -219,14 +284,14 @@ class _EditProfileState extends State<EditProfile> {
                 child: ListBody(
                   children: sportNames.map((sport) {
                     return CheckboxListTile(
-                      value: tempSelectedSports.contains(sport['name']),
-                      title: Text(sport['name']),
+                      value: tempSelectedSports.contains(sport),
+                      title: Text(sport),
                       onChanged: (bool? value) {
                         setState(() {
                           if (value == true) {
-                            tempSelectedSports.add(sport['name']);
+                            tempSelectedSports.add(sport);
                           } else {
-                            tempSelectedSports.remove(sport['name']);
+                            tempSelectedSports.remove(sport);
                           }
                         });
                       },
@@ -288,225 +353,234 @@ class _EditProfileState extends State<EditProfile> {
         centerTitle: true,
       ),
       backgroundColor: ThemeService.background,
-      body: SingleChildScrollView(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          children: [
-            Center(
-              child: Stack(
-                children: [
-                  Container(
-                    height: 150,
-                    width: 150,
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      color: Colors.grey[300],
-                      border: Border.all(
-                        color: ThemeService.buttonBg,
-                        width: 3,
-                      ),
-                    ),
-                    child: ClipOval(
-                      child: (imageUrl ?? '').isEmpty
-                          ? _selectedImage == null
-                              ? Center(
-                                  child: Icon(
-                                    Icons.person,
-                                    color: Colors.grey[800],
-                                    size: 100,
-                                  ),
-                                )
-                              : Image.file(
-                                  _selectedImage!,
-                                  fit: BoxFit.cover,
-                                )
-                          : Image.network(
-                              imageUrl!,
-                              fit: BoxFit.cover,
-                              loadingBuilder:
-                                  (context, child, loadingProgress) {
-                                if (loadingProgress == null) return child;
-                                return Center(
-                                  child: CircularProgressIndicator(
-                                    value: loadingProgress.expectedTotalBytes !=
-                                            null
-                                        ? loadingProgress
-                                                .cumulativeBytesLoaded /
-                                            loadingProgress.expectedTotalBytes!
-                                        : null,
-                                  ),
-                                );
-                              },
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  color: Colors.grey[
-                                      300], // Placeholder color in case of error
-                                  child: Icon(
-                                    Icons.error,
-                                    color: Colors.red, // Error icon color
-                                  ),
-                                );
-                              },
-                            ),
-                    ),
-                  ),
-                  Positioned(
-                    bottom: 5,
-                    right: 5,
-                    child: GestureDetector(
-                      onTap: pickImage,
-                      child: CircleAvatar(
-                        radius: 20,
-                        backgroundColor: ThemeService.buttonBg,
-                        child: Icon(
-                          Icons.camera_alt,
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-            SizedBox(height: 16.0),
-            Padding(
-              padding: const EdgeInsets.all(10.0),
+      body: isLoading
+          ? Loader()
+          : SingleChildScrollView(
+              padding: EdgeInsets.all(16.0),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
                 children: [
-                  SizedBox(height: 16.0),
-                  Row(
-                    children: [
-                      Text(
-                        'Username',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w800),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  TextField(
-                    controller: _usernameController,
-                    decoration: InputDecoration(
-                      hintText: 'Username',
-                      border: OutlineInputBorder(),
-                    ),
-                  ),
-                  SizedBox(height: 16.0),
-                  Row(
-                    children: [
-                      Text(
-                        'Location',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w800),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  GestureDetector(
-                    onTap: handleLocation,
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 15.0, horizontal: 8.0),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(4.0),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: _isLocationLoading
-                                ? Row(
-                                    children: [
-                                      Container(
-                                        width: 20,
-                                        height: 20,
-                                        child: CircularProgressIndicator(
-                                          color: ThemeService.buttonBg,
-                                        ),
-                                      ),
-                                      SizedBox(width: 10),
-                                      Text(
-                                        'Fetching location...',
-                                        softWrap: true,
-                                      ),
-                                    ],
-                                  )
-                                : TextField(
-                                    controller: _locationController,
-                                    decoration: InputDecoration(
-                                      hintText: 'Select your location',
-                                      border: InputBorder.none,
-                                    ),
-                                  ),
-                          ),
-                          Icon(Icons.location_on, color: Colors.grey[600]),
-                        ],
-                      ),
-                    ),
-                  ),
-                  SizedBox(height: 16.0),
-                  Row(
-                    children: [
-                      Text(
-                        'Sports',
-                        style: TextStyle(
-                            fontSize: 18, fontWeight: FontWeight.w800),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 8),
-                  GestureDetector(
-                    onTap: showSportsDialog,
-                    child: Container(
-                      padding:
-                          EdgeInsets.symmetric(vertical: 16.0, horizontal: 8.0),
-                      decoration: BoxDecoration(
-                        border: Border.all(color: Colors.grey),
-                        borderRadius: BorderRadius.circular(4.0),
-                      ),
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Text(
-                              _selectedSports.isEmpty
-                                  ? 'Select your sports'
-                                  : _selectedSports.join(', '),
-                              style: TextStyle(color: Colors.grey[600]),
+                  Center(
+                    child: Stack(
+                      children: [
+                        Container(
+                          height: 150,
+                          width: 150,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            color: Colors.grey[300],
+                            border: Border.all(
+                              color: ThemeService.buttonBg,
+                              width: 3,
                             ),
                           ),
-                          Icon(Icons.sports, color: Colors.grey[600]),
-                        ],
-                      ),
+                          child: ClipOval(
+                            child: (imageUrl ?? '').isEmpty
+                                ? _selectedImage == null
+                                    ? Center(
+                                        child: Icon(
+                                          Icons.person,
+                                          color: Colors.grey[800],
+                                          size: 100,
+                                        ),
+                                      )
+                                    : Image.file(
+                                        _selectedImage!,
+                                        fit: BoxFit.cover,
+                                      )
+                                : Image.network(
+                                    imageUrl!,
+                                    fit: BoxFit.cover,
+                                    loadingBuilder:
+                                        (context, child, loadingProgress) {
+                                      if (loadingProgress == null) return child;
+                                      return Center(
+                                        child: CircularProgressIndicator(
+                                          value: loadingProgress
+                                                      .expectedTotalBytes !=
+                                                  null
+                                              ? loadingProgress
+                                                      .cumulativeBytesLoaded /
+                                                  loadingProgress
+                                                      .expectedTotalBytes!
+                                              : null,
+                                        ),
+                                      );
+                                    },
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        color: Colors.grey[
+                                            300], // Placeholder color in case of error
+                                        child: Icon(
+                                          Icons.error,
+                                          color: Colors.red, // Error icon color
+                                        ),
+                                      );
+                                    },
+                                  ),
+                          ),
+                        ),
+                        Positioned(
+                          bottom: 5,
+                          right: 5,
+                          child: GestureDetector(
+                            onTap: pickImage,
+                            child: CircleAvatar(
+                              radius: 20,
+                              backgroundColor: ThemeService.buttonBg,
+                              child: Icon(
+                                Icons.camera_alt,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
-                  SizedBox(height: 36.0),
-                  SizedBox(
-                    width: double.infinity,
-                    child: ElevatedButton(
-                      onPressed: handleSave,
-                      style: ElevatedButton.styleFrom(
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8.0),
+                  SizedBox(height: 16.0),
+                  Padding(
+                    padding: const EdgeInsets.all(10.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        SizedBox(height: 16.0),
+                        Row(
+                          children: [
+                            Text(
+                              'Username',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w800),
+                            ),
+                          ],
                         ),
-                        backgroundColor: ThemeService.buttonBg,
-                      ),
-                      child: const Text(
-                        'Save Profile',
-                        style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.white,
+                        SizedBox(height: 8),
+                        TextField(
+                          controller: _usernameController,
+                          decoration: InputDecoration(
+                            hintText: 'Username',
+                            border: OutlineInputBorder(),
+                          ),
                         ),
-                      ),
+                        SizedBox(height: 16.0),
+                        Row(
+                          children: [
+                            Text(
+                              'Location',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w800),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        GestureDetector(
+                          onTap: handleLocation,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: _isLocationLoading ? 16 : 3.0,
+                                horizontal: 8.0),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: _isLocationLoading
+                                      ? Row(
+                                          children: [
+                                            Container(
+                                              width: 20,
+                                              height: 20,
+                                              child: CircularProgressIndicator(
+                                                color: ThemeService.buttonBg,
+                                              ),
+                                            ),
+                                            SizedBox(width: 10),
+                                            Text(
+                                              'Fetching location...',
+                                              softWrap: true,
+                                            ),
+                                          ],
+                                        )
+                                      : TextField(
+                                          controller: _locationController,
+                                          readOnly: true,
+                                          onTap: () => handleLocation,
+                                          keyboardType: TextInputType.none,
+                                          decoration: InputDecoration(
+                                            hintText: 'Select your location',
+                                            border: InputBorder.none,
+                                          ),
+                                        ),
+                                ),
+                                Icon(Icons.location_on,
+                                    color: Colors.grey[600]),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 16.0),
+                        Row(
+                          children: [
+                            Text(
+                              'Sports',
+                              style: TextStyle(
+                                  fontSize: 18, fontWeight: FontWeight.w800),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 8),
+                        GestureDetector(
+                          onTap: showSportsDialog,
+                          child: Container(
+                            padding: EdgeInsets.symmetric(
+                                vertical: 16.0, horizontal: 8.0),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey),
+                              borderRadius: BorderRadius.circular(4.0),
+                            ),
+                            child: Row(
+                              children: [
+                                Expanded(
+                                  child: Text(
+                                    _selectedSports.isEmpty
+                                        ? 'Select your sports'
+                                        : _selectedSports.join(', '),
+                                    style: TextStyle(color: Colors.grey[600]),
+                                  ),
+                                ),
+                                Icon(Icons.sports, color: Colors.grey[600]),
+                              ],
+                            ),
+                          ),
+                        ),
+                        SizedBox(height: 36.0),
+                        SizedBox(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: handleSave,
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              backgroundColor: ThemeService.buttonBg,
+                            ),
+                            child: const Text(
+                              'Save Profile',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
                   ),
                 ],
               ),
             ),
-          ],
-        ),
-      ),
     );
   }
 }
