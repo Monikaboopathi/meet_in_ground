@@ -12,11 +12,10 @@ import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/util/Services/userName_service.dart';
+import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
-
-DateTime? currentBackPressTime;
 
 class Addposts extends StatefulWidget {
   @override
@@ -230,19 +229,13 @@ class _AddpostsState extends State<Addposts> {
       ),
       backgroundColor: ThemeService.background,
       body: WillPopScope(
-        onWillPop: () async {
-          DateTime now = DateTime.now();
-          if (currentBackPressTime == null ||
-              now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
-            currentBackPressTime = now;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Press back again to exit'),
-              ),
-            );
-            return false;
-          }
-          return true;
+         onWillPop: () async {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => BottomNavigationScreen(currentIndex: 0),
+            ),
+          );
+          return false;
         },
         child: Stack(
           children: [

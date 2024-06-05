@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:meet_in_ground/Ads/NativeAd.dart';
 import 'package:meet_in_ground/Models/Post.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/widgets/Confirmation_Dialog.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
@@ -15,7 +16,6 @@ import 'package:meet_in_ground/constant/sports_names.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
 
-DateTime? currentBackPressTime;
 
 class Favorites extends StatefulWidget {
   @override
@@ -465,20 +465,13 @@ class _FavoritesState extends State<Favorites> {
       ),
       body: WillPopScope(
            onWillPop: () async {
-          DateTime now = DateTime.now();
-          if (currentBackPressTime == null ||
-              now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
-            currentBackPressTime = now;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Press back again to exit'),
-              ),
-            );
-            return false;
-          }
-          return true;
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => BottomNavigationScreen(currentIndex: 0),
+            ),
+          );
+          return false;
         },
-      
         child: RefreshIndicator(
           onRefresh: () async {
             setState(() {

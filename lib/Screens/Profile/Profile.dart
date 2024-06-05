@@ -17,6 +17,7 @@ import 'package:http/http.dart' as http;
 import 'package:meet_in_ground/util/Services/Auth_service.dart';
 import 'package:meet_in_ground/util/Services/PreferencesService.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/ShareMethods.dart';
 
@@ -176,55 +177,67 @@ class _ProfileScreenState extends State<ProfileScreen> {
         centerTitle: true,
       ),
       backgroundColor: ThemeService.background,
-      body: RefreshIndicator(
-        onRefresh: _refresh,
-        child: isLoading
-            ? Loader()
-            : SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
-                  children: [
-                    ProfileHeader(
-                      userDetails: userDetails,
-                      userCity: userCity,
-                      onEditProfile: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => EditProfile(
-                                  userDetails: userDetails,
-                                  lat: lat,
-                                  lng: lng)),
-                        );
-                      },
-                    ),
-                    ProfileDetails(userDetails: userDetails),
-                    FeaturesSection(
-                      balance: balance.toString(),
-                      notificationCount: notificationData.length,
-                      referredPost: referredPost,
-                      referralDetails: referralDetails,
-                      onRateUs: () {
-                        setState(() {
-                          modalVisible = true;
-                        });
-                      },
-                      onShareUs: () {
-                        shareApp();
-                      },
-                    ),
-                    SizedBox(height: 20),
-                    AdMobBanner(),
-                    AdMobReward(),
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Container(
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          onPressed: handleLogout,
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
+      body: WillPopScope(
+           onWillPop: () async {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => BottomNavigationScreen(currentIndex: 0),
+            ),
+          );
+          return false;
+        },
+        child: RefreshIndicator(
+          onRefresh: _refresh,
+          child: isLoading
+              ? Loader()
+              : SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      ProfileHeader(
+                        userDetails: userDetails,
+                        userCity: userCity,
+                        onEditProfile: () {
+                          Navigator.pushAndRemoveUntil(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    EditProfile(userDetails: userDetails)),
+                            (route) => false,
+                          );
+                        },
+                      ),
+                      ProfileDetails(userDetails: userDetails),
+                      FeaturesSection(
+                        balance: balance.toString(),
+                        notificationCount: notificationData.length,
+                        referredPost: referredPost,
+                        referralDetails: referralDetails,
+                        onRateUs: () {
+                          setState(() {
+                            modalVisible = true;
+                          });
+                        },
+                        onShareUs: () {
+                          shareApp();
+                        },
+                      ),
+                      SizedBox(height: 20),
+                      AdMobBanner(),
+                      AdMobInterstitial(),
+                      AdMobReward(),
+                      Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 20),
+                        child: Container(
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            onPressed: handleLogout,
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              backgroundColor: ThemeService.buttonBg,
+
                             ),
                             backgroundColor: ThemeService.buttonBg,
                           ),
