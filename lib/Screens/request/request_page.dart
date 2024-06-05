@@ -28,12 +28,30 @@ class _RequestsScreenState extends State<RequestsScreen> {
   String userName = '';
   String userProfile = '';
   bool isLoading = false;
+  String? currentMobileNumber;
 
   @override
   void initState() {
     super.initState();
     fetchData();
     getUserPhone();
+    initializeData().then((mobileNumber) {
+      if (mounted) {
+        setState(() {
+          currentMobileNumber = mobileNumber!;
+        });
+      }
+    });
+  }
+
+  Future<String?> initializeData() async {
+    try {
+      String? number = await MobileNo.getMobilenumber();
+      return number;
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
   }
 
   fetchData() async {
@@ -75,7 +93,8 @@ class _RequestsScreenState extends State<RequestsScreen> {
     try {
       final response = await http.patch(
         Uri.parse(url),
-        body: jsonEncode({'status': 'Requested'}),
+        body: jsonEncode(
+            {'status': 'Requested', 'phoneNumber': '${currentMobileNumber!}'}),
         headers: {'Content-Type': 'application/json'},
       );
 

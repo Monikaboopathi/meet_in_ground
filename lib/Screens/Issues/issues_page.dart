@@ -94,7 +94,7 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
           _subjectController.clear();
 
            setState(() {
-          _selectedImage = null; // Clear the selected image
+          _selectedImage = null; 
         });
         
           Fluttertoast.showToast(

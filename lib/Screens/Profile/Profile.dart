@@ -4,10 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:clipboard/clipboard.dart';
-import 'package:get/get.dart';
 import 'package:meet_in_ground/Ads/BannerAd.dart';
-import 'package:meet_in_ground/Ads/InterstitialAd.dart';
-import 'package:meet_in_ground/Ads/NativeAd.dart';
 import 'package:meet_in_ground/Ads/RewardAds.dart';
 import 'package:meet_in_ground/Screens/Profile/EditProfilePage.dart';
 import 'package:geocoding/geocoding.dart';
@@ -42,10 +39,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   bool isLoading = false;
   bool modalVisible = false;
   String? currentMobileNumber;
-  final NativeAdsController nativeAdController = Get.put(NativeAdsController());
   @override
   void initState() {
-    nativeAdController.loadAd();
     super.initState();
     initializeData().then((mobileNumber) {
       if (mounted) {
@@ -220,7 +215,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     ),
                     SizedBox(height: 20),
                     AdMobBanner(),
-                    AdMobInterstitial(),
                     AdMobReward(),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
