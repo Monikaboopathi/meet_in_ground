@@ -32,8 +32,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Align(
       child: Image.asset(
         assetName,
-        width: 350.0,
-        height: 450,
+        width: MediaQuery.of(context).size.width * 0.9,
+        height: MediaQuery.of(context).size.height * 0.6,
         fit: BoxFit.contain,
       ),
       alignment: Alignment.center,
@@ -63,11 +63,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         border: Border.all(
           color:
               isSelected ? Colors.white.withOpacity(0.9) : Colors.transparent,
-          width: 2, // Adjust the width of the border
+          width: 2,
         ),
       ),
       padding: EdgeInsets.all(8),
-      margin: EdgeInsets.symmetric(horizontal: 5), // Add horizontal spacing
+      margin: EdgeInsets.symmetric(horizontal: 5),
       child: Padding(
         padding: const EdgeInsets.all(4.0),
         child: Icon(icon, color: Colors.white, size: 30),
@@ -90,9 +90,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
         mainAxisAlignment: MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          SizedBox(height: 40),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.05),
           buildImage(image),
-          SizedBox(height: 20),
+          SizedBox(height: MediaQuery.of(context).size.height * 0.02),
           body,
         ],
       ),
@@ -102,8 +102,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors
-          .transparent, // Set the background color of the scaffold to transparent
+      backgroundColor: Colors.transparent,
       body: IntroductionScreen(
         pages: [
           buildPageViewModel(
@@ -114,7 +113,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 20,
+                fontSize: MediaQuery.of(context).size.width * 0.05,
               ),
             ),
           ),
@@ -126,7 +125,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 20,
+                fontSize: MediaQuery.of(context).size.width * 0.05,
               ),
             ),
           ),
@@ -138,7 +137,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
-                fontSize: 20,
+                fontSize: MediaQuery.of(context).size.width * 0.05,
               ),
             ),
           ),
@@ -168,13 +167,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
             style: TextStyle(
               fontWeight: FontWeight.w800,
               fontSize: 18,
-              color: Colors.white, // Color based on your theme
+              color: Colors.white,
             ),
           ),
         ),
         globalBackgroundColor: pageColors[_currentPage],
         globalHeader: Container(
-          padding: EdgeInsets.only(top: 50),
+          padding: EdgeInsets.only(top: MediaQuery.of(context).size.height * 0.05),
           child: buildIcons(),
         ),
         dotsDecorator: DotsDecorator(
