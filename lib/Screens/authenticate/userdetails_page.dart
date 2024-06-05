@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:geocoding/geocoding.dart' hide Location;
 import 'package:image_picker/image_picker.dart';
 import 'package:http/http.dart' as http;
 import 'package:location/location.dart';
@@ -105,7 +106,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
         content: Text(
-          'Location permission denied forever. Please enable it in app settings.'),
+            'Location permission denied forever. Please enable it in app settings.'),
       ));
     }
   }
@@ -126,14 +127,16 @@ class _UserOnBoardState extends State<UserOnBoard> {
     }
 
     userLocation = await location.getLocation();
-    await fetchLocationInfo(userLocation!.latitude!, userLocation!.longitude!);
-
+    final address = await getAddressFromLatLng(
+        userLocation!.latitude!, userLocation!.longitude!);
     setState(() {
+      userCity = address;
       locationLoader = false;
       // Disable the button after obtaining location
       loadingLocation = false;
     });
   }
+
   Future<void> pickImage() async {
     final pickedFile = await picker.pickImage(source: ImageSource.gallery);
 
@@ -144,13 +147,16 @@ class _UserOnBoardState extends State<UserOnBoard> {
     }
   }
 
-  Future<void> fetchLocationInfo(double latitude, double longitude) async {
-    final response = await http.get(Uri.parse(
-        'https://nominatim.openstreetmap.org/reverse?lat=$latitude&lon=$longitude&format=json'));
-    final data = jsonDecode(response.body);
-    setState(() {
-      userCity = data['display_name'] ?? '';
-    });
+  Future<String> getAddressFromLatLng(double lat, double lng) async {
+    try {
+      List<Placemark> placemarks = await placemarkFromCoordinates(lat, lng);
+
+      Placemark place = placemarks[0];
+
+      return "${place.street}, ${place.locality}, ${place.administrativeArea}, ${place.country}";
+    } catch (e) {
+      return 'Error getting address';
+    }
   }
 
   void handleShareLocation() async {
@@ -496,7 +502,8 @@ class _UserOnBoardState extends State<UserOnBoard> {
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(8.0),
                 ),
-                backgroundColor: loadingLocation ? Colors.grey :ThemeService.buttonBg,
+                backgroundColor:
+                    loadingLocation ? Colors.grey : ThemeService.buttonBg,
               ),
               child: const Text(
                 'Share Location',
