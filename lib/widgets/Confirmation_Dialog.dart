@@ -74,7 +74,7 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
                               Navigator.pop(context);
                             },
                             child: Icon(
-                              Icons.close,
+                              Icons.cancel,
                               size: 25,
                               color: ThemeService.textColor,
                             ),
@@ -109,7 +109,8 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               backgroundColor: Colors.grey.shade400,
-                              padding: EdgeInsets.symmetric(vertical: 10),
+                              padding: EdgeInsets.symmetric(vertical: 2),
+                              minimumSize: Size(60, 20),
                             ),
                             child: Container(
                               alignment: Alignment.center,
@@ -128,12 +129,12 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
                               Navigator.pop(context);
                             },
                             style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              backgroundColor: widget.colors,
-                              padding: EdgeInsets.symmetric(vertical: 10),
-                            ),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                backgroundColor: widget.colors,
+                                padding: EdgeInsets.symmetric(vertical: 2),
+                                minimumSize: Size(60, 20)),
                             child: Container(
                               alignment: Alignment.center,
                               child: Text(
