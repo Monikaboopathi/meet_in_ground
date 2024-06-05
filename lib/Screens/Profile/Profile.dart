@@ -20,6 +20,7 @@ import 'package:http/http.dart' as http;
 import 'package:meet_in_ground/util/Services/Auth_service.dart';
 import 'package:meet_in_ground/util/Services/PreferencesService.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/ShareMethods.dart';
 DateTime? currentBackPressTime;
@@ -186,20 +187,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
       backgroundColor: ThemeService.background,
       body: WillPopScope(
            onWillPop: () async {
-          DateTime now = DateTime.now();
-          if (currentBackPressTime == null ||
-              now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
-            currentBackPressTime = now;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Press back again to exit'),
-              ),
-            );
-            return false;
-          }
-          return true;
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => BottomNavigationScreen(currentIndex: 0),
+            ),
+          );
+          return false;
         },
-      
         child: RefreshIndicator(
           onRefresh: _refresh,
           child: isLoading

@@ -15,10 +15,10 @@ import 'package:http/http.dart' as http;
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/util/Services/userName_service.dart';
+import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
-DateTime? currentBackPressTime;
 
 class Addposts extends StatefulWidget {
   @override
@@ -234,21 +234,14 @@ class _AddpostsState extends State<Addposts> {
       ),
       backgroundColor: ThemeService.background,
       body: WillPopScope(
-           onWillPop: () async {
-          DateTime now = DateTime.now();
-          if (currentBackPressTime == null ||
-              now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
-            currentBackPressTime = now;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Press back again to exit'),
-              ),
-            );
-            return false;
-          }
-          return true;
+         onWillPop: () async {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => BottomNavigationScreen(currentIndex: 0),
+            ),
+          );
+          return false;
         },
-      
         child: Stack(
           children: [
             SingleChildScrollView(
@@ -265,8 +258,8 @@ class _AddpostsState extends State<Addposts> {
                         decoration: BoxDecoration(
                           color: Colors.grey[300],
                           borderRadius: BorderRadius.circular(10),
-                          border:
-                              Border.all(color: ThemeService.buttonBg, width: 3),
+                          border: Border.all(
+                              color: ThemeService.buttonBg, width: 3),
                         ),
                         child: selectedImage == null
                             ? Center(
@@ -275,8 +268,8 @@ class _AddpostsState extends State<Addposts> {
                               )
                             : ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
-                                child:
-                                    Image.file(selectedImage!, fit: BoxFit.cover),
+                                child: Image.file(selectedImage!,
+                                    fit: BoxFit.cover),
                               ),
                       ),
                     ),
@@ -327,8 +320,8 @@ class _AddpostsState extends State<Addposts> {
                                   padding: EdgeInsets.symmetric(horizontal: 10),
                                   child: Text(
                                     'Select Sport',
-                                    style:
-                                        TextStyle(color: ThemeService.textColor),
+                                    style: TextStyle(
+                                        color: ThemeService.textColor),
                                   ),
                                 ),
                               ),
@@ -454,7 +447,8 @@ class _AddpostsState extends State<Addposts> {
                     },
                   ),
                   if (matchDetailsError != null)
-                    Text(matchDetailsError!, style: TextStyle(color: Colors.red)),
+                    Text(matchDetailsError!,
+                        style: TextStyle(color: Colors.red)),
                   SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,

@@ -4,11 +4,10 @@ import 'package:meet_in_ground/Screens/chat/ChatScreen.dart';
 import 'package:meet_in_ground/constant/format_time.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:meet_in_ground/util/Services/ChatService.dart';
+import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
-
-DateTime? currentBackPressTime;
 
 class Messages extends StatefulWidget {
   Messages({Key? key}) : super(key: key);
@@ -51,21 +50,14 @@ class _MessagesState extends State<Messages> {
         centerTitle: true,
       ),
       body: WillPopScope(
-           onWillPop: () async {
-          DateTime now = DateTime.now();
-          if (currentBackPressTime == null ||
-              now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
-            currentBackPressTime = now;
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Press back again to exit'),
-              ),
-            );
-            return false;
-          }
-          return true;
+        onWillPop: () async {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => BottomNavigationScreen(currentIndex: 0),
+            ),
+          );
+          return false;
         },
-      
         child: FutureBuilder<List<Map<String, dynamic>>>(
           future: _futureChatRooms,
           builder: (context, snapshot) {
@@ -75,7 +67,7 @@ class _MessagesState extends State<Messages> {
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
               return NoDataFoundWidget();
             }
-        
+
             List<Map<String, dynamic>> chatRooms = snapshot.data!;
             return RefreshIndicator(
               onRefresh: _refreshChatRooms,
@@ -83,7 +75,7 @@ class _MessagesState extends State<Messages> {
                 itemCount: chatRooms.length,
                 itemBuilder: (context, index) {
                   var chatRoom = chatRooms[index];
-        
+
                   return ListTile(
                     onTap: () {
                       Navigator.of(context).pushReplacement(
