@@ -5,6 +5,7 @@ import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:clipboard/clipboard.dart';
 import 'package:meet_in_ground/Ads/BannerAd.dart';
+import 'package:meet_in_ground/Ads/InterstitialAd.dart';
 import 'package:meet_in_ground/Ads/RewardAds.dart';
 import 'package:meet_in_ground/Screens/Profile/EditProfilePage.dart';
 import 'package:geocoding/geocoding.dart';
@@ -202,7 +203,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                             context,
                             MaterialPageRoute(
                                 builder: (context) =>
-                                    EditProfile(userDetails: userDetails)),
+                                    EditProfile(userDetails: userDetails, lat:lat , lng: lng,)),
                             (route) => false,
                           );
                         },
@@ -239,8 +240,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               backgroundColor: ThemeService.buttonBg,
 
                             ),
-                            backgroundColor: ThemeService.buttonBg,
-                          ),
                           child: Text(
                             'Logout',
                             style: TextStyle(
@@ -255,6 +254,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 ),
               ),
       ),
+    ),
     );
   }
 }
