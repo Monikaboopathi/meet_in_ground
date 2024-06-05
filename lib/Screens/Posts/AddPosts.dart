@@ -1,12 +1,9 @@
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:get/get.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
 import 'package:meet_in_ground/Ads/BannerAd.dart';
-import 'package:meet_in_ground/Ads/InterstitialAd.dart';
-import 'package:meet_in_ground/Ads/NativeAd.dart';
 import 'package:meet_in_ground/Ads/RewardAds.dart';
 import 'package:meet_in_ground/Screens/Posts/MyPosts.dart';
 import 'package:meet_in_ground/constant/sports_names.dart';
@@ -18,6 +15,7 @@ import 'package:meet_in_ground/util/Services/userName_service.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
+
 DateTime? currentBackPressTime;
 
 class Addposts extends StatefulWidget {
@@ -41,10 +39,8 @@ class _AddpostsState extends State<Addposts> {
   String? locationError;
   String? matchDetailsError;
   String? priceError;
-  final NativeAdsController nativeAdController = Get.put(NativeAdsController());
   @override
   void initState() {
-    nativeAdController.loadAd();
     super.initState();
   }
 
@@ -234,7 +230,7 @@ class _AddpostsState extends State<Addposts> {
       ),
       backgroundColor: ThemeService.background,
       body: WillPopScope(
-           onWillPop: () async {
+        onWillPop: () async {
           DateTime now = DateTime.now();
           if (currentBackPressTime == null ||
               now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
@@ -248,7 +244,6 @@ class _AddpostsState extends State<Addposts> {
           }
           return true;
         },
-      
         child: Stack(
           children: [
             SingleChildScrollView(
@@ -265,8 +260,8 @@ class _AddpostsState extends State<Addposts> {
                         decoration: BoxDecoration(
                           color: Colors.grey[300],
                           borderRadius: BorderRadius.circular(10),
-                          border:
-                              Border.all(color: ThemeService.buttonBg, width: 3),
+                          border: Border.all(
+                              color: ThemeService.buttonBg, width: 3),
                         ),
                         child: selectedImage == null
                             ? Center(
@@ -275,8 +270,8 @@ class _AddpostsState extends State<Addposts> {
                               )
                             : ClipRRect(
                                 borderRadius: BorderRadius.circular(10),
-                                child:
-                                    Image.file(selectedImage!, fit: BoxFit.cover),
+                                child: Image.file(selectedImage!,
+                                    fit: BoxFit.cover),
                               ),
                       ),
                     ),
@@ -327,8 +322,8 @@ class _AddpostsState extends State<Addposts> {
                                   padding: EdgeInsets.symmetric(horizontal: 10),
                                   child: Text(
                                     'Select Sport',
-                                    style:
-                                        TextStyle(color: ThemeService.textColor),
+                                    style: TextStyle(
+                                        color: ThemeService.textColor),
                                   ),
                                 ),
                               ),
@@ -454,7 +449,8 @@ class _AddpostsState extends State<Addposts> {
                     },
                   ),
                   if (matchDetailsError != null)
-                    Text(matchDetailsError!, style: TextStyle(color: Colors.red)),
+                    Text(matchDetailsError!,
+                        style: TextStyle(color: Colors.red)),
                   SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
@@ -504,7 +500,6 @@ class _AddpostsState extends State<Addposts> {
                     ),
                   ),
                   AdMobBanner(),
-                  AdMobInterstitial(),
                   AdMobReward(),
                 ],
               ),
