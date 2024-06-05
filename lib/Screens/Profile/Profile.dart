@@ -37,6 +37,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
   String balance = "";
   List<dynamic> notificationData = [];
   double rating = 0.0;
+  double lat = 0.0;
+  double lng = 0.0;
   bool isLoading = false;
   bool modalVisible = false;
   String? currentMobileNumber;
@@ -76,15 +78,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
       if (response.statusCode == 200) {
         var data = jsonDecode(response.body)['data'];
-     print('Fetched Data: $data'); // Debugging line
-
-      var userDetailsData = data['userDetails'];
-      print('User Details Data: $userDetailsData'); // Debugging line
-
-      List<String> latlog = userDetailsData['location'].toString().split(",");
-      double lat = double.parse(latlog[0].split(":")[1].trim());
-      double lng = double.parse(latlog[1].split(":")[1].trim());
-
+        List<String> latlog =
+            data['userDetails']['location'].toString().split(",");
+        setState(() {
+          lat = double.parse(latlog[0]);
+          lng = double.parse(latlog[1]);
+        });
         String location = await getAddressFromLatLng(lat, lng);
         setState(() {
           userDetails = {
@@ -95,8 +94,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             'sport': data['userDetails']['sport'],
             'referralId': data['userDetails']['referralId']
           };
-          print(userDetails);
-          print('Parsed User Details: $userDetails'); 
+
           referralDetails = {
             'registeredUserCount': data['totalReferredUsers'] == null
                 ? "0"
@@ -195,12 +193,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       userDetails: userDetails,
                       userCity: userCity,
                       onEditProfile: () {
-                        Navigator.pushAndRemoveUntil(
+                        Navigator.push(
                           context,
                           MaterialPageRoute(
-                              builder: (context) =>
-                                  EditProfile(userDetails: userDetails)),
-                          (route) => false,
+                              builder: (context) => EditProfile(
+                                  userDetails: userDetails,
+                                  lat: lat,
+                                  lng: lng)),
                         );
                       },
                     ),
