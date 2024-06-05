@@ -10,7 +10,6 @@ import 'package:http/http.dart' as http;
 import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
 import 'package:meet_in_ground/widgets/ShareMethods.dart';
 
-
 class WalletPage extends StatefulWidget {
   @override
   _WalletPageState createState() => _WalletPageState();
@@ -104,7 +103,7 @@ class _WalletPageState extends State<WalletPage> {
         headers: {'Content-Type': 'application/json'},
         body: jsonEncode({'upiID': trimmedText}),
       );
-final Map<String, dynamic> responseData = jsonDecode(response.body);
+      final Map<String, dynamic> responseData = jsonDecode(response.body);
 
       print(responseData);
 
@@ -128,7 +127,7 @@ final Map<String, dynamic> responseData = jsonDecode(response.body);
       } else {
         // Handle error
         Fluttertoast.showToast(
-          msg:responseData['error'] ,
+          msg: responseData['error'],
           toastLength: Toast.LENGTH_SHORT,
           gravity: ToastGravity.TOP,
           timeInSecForIosWeb: 2,
@@ -435,7 +434,7 @@ final Map<String, dynamic> responseData = jsonDecode(response.body);
             margin: EdgeInsets.symmetric(horizontal: 20.0),
             decoration: BoxDecoration(
               color: Colors.grey.shade200,
-              border: Border.all(color: ThemeService.primary,width: 3),
+              border: Border.all(color: ThemeService.primary, width: 3),
               borderRadius: BorderRadius.circular(10),
             ),
             child: Column(
@@ -444,7 +443,7 @@ final Map<String, dynamic> responseData = jsonDecode(response.body);
                 Align(
                   alignment: Alignment.topRight,
                   child: IconButton(
-                    icon: Icon(Icons.close),
+                    icon: Icon(Icons.cancel),
                     onPressed: () => setState(() {
                       _visible = false;
                     }),
