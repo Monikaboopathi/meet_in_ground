@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:meet_in_ground/Screens/authenticate/login_page.dart';
 import 'package:meet_in_ground/Screens/authenticate/userdetails_page.dart';
 import 'package:meet_in_ground/Screens/onboarding/Onboarding.dart';
+import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:meet_in_ground/util/Services/PreferencesService.dart';
 
 import '../../util/Services/Auth_service.dart';
@@ -72,15 +73,13 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        // ignore: sized_box_for_whitespace
-        child: Container(
-          width: double.infinity,
-          height: double.infinity,
-          child: Image.asset(
-            'assets/splash.png',
-            fit: BoxFit.cover,
-          ),
+      body: Container(
+        width: double.infinity,
+        height: double.infinity,
+        color: ThemeService.primary,
+        child: Image.asset(
+          'assets/splash.png',
+          fit: BoxFit.contain,
         ),
       ),
     );
