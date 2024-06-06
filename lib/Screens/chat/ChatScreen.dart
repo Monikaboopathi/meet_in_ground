@@ -228,8 +228,6 @@ class _ChatScreenState extends State<ChatScreen> {
                                     });
                                   },
                                   child: Container(
-                                    width:
-                                        MediaQuery.of(context).size.width * 0.7,
                                     decoration: BoxDecoration(
                                       color: isSender
                                           ? Colors.green[100]
@@ -245,62 +243,66 @@ class _ChatScreenState extends State<ChatScreen> {
                                         bottomRight: Radius.circular(16),
                                       ),
                                     ),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Padding(
-                                          padding: EdgeInsets.all(12),
-                                          child: Text(
-                                            isExpanded
-                                                ? message.message
-                                                : (isMessageTruncated
-                                                    ? '${message.message.substring(0, 100)}...'
-                                                    : message.message),
-                                            style: TextStyle(fontSize: 14),
-                                          ),
-                                        ),
-                                        SizedBox(height: 4),
-                                        Align(
-                                          alignment: Alignment.bottomRight,
-                                          child: Padding(
-                                            padding: EdgeInsets.only(
-                                                right: 12, bottom: 4),
+                                    child: IntrinsicWidth(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        mainAxisSize: MainAxisSize.min,
+                                        children: [
+                                          Padding(
+                                            padding: EdgeInsets.all(12),
                                             child: Text(
-                                              formatTime(message.timestamp),
-                                              style: TextStyle(
-                                                fontSize: 12,
-                                                color: Colors.grey,
-                                              ),
+                                              isExpanded
+                                                  ? message.message
+                                                  : (isMessageTruncated
+                                                      ? '${message.message.substring(0, 100)}...'
+                                                      : message.message),
+                                              style: TextStyle(fontSize: 14),
                                             ),
                                           ),
-                                        ),
-                                        if (isMessageTruncated)
-                                          GestureDetector(
-                                            onTap: () {
-                                              setState(() {
-                                                isMessageExpanded[index] =
-                                                    !(isMessageExpanded[
-                                                            index] ??
-                                                        false);
-                                              });
-                                            },
+                                          SizedBox(height: 4),
+                                          Align(
+                                            alignment: Alignment.bottomRight,
                                             child: Padding(
                                               padding: EdgeInsets.only(
-                                                  left: 12, bottom: 8),
+                                                  right: 12,
+                                                  bottom: 4,
+                                                  left: 12),
                                               child: Text(
-                                                isExpanded
-                                                    ? 'Show less'
-                                                    : 'Show more',
+                                                formatTime(message.timestamp),
                                                 style: TextStyle(
-                                                  color: Colors.blue,
                                                   fontSize: 12,
+                                                  color: Colors.grey,
                                                 ),
                                               ),
                                             ),
                                           ),
-                                      ],
+                                          if (isMessageTruncated)
+                                            GestureDetector(
+                                              onTap: () {
+                                                setState(() {
+                                                  isMessageExpanded[index] =
+                                                      !(isMessageExpanded[
+                                                              index] ??
+                                                          false);
+                                                });
+                                              },
+                                              child: Padding(
+                                                padding: EdgeInsets.only(
+                                                    left: 12, bottom: 8),
+                                                child: Text(
+                                                  isExpanded
+                                                      ? 'Show less'
+                                                      : 'Show more',
+                                                  style: TextStyle(
+                                                    color: Colors.blue,
+                                                    fontSize: 12,
+                                                  ),
+                                                ),
+                                              ),
+                                            ),
+                                        ],
+                                      ),
                                     ),
                                   ),
                                 ),
