@@ -285,6 +285,7 @@ class _HomeScreenState extends State<HomeScreen> {
     return Scaffold(
       backgroundColor: ThemeService.background,
       appBar: AppBar(
+        notificationPredicate: (notification) => false,
         automaticallyImplyLeading: false,
         backgroundColor: ThemeService.background,
         title: Text(
@@ -463,7 +464,7 @@ class _HomeScreenState extends State<HomeScreen> {
         ),
       ),
       body: WillPopScope(
-         onWillPop: () async {
+        onWillPop: () async {
           DateTime now = DateTime.now();
           if (currentBackPressTime == null ||
               now.difference(currentBackPressTime!) > Duration(seconds: 2)) {
@@ -477,7 +478,6 @@ class _HomeScreenState extends State<HomeScreen> {
           }
           return true;
         },
-       
         child: RefreshIndicator(
           onRefresh: () async {
             setState(() {
@@ -500,7 +500,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   itemBuilder: (context, index) {
                     Post post = snapshot.data![index];
                     bool isShowMore = showMoreMap[post.id] ?? false;
-        
+
                     return Post_Widget(
                       userName: post.userName,
                       placeOfMatch: post.placeOfMatch,

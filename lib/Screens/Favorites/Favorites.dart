@@ -16,7 +16,6 @@ import 'package:meet_in_ground/constant/sports_names.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
 
-
 class Favorites extends StatefulWidget {
   @override
   _FavoritesState createState() => _FavoritesState();
@@ -286,6 +285,7 @@ class _FavoritesState extends State<Favorites> {
     return Scaffold(
       backgroundColor: ThemeService.background,
       appBar: AppBar(
+        notificationPredicate: (notification) => false,
         backgroundColor: ThemeService.background,
         automaticallyImplyLeading: false,
         title: Text(
@@ -464,7 +464,7 @@ class _FavoritesState extends State<Favorites> {
         ),
       ),
       body: WillPopScope(
-           onWillPop: () async {
+        onWillPop: () async {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => BottomNavigationScreen(currentIndex: 0),
@@ -494,7 +494,7 @@ class _FavoritesState extends State<Favorites> {
                   itemBuilder: (context, index) {
                     Post post = snapshot.data![index];
                     bool isShowMore = showMoreMap[post.id] ?? false;
-        
+
                     return Post_Widget(
                       userName: post.userName,
                       placeOfMatch: post.placeOfMatch,

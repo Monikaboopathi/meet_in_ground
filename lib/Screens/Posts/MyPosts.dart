@@ -157,6 +157,7 @@ class _MyPostsState extends State<MyPosts> {
     return Scaffold(
       backgroundColor: ThemeService.background,
       appBar: AppBar(
+        notificationPredicate: (notification) => false,
         backgroundColor: ThemeService.background,
         leading: IconButton(
           icon: Icon(Icons.arrow_back, color: ThemeService.textColor, size: 35),

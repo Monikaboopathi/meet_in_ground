@@ -144,6 +144,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        notificationPredicate: (notification) => false,
         automaticallyImplyLeading: true,
         backgroundColor: ThemeService.background,
         title: Text(

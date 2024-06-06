@@ -89,14 +89,13 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
         print(responseData);
 
         if (response.statusCode == 200) {
-
           _messageController.clear();
           _subjectController.clear();
 
-           setState(() {
-          _selectedImage = null; 
-        });
-        
+          setState(() {
+            _selectedImage = null;
+          });
+
           Fluttertoast.showToast(
             msg: responseData['message'],
             toastLength: Toast.LENGTH_SHORT,
@@ -127,6 +126,7 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        notificationPredicate: (notification) => false,
         automaticallyImplyLeading: true,
         backgroundColor: ThemeService.background,
         title: Text(

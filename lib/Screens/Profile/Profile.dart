@@ -165,6 +165,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        notificationPredicate: (notification) => false,
         backgroundColor: ThemeService.background,
         automaticallyImplyLeading: false,
         title: Text(
@@ -179,7 +180,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       ),
       backgroundColor: ThemeService.background,
       body: WillPopScope(
-           onWillPop: () async {
+        onWillPop: () async {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => BottomNavigationScreen(currentIndex: 0),
@@ -202,8 +203,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                           Navigator.pushAndRemoveUntil(
                             context,
                             MaterialPageRoute(
-                                builder: (context) =>
-                                    EditProfile(userDetails: userDetails, lat:lat , lng: lng,)),
+                                builder: (context) => EditProfile(
+                                      userDetails: userDetails,
+                                      lat: lat,
+                                      lng: lng,
+                                    )),
                             (route) => false,
                           );
                         },
@@ -238,23 +242,22 @@ class _ProfileScreenState extends State<ProfileScreen> {
                                 borderRadius: BorderRadius.circular(8.0),
                               ),
                               backgroundColor: ThemeService.buttonBg,
-
                             ),
-                          child: Text(
-                            'Logout',
-                            style: TextStyle(
-                              fontSize: 18,
-                              color: Colors.white,
+                            child: Text(
+                              'Logout',
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.white,
+                              ),
                             ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
+                    ],
+                  ),
                 ),
-              ),
+        ),
       ),
-    ),
     );
   }
 }
