@@ -133,11 +133,11 @@ class _ChatScreenState extends State<ChatScreen> {
                       fontWeight: FontWeight.bold,
                       color: ThemeService.textColor),
                 ),
-                Text(
-                  'Online',
-                  style:
-                      TextStyle(fontSize: 12, color: ThemeService.placeHolder),
-                ),
+                // Text(
+                //   'Online',
+                //   style:
+                //       TextStyle(fontSize: 12, color: ThemeService.placeHolder),
+                // ),
               ],
             ),
           ],

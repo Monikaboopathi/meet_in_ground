@@ -52,9 +52,11 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
         height: 60,
         child: BottomAppBar(
           color: ThemeService.background,
+
           shape: CircularNotchedRectangle(),
           child: Container(
             height: kBottomNavigationBarHeight,
+
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -98,6 +100,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
       body: PageView(
         controller: pageController,
         onPageChanged: onPageChanged,
+         physics: NeverScrollableScrollPhysics(),
         children: [
           HomeScreen(),
           Messages(),
