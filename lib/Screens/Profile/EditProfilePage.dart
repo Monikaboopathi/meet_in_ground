@@ -333,6 +333,7 @@ class _EditProfileState extends State<EditProfile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        notificationPredicate: (notification) => false,
         automaticallyImplyLeading: true,
         backgroundColor: ThemeService.background,
         title: Text(

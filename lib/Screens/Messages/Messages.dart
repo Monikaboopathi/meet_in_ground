@@ -37,6 +37,7 @@ class _MessagesState extends State<Messages> {
     return Scaffold(
       backgroundColor: ThemeService.background,
       appBar: AppBar(
+        notificationPredicate: (notification) => false,
         backgroundColor: ThemeService.background,
         automaticallyImplyLeading: false,
         title: Text(

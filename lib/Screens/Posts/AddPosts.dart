@@ -215,6 +215,7 @@ class _AddpostsState extends State<Addposts> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        notificationPredicate: (notification) => false,
         automaticallyImplyLeading: false,
         backgroundColor: ThemeService.background,
         title: Text(
@@ -229,7 +230,7 @@ class _AddpostsState extends State<Addposts> {
       ),
       backgroundColor: ThemeService.background,
       body: WillPopScope(
-         onWillPop: () async {
+        onWillPop: () async {
           Navigator.of(context).pushReplacement(
             MaterialPageRoute(
               builder: (context) => BottomNavigationScreen(currentIndex: 0),
