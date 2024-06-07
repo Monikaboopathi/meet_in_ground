@@ -7,6 +7,7 @@ import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:http/http.dart' as http;
+import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
 import 'package:meet_in_ground/widgets/ShareMethods.dart';
 
@@ -25,6 +26,7 @@ class _WalletPageState extends State<WalletPage> {
   Color _checkColor2 = ThemeService.primary;
   String _balance = '';
   List<Map<String, dynamic>> _withdrawalHistory = [];
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -92,7 +94,9 @@ class _WalletPageState extends State<WalletPage> {
       });
       return;
     }
-
+    setState(() {
+      isLoading = true;
+    });
     String? userMobileNumber = await MobileNo.getMobilenumber();
 
     final url = Uri.parse('$Base_url/user/withdrawRequest/$userMobileNumber');
@@ -115,7 +119,8 @@ class _WalletPageState extends State<WalletPage> {
           _isChecked1 = false;
           _isChecked2 = false;
         });
-        // Show success message or handle UI update
+        await _fetchData();
+        await _fetchWithdrawalHistory();
         Fluttertoast.showToast(
           msg: responseData['message'],
           toastLength: Toast.LENGTH_SHORT,
@@ -137,6 +142,10 @@ class _WalletPageState extends State<WalletPage> {
       }
     } catch (e) {
       print('Error submitting withdraw request: $e');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -263,7 +272,7 @@ class _WalletPageState extends State<WalletPage> {
                         Text(
                           'Minimum withdrawal limit should be ',
                           style: TextStyle(
-                              fontSize: 16,
+                              fontSize: 12,
                               fontWeight: FontWeight.w500,
                               color: ThemeService.textColor),
                         ),
@@ -283,9 +292,9 @@ class _WalletPageState extends State<WalletPage> {
                         Text(
                           'Withdrawal History',
                           style: TextStyle(
-                              fontSize: 22,
+                              fontSize: 18,
                               color: ThemeService.textColor,
-                              fontWeight: FontWeight.bold),
+                              fontWeight: FontWeight.w600),
                         ),
                         Icon(Icons.swap_vert,
                             color: ThemeService.placeHolder, size: 26),
@@ -325,21 +334,34 @@ class _WalletPageState extends State<WalletPage> {
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                Text(
-                                                  'UPI ID: ${transaction['upiID']}',
-                                                  style: TextStyle(
-                                                      fontSize: 16,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: ThemeService
-                                                          .textColor),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      'UPI ID: ',
+                                                      style: TextStyle(
+                                                          fontSize: 11,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: ThemeService
+                                                              .textColor),
+                                                    ),
+                                                    Text(
+                                                      '${transaction['upiID']}',
+                                                      style: TextStyle(
+                                                          fontSize: 12,
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          color: ThemeService
+                                                              .textColor),
+                                                    ),
+                                                  ],
                                                 ),
                                                 Text(
                                                   '₹${transaction['amount']}',
                                                   style: TextStyle(
                                                       color:
                                                           ThemeService.primary,
-                                                      fontSize: 16,
+                                                      fontSize: 14,
                                                       fontWeight:
                                                           FontWeight.bold),
                                                 ),
@@ -351,23 +373,49 @@ class _WalletPageState extends State<WalletPage> {
                                                   MainAxisAlignment
                                                       .spaceBetween,
                                               children: [
-                                                Text(
-                                                  'Requested on: ${transaction['createdAt'].split(" ")[0]}',
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: ThemeService
-                                                          .textColor),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      'Requested on: ',
+                                                      style: TextStyle(
+                                                          fontSize: 11,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: ThemeService
+                                                              .textColor),
+                                                    ),
+                                                    Text(
+                                                      '${transaction['createdAt'].split(" ")[0]}',
+                                                      style: TextStyle(
+                                                          fontSize: 10,
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          color: ThemeService
+                                                              .textColor),
+                                                    ),
+                                                  ],
                                                 ),
-                                                Text(
-                                                  'Approved on: ${transaction['status'] == "Pending" ? "----" : transaction['updatedAt'].split(" ")[0]}',
-                                                  style: TextStyle(
-                                                      fontSize: 14,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: ThemeService
-                                                          .textColor),
+                                                Row(
+                                                  children: [
+                                                    Text(
+                                                      'Approved on: ',
+                                                      style: TextStyle(
+                                                          fontSize: 11,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: ThemeService
+                                                              .textColor),
+                                                    ),
+                                                    Text(
+                                                      '${transaction['status'] == "Pending" ? "----" : transaction['updatedAt'].split(" ")[0]}',
+                                                      style: TextStyle(
+                                                          fontSize: 10,
+                                                          fontWeight:
+                                                              FontWeight.w400,
+                                                          color: ThemeService
+                                                              .textColor),
+                                                    ),
+                                                  ],
                                                 ),
                                               ],
                                             ),
@@ -435,6 +483,7 @@ class _WalletPageState extends State<WalletPage> {
                 ),
               ),
               _buildModal(),
+              if (isLoading) Loader()
             ],
           ),
         ),

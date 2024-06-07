@@ -78,6 +78,9 @@ class _AddpostsState extends State<Addposts> {
   }
 
   Future<void> _handleSubmit() async {
+    setState(() {
+      isLoading = true;
+    });
     String Base_url = dotenv.get("BASE_URL", fallback: null);
     if (_validateFields()) {
       String? userMobileNumber = await MobileNo.getMobilenumber();
@@ -137,7 +140,9 @@ class _AddpostsState extends State<Addposts> {
           print(
               'Post request failed with status: ${response.request.toString()}');
           Fluttertoast.showToast(
-            msg: "Failed to submit post. Please try again later.",
+            msg: response.request.toString().isEmpty
+                ? "Failed to submit post. Please try again later."
+                : response.request.toString(),
             toastLength: Toast.LENGTH_SHORT,
             gravity: ToastGravity.TOP,
             timeInSecForIosWeb: 2,
@@ -147,6 +152,10 @@ class _AddpostsState extends State<Addposts> {
         }
       } catch (error) {
         print('Error: $error');
+      } finally {
+        setState(() {
+          isLoading = false;
+        });
       }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
