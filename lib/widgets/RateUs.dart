@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
+import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter_rating_bar/flutter_rating_bar.dart';
@@ -29,18 +30,36 @@ class _RateUsDialogState extends State<RateUsDialog> {
 
   bool isLoading = false;
   bool showComments = false;
+  String? currentMobileNumber;
 
   @override
   void initState() {
     super.initState();
     ratings = "";
     feedbackController = TextEditingController();
+    initializeData().then((mobileNumber) {
+      if (mounted) {
+        setState(() {
+          currentMobileNumber = mobileNumber!;
+        });
+      }
+    });
   }
 
   @override
   void dispose() {
     feedbackController.dispose();
     super.dispose();
+  }
+
+  Future<String?> initializeData() async {
+    try {
+      String? number = await MobileNo.getMobilenumber() ?? "";
+      return number;
+    } catch (exception) {
+      print(exception);
+    }
+    return null;
   }
 
   Future<void> handleRateUs() async {
@@ -51,7 +70,7 @@ class _RateUsDialogState extends State<RateUsDialog> {
     });
     try {
       final response = await http.post(
-        Uri.parse('$Base_url/user/addRating/8072974576'),
+        Uri.parse('$Base_url/user/addRating/$currentMobileNumber'),
         body: jsonEncode(
             {"rating": ratings, "comments": feedbackController.text}),
         headers: {

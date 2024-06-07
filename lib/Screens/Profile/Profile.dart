@@ -226,8 +226,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                       ),
                       SizedBox(height: 20),
-                      // AdMobBanner(),
-                      // AdMobReward(),
+                      AdMobBanner(),
+                      AdMobReward(),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Container(

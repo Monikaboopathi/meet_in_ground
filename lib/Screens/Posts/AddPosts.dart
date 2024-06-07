@@ -136,9 +136,6 @@ class _AddpostsState extends State<Addposts> {
 
           print('Post request successful');
         } else {
-          print('Post request failed with status: ${response.statusCode}');
-          print(
-              'Post request failed with status: ${response.request.toString()}');
           Fluttertoast.showToast(
             msg: response.request.toString().isEmpty
                 ? "Failed to submit post. Please try again later."
