@@ -29,6 +29,13 @@ class NoDataFoundWidget extends StatelessWidget {
               width: width,
               height: height,
             ),
+            Text(
+              "NO DATA FOUND",
+              style: TextStyle(
+                  color: ThemeService.primary,
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold),
+            )
           ],
         ),
       ),

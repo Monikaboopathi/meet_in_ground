@@ -355,234 +355,248 @@ class _EditProfileState extends State<EditProfile> {
         centerTitle: true,
       ),
       backgroundColor: ThemeService.background,
-      body: isLoading
-          ? Loader()
-          : SingleChildScrollView(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  Center(
-                    child: Stack(
-                      children: [
-                        Container(
-                          height: 150,
-                          width: 150,
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            color: Colors.grey[300],
-                            border: Border.all(
-                              color: ThemeService.buttonBg,
-                              width: 3,
-                            ),
-                          ),
-                          child: ClipOval(
-                            child: (imageUrl ?? '').isEmpty
-                                ? _selectedImage == null
-                                    ? Center(
-                                        child: Icon(
-                                          Icons.person,
-                                          color: Colors.grey[800],
-                                          size: 100,
-                                        ),
-                                      )
-                                    : Image.file(
-                                        _selectedImage!,
-                                        fit: BoxFit.cover,
-                                      )
-                                : Image.network(
-                                    imageUrl!,
-                                    fit: BoxFit.cover,
-                                    loadingBuilder:
-                                        (context, child, loadingProgress) {
-                                      if (loadingProgress == null) return child;
-                                      return Center(
-                                        child: CircularProgressIndicator(
-                                          value: loadingProgress
-                                                      .expectedTotalBytes !=
-                                                  null
-                                              ? loadingProgress
-                                                      .cumulativeBytesLoaded /
-                                                  loadingProgress
-                                                      .expectedTotalBytes!
-                                              : null,
-                                        ),
-                                      );
-                                    },
-                                    errorBuilder: (context, error, stackTrace) {
-                                      return Container(
-                                        color: Colors.grey[
-                                            300], // Placeholder color in case of error
-                                        child: Icon(
-                                          Icons.error,
-                                          color: Colors.red, // Error icon color
-                                        ),
-                                      );
-                                    },
-                                  ),
-                          ),
-                        ),
-                        Positioned(
-                          bottom: 5,
-                          right: 5,
-                          child: GestureDetector(
-                            onTap: pickImage,
-                            child: CircleAvatar(
-                              radius: 20,
-                              backgroundColor: ThemeService.buttonBg,
-                              child: Icon(
-                                Icons.camera_alt,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                  SizedBox(height: 16.0),
-                  Padding(
-                    padding: const EdgeInsets.all(10.0),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.center,
-                      children: [
-                        SizedBox(height: 16.0),
-                        Row(
-                          children: [
-                            Text(
-                              'Username',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w800),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        TextField(
-                          controller: _usernameController,
-                          decoration: InputDecoration(
-                            hintText: 'Username',
-                            border: OutlineInputBorder(),
-                          ),
-                        ),
-                        SizedBox(height: 16.0),
-                        Row(
-                          children: [
-                            Text(
-                              'Location',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w800),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        GestureDetector(
-                          onTap: handleLocation,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: _isLocationLoading ? 16 : 3.0,
-                                horizontal: 8.0),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(4.0),
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: _isLocationLoading
-                                      ? Row(
-                                          children: [
-                                            Container(
-                                              width: 20,
-                                              height: 20,
-                                              child: CircularProgressIndicator(
-                                                color: ThemeService.buttonBg,
-                                              ),
-                                            ),
-                                            SizedBox(width: 10),
-                                            Text(
-                                              'Fetching location...',
-                                              softWrap: true,
-                                            ),
-                                          ],
-                                        )
-                                      : TextField(
-                                          controller: _locationController,
-                                          readOnly: true,
-                                          onTap: () => handleLocation,
-                                          keyboardType: TextInputType.none,
-                                          decoration: InputDecoration(
-                                            hintText: 'Select your location',
-                                            border: InputBorder.none,
-                                          ),
-                                        ),
-                                ),
-                                Icon(Icons.location_on,
-                                    color: Colors.grey[600]),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 16.0),
-                        Row(
-                          children: [
-                            Text(
-                              'Sports',
-                              style: TextStyle(
-                                  fontSize: 18, fontWeight: FontWeight.w800),
-                            ),
-                          ],
-                        ),
-                        SizedBox(height: 8),
-                        GestureDetector(
-                          onTap: showSportsDialog,
-                          child: Container(
-                            padding: EdgeInsets.symmetric(
-                                vertical: 16.0, horizontal: 8.0),
-                            decoration: BoxDecoration(
-                              border: Border.all(color: Colors.grey),
-                              borderRadius: BorderRadius.circular(4.0),
-                            ),
-                            child: Row(
-                              children: [
-                                Expanded(
-                                  child: Text(
-                                    _selectedSports.isEmpty
-                                        ? 'Select your sports'
-                                        : _selectedSports.join(', '),
-                                    style: TextStyle(color: Colors.grey[600]),
-                                  ),
-                                ),
-                                Icon(Icons.sports, color: Colors.grey[600]),
-                              ],
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 36.0),
-                        SizedBox(
-                          width: double.infinity,
-                          child: ElevatedButton(
-                            onPressed: handleSave,
-                            style: ElevatedButton.styleFrom(
-                              shape: RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(8.0),
-                              ),
-                              backgroundColor: ThemeService.buttonBg,
-                            ),
-                            child: const Text(
-                              'Save Profile',
-                              style: TextStyle(
-                                fontSize: 18,
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
+      body: WillPopScope(
+        onWillPop: () async {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => BottomNavigationScreen(currentIndex: 4),
             ),
+          );
+          return false;
+        },
+        child: isLoading
+            ? Loader()
+            : SingleChildScrollView(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    Center(
+                      child: Stack(
+                        children: [
+                          Container(
+                            height: 150,
+                            width: 150,
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              color: Colors.grey[300],
+                              border: Border.all(
+                                color: ThemeService.buttonBg,
+                                width: 3,
+                              ),
+                            ),
+                            child: ClipOval(
+                              child: (imageUrl ?? '').isEmpty
+                                  ? _selectedImage == null
+                                      ? Center(
+                                          child: Icon(
+                                            Icons.person,
+                                            color: Colors.grey[800],
+                                            size: 100,
+                                          ),
+                                        )
+                                      : Image.file(
+                                          _selectedImage!,
+                                          fit: BoxFit.cover,
+                                        )
+                                  : Image.network(
+                                      imageUrl!,
+                                      fit: BoxFit.cover,
+                                      loadingBuilder:
+                                          (context, child, loadingProgress) {
+                                        if (loadingProgress == null)
+                                          return child;
+                                        return Center(
+                                          child: CircularProgressIndicator(
+                                            value: loadingProgress
+                                                        .expectedTotalBytes !=
+                                                    null
+                                                ? loadingProgress
+                                                        .cumulativeBytesLoaded /
+                                                    loadingProgress
+                                                        .expectedTotalBytes!
+                                                : null,
+                                          ),
+                                        );
+                                      },
+                                      errorBuilder:
+                                          (context, error, stackTrace) {
+                                        return Container(
+                                          color: Colors.grey[
+                                              300], // Placeholder color in case of error
+                                          child: Icon(
+                                            Icons.error,
+                                            color:
+                                                Colors.red, // Error icon color
+                                          ),
+                                        );
+                                      },
+                                    ),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 5,
+                            right: 5,
+                            child: GestureDetector(
+                              onTap: pickImage,
+                              child: CircleAvatar(
+                                radius: 20,
+                                backgroundColor: ThemeService.buttonBg,
+                                child: Icon(
+                                  Icons.camera_alt,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 16.0),
+                    Padding(
+                      padding: const EdgeInsets.all(10.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          SizedBox(height: 16.0),
+                          Row(
+                            children: [
+                              Text(
+                                'Username',
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.w800),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8),
+                          TextField(
+                            controller: _usernameController,
+                            decoration: InputDecoration(
+                              hintText: 'Username',
+                              border: OutlineInputBorder(),
+                            ),
+                          ),
+                          SizedBox(height: 16.0),
+                          Row(
+                            children: [
+                              Text(
+                                'Location',
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.w800),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8),
+                          GestureDetector(
+                            onTap: handleLocation,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: _isLocationLoading ? 16 : 3.0,
+                                  horizontal: 8.0),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: _isLocationLoading
+                                        ? Row(
+                                            children: [
+                                              Container(
+                                                width: 20,
+                                                height: 20,
+                                                child:
+                                                    CircularProgressIndicator(
+                                                  color: ThemeService.buttonBg,
+                                                ),
+                                              ),
+                                              SizedBox(width: 10),
+                                              Text(
+                                                'Fetching location...',
+                                                softWrap: true,
+                                              ),
+                                            ],
+                                          )
+                                        : TextField(
+                                            controller: _locationController,
+                                            readOnly: true,
+                                            onTap: () => handleLocation,
+                                            keyboardType: TextInputType.none,
+                                            decoration: InputDecoration(
+                                              hintText: 'Select your location',
+                                              border: InputBorder.none,
+                                            ),
+                                          ),
+                                  ),
+                                  Icon(Icons.location_on,
+                                      color: Colors.grey[600]),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 16.0),
+                          Row(
+                            children: [
+                              Text(
+                                'Sports',
+                                style: TextStyle(
+                                    fontSize: 18, fontWeight: FontWeight.w800),
+                              ),
+                            ],
+                          ),
+                          SizedBox(height: 8),
+                          GestureDetector(
+                            onTap: showSportsDialog,
+                            child: Container(
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 16.0, horizontal: 8.0),
+                              decoration: BoxDecoration(
+                                border: Border.all(color: Colors.grey),
+                                borderRadius: BorderRadius.circular(4.0),
+                              ),
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Text(
+                                      _selectedSports.isEmpty
+                                          ? 'Select your sports'
+                                          : _selectedSports.join(', '),
+                                      style: TextStyle(color: Colors.grey[600]),
+                                    ),
+                                  ),
+                                  Icon(Icons.sports, color: Colors.grey[600]),
+                                ],
+                              ),
+                            ),
+                          ),
+                          SizedBox(height: 36.0),
+                          SizedBox(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: handleSave,
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                backgroundColor: ThemeService.buttonBg,
+                              ),
+                              child: const Text(
+                                'Save Profile',
+                                style: TextStyle(
+                                  fontSize: 18,
+                                  color: Colors.white,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+      ),
     );
   }
 }

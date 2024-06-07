@@ -144,258 +144,272 @@ class _ChatScreenState extends State<ChatScreen> {
           ],
         ),
       ),
-      body: Container(
-        width: MediaQuery.of(context).size.width,
-        child: Column(
-          children: [
-            Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: _chatservice.getMessages(widget.receiverId),
-                builder: (context, snapshot) {
-                  if (!snapshot.hasData) {
-                    return Loader();
-                  }
+      body: WillPopScope(
+        onWillPop: () async {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => BottomNavigationScreen(currentIndex: 1),
+            ),
+          );
+          return false;
+        },
+        child: Container(
+          width: MediaQuery.of(context).size.width,
+          child: Column(
+            children: [
+              Expanded(
+                child: StreamBuilder<QuerySnapshot>(
+                  stream: _chatservice.getMessages(widget.receiverId),
+                  builder: (context, snapshot) {
+                    if (!snapshot.hasData) {
+                      return Loader();
+                    }
 
-                  var messages = snapshot.data!.docs.map((doc) {
-                    return Message.fromMap(doc.data() as Map<String, dynamic>);
-                  }).toList();
+                    var messages = snapshot.data!.docs.map((doc) {
+                      return Message.fromMap(
+                          doc.data() as Map<String, dynamic>);
+                    }).toList();
 
-                  WidgetsBinding.instance.addPostFrameCallback((_) {
-                    scrollToBottom();
-                  });
+                    WidgetsBinding.instance.addPostFrameCallback((_) {
+                      scrollToBottom();
+                    });
 
-                  DateTime? lastDisplayedDate;
+                    DateTime? lastDisplayedDate;
 
-                  return ListView.builder(
-                    controller: _messageScroll,
-                    padding: EdgeInsets.symmetric(vertical: 8),
-                    itemCount: messages.length,
-                    itemBuilder: (context, index) {
-                      final message = messages[index];
-                      final isSender =
-                          message.sender == "+91" + currentMobileNumber!;
-                      final isMessageTruncated = message.message.length > 100;
-                      final isExpanded = isMessageExpanded.containsKey(index)
-                          ? isMessageExpanded[index]!
-                          : false;
-                      final messageDate = message.timestamp.toDate();
-                      bool showDate = false;
+                    return ListView.builder(
+                      controller: _messageScroll,
+                      padding: EdgeInsets.symmetric(vertical: 8),
+                      itemCount: messages.length,
+                      itemBuilder: (context, index) {
+                        final message = messages[index];
+                        final isSender =
+                            message.sender == "+91" + currentMobileNumber!;
+                        final isMessageTruncated = message.message.length > 100;
+                        final isExpanded = isMessageExpanded.containsKey(index)
+                            ? isMessageExpanded[index]!
+                            : false;
+                        final messageDate = message.timestamp.toDate();
+                        bool showDate = false;
 
-                      if (lastDisplayedDate == null ||
-                          messageDate.day != lastDisplayedDate!.day ||
-                          messageDate.month != lastDisplayedDate!.month ||
-                          messageDate.year != lastDisplayedDate!.year) {
-                        showDate = true;
-                        lastDisplayedDate = messageDate;
-                      }
+                        if (lastDisplayedDate == null ||
+                            messageDate.day != lastDisplayedDate!.day ||
+                            messageDate.month != lastDisplayedDate!.month ||
+                            messageDate.year != lastDisplayedDate!.year) {
+                          showDate = true;
+                          lastDisplayedDate = messageDate;
+                        }
 
-                      return Column(
-                        children: [
-                          if (showDate)
-                            Padding(
-                              padding: const EdgeInsets.symmetric(vertical: 8),
-                              child: Center(
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 12, vertical: 4),
-                                  decoration: BoxDecoration(
-                                    color: ThemeService.transparent,
-                                    borderRadius: BorderRadius.circular(16),
-                                  ),
-                                  child: Text(
-                                    getMessageDate(messageDate),
-                                    style: TextStyle(
-                                      fontSize: 12,
-                                      color: ThemeService.textColor,
+                        return Column(
+                          children: [
+                            if (showDate)
+                              Padding(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 8),
+                                child: Center(
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 12, vertical: 4),
+                                    decoration: BoxDecoration(
+                                      color: ThemeService.transparent,
+                                      borderRadius: BorderRadius.circular(16),
+                                    ),
+                                    child: Text(
+                                      getMessageDate(messageDate),
+                                      style: TextStyle(
+                                        fontSize: 12,
+                                        color: ThemeService.textColor,
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
-                            ),
-                          Row(
-                            mainAxisAlignment: isSender
-                                ? MainAxisAlignment.end
-                                : MainAxisAlignment.start,
-                            mainAxisSize: MainAxisSize.max,
-                            children: [
-                              SizedBox(width: 10),
-                              Flexible(
-                                child: GestureDetector(
-                                  onTap: () {
-                                    setState(() {
-                                      isMessageExpanded[index] =
-                                          !(isMessageExpanded[index] ?? false);
-                                    });
-                                  },
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      color: isSender
-                                          ? Colors.green[100]
-                                          : Colors.grey[200],
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: isSender
-                                            ? Radius.circular(16)
-                                            : Radius.circular(0),
-                                        topRight: isSender
-                                            ? Radius.circular(0)
-                                            : Radius.circular(16),
-                                        bottomLeft: Radius.circular(16),
-                                        bottomRight: Radius.circular(16),
+                            Row(
+                              mainAxisAlignment: isSender
+                                  ? MainAxisAlignment.end
+                                  : MainAxisAlignment.start,
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                SizedBox(width: 10),
+                                Flexible(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      setState(() {
+                                        isMessageExpanded[index] =
+                                            !(isMessageExpanded[index] ??
+                                                false);
+                                      });
+                                    },
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: isSender
+                                            ? Colors.green[100]
+                                            : Colors.grey[200],
+                                        borderRadius: BorderRadius.only(
+                                          topLeft: isSender
+                                              ? Radius.circular(16)
+                                              : Radius.circular(0),
+                                          topRight: isSender
+                                              ? Radius.circular(0)
+                                              : Radius.circular(16),
+                                          bottomLeft: Radius.circular(16),
+                                          bottomRight: Radius.circular(16),
+                                        ),
                                       ),
-                                    ),
-                                    child: IntrinsicWidth(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        mainAxisSize: MainAxisSize.min,
-                                        children: [
-                                          Padding(
-                                            padding: EdgeInsets.all(12),
-                                            child: Text(
-                                              isExpanded
-                                                  ? message.message
-                                                  : (isMessageTruncated
-                                                      ? '${message.message.substring(0, 100)}...'
-                                                      : message.message),
-                                              style: TextStyle(fontSize: 14),
-                                            ),
-                                          ),
-                                          SizedBox(height: 4),
-                                          Align(
-                                            alignment: Alignment.bottomRight,
-                                            child: Padding(
-                                              padding: EdgeInsets.only(
-                                                  right: 12,
-                                                  bottom: 4,
-                                                  left: 12),
+                                      child: IntrinsicWidth(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          mainAxisSize: MainAxisSize.min,
+                                          children: [
+                                            Padding(
+                                              padding: EdgeInsets.all(12),
                                               child: Text(
-                                                formatTime(message.timestamp),
-                                                style: TextStyle(
-                                                  fontSize: 12,
-                                                  color: Colors.grey,
-                                                ),
+                                                isExpanded
+                                                    ? message.message
+                                                    : (isMessageTruncated
+                                                        ? '${message.message.substring(0, 100)}...'
+                                                        : message.message),
+                                                style: TextStyle(fontSize: 14),
                                               ),
                                             ),
-                                          ),
-                                          if (isMessageTruncated)
-                                            GestureDetector(
-                                              onTap: () {
-                                                setState(() {
-                                                  isMessageExpanded[index] =
-                                                      !(isMessageExpanded[
-                                                              index] ??
-                                                          false);
-                                                });
-                                              },
+                                            SizedBox(height: 4),
+                                            Align(
+                                              alignment: Alignment.bottomRight,
                                               child: Padding(
                                                 padding: EdgeInsets.only(
-                                                    left: 12, bottom: 8),
+                                                    right: 12,
+                                                    bottom: 4,
+                                                    left: 12),
                                                 child: Text(
-                                                  isExpanded
-                                                      ? 'Show less'
-                                                      : 'Show more',
+                                                  formatTime(message.timestamp),
                                                   style: TextStyle(
-                                                    color: Colors.blue,
                                                     fontSize: 12,
+                                                    color: Colors.grey,
                                                   ),
                                                 ),
                                               ),
                                             ),
-                                        ],
+                                            if (isMessageTruncated)
+                                              GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    isMessageExpanded[index] =
+                                                        !(isMessageExpanded[
+                                                                index] ??
+                                                            false);
+                                                  });
+                                                },
+                                                child: Padding(
+                                                  padding: EdgeInsets.only(
+                                                      left: 12, bottom: 8),
+                                                  child: Text(
+                                                    isExpanded
+                                                        ? 'Show less'
+                                                        : 'Show more',
+                                                    style: TextStyle(
+                                                      color: Colors.blue,
+                                                      fontSize: 12,
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   ),
                                 ),
-                              ),
-                              SizedBox(width: 10),
-                            ],
-                          ),
-                          SizedBox(height: 20),
-                        ],
-                      );
-                    },
-                  );
-                },
-              ),
-            ),
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
-              child: Container(
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: ThemeService.primary,
-                    width: 1.0,
-                  ),
-                  borderRadius: BorderRadius.circular(24.0),
-                ),
-                child: Row(
-                  children: [
-                    IconButton(
-                      onPressed: () {
-                        setState(() {
-                          showEmojiPicker = !showEmojiPicker;
-                        });
+                                SizedBox(width: 10),
+                              ],
+                            ),
+                            SizedBox(height: 20),
+                          ],
+                        );
                       },
-                      icon: Icon(
-                        Icons.emoji_emotions,
-                        color: ThemeService.textColor,
-                      ),
+                    );
+                  },
+                ),
+              ),
+              Padding(
+                padding:
+                    const EdgeInsets.symmetric(horizontal: 5, vertical: 10),
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: ThemeService.primary,
+                      width: 1.0,
                     ),
-                    Expanded(
-                      child: Padding(
-                        padding:
-                            EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                        child: TextField(
-                          controller: messageController,
-                          decoration: InputDecoration.collapsed(
-                            hintText: 'Type a message...',
-                            hintStyle:
-                                TextStyle(color: ThemeService.placeHolder),
-                          ),
-                          textInputAction: TextInputAction.send,
-                          keyboardType: TextInputType.multiline,
-                          maxLines: null,
-                          autocorrect: true,
-                          cursorColor: ThemeService.primary,
-                          style: TextStyle(color: ThemeService.textColor),
-                          onChanged: (value) => setState(() {
-                            messageController.text = value;
-                          }),
+                    borderRadius: BorderRadius.circular(24.0),
+                  ),
+                  child: Row(
+                    children: [
+                      IconButton(
+                        onPressed: () {
+                          setState(() {
+                            showEmojiPicker = !showEmojiPicker;
+                          });
+                        },
+                        icon: Icon(
+                          Icons.emoji_emotions,
+                          color: ThemeService.textColor,
                         ),
                       ),
-                    ),
-                    IconButton(
-                      onPressed: onSendMessage,
-                      icon: Icon(Icons.send, color: ThemeService.primary),
-                    ),
-                  ],
-                ),
-              ),
-            ),
-            if (showEmojiPicker)
-              Expanded(
-                child: EmojiPicker(
-                  textEditingController: messageController,
-                  scrollController: _emojiScroll,
-                  config: Config(
-                    height: 256,
-                    checkPlatformCompatibility: true,
-                    emojiViewConfig: EmojiViewConfig(
-                      emojiSizeMax: 28 *
-                          (foundation.defaultTargetPlatform ==
-                                  TargetPlatform.iOS
-                              ? 1.2
-                              : 1.0),
-                    ),
-                    swapCategoryAndBottomBar: false,
-                    skinToneConfig: const SkinToneConfig(),
-                    categoryViewConfig: const CategoryViewConfig(),
-                    bottomActionBarConfig: const BottomActionBarConfig(),
-                    searchViewConfig: const SearchViewConfig(),
+                      Expanded(
+                        child: Padding(
+                          padding:
+                              EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                          child: TextField(
+                            controller: messageController,
+                            decoration: InputDecoration.collapsed(
+                              hintText: 'Type a message...',
+                              hintStyle:
+                                  TextStyle(color: ThemeService.placeHolder),
+                            ),
+                            textInputAction: TextInputAction.send,
+                            keyboardType: TextInputType.multiline,
+                            maxLines: null,
+                            autocorrect: true,
+                            cursorColor: ThemeService.primary,
+                            style: TextStyle(color: ThemeService.textColor),
+                            onChanged: (value) => setState(() {
+                              messageController.text = value;
+                            }),
+                          ),
+                        ),
+                      ),
+                      IconButton(
+                        onPressed: onSendMessage,
+                        icon: Icon(Icons.send, color: ThemeService.primary),
+                      ),
+                    ],
                   ),
                 ),
               ),
-          ],
+              if (showEmojiPicker)
+                Expanded(
+                  child: EmojiPicker(
+                    textEditingController: messageController,
+                    scrollController: _emojiScroll,
+                    config: Config(
+                      height: 256,
+                      checkPlatformCompatibility: true,
+                      emojiViewConfig: EmojiViewConfig(
+                        emojiSizeMax: 28 *
+                            (foundation.defaultTargetPlatform ==
+                                    TargetPlatform.iOS
+                                ? 1.2
+                                : 1.0),
+                      ),
+                      swapCategoryAndBottomBar: false,
+                      skinToneConfig: const SkinToneConfig(),
+                      categoryViewConfig: const CategoryViewConfig(),
+                      bottomActionBarConfig: const BottomActionBarConfig(),
+                      searchViewConfig: const SearchViewConfig(),
+                    ),
+                  ),
+                ),
+            ],
+          ),
         ),
       ),
     );

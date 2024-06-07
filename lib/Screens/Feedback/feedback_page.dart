@@ -111,97 +111,107 @@ class _FeedbackpageState extends State<Feedbackpage> {
         centerTitle: true,
       ),
       backgroundColor: ThemeService.background,
-      body: SafeArea(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Have suggestions to say? Please share with us below..',
-                    style:
-                        TextStyle(fontSize: 18, color: ThemeService.textColor),
-                  ),
-                  SizedBox(height: 20.0),
-                  Row(
-                    children: [
-                      Text(
-                        'Message ',
-                        style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w800,
-                            color: ThemeService.textColor),
-                      ),
-                      Text(
-                        '*',
-                        style: TextStyle(
-                            color: Colors.red,
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    ],
-                  ),
-                  TextField(
-                    controller: _messageController,
-                    maxLines: 5,
-                    style: TextStyle(color: ThemeService.textColor),
-                    decoration: InputDecoration(
-                      hintText: 'Type your message here',
-                      hintStyle: TextStyle(color: ThemeService.textColor),
-                      errorText:
-                          _messageError.isNotEmpty ? _messageError : null,
-                      border: OutlineInputBorder(),
-                    ),
-                    onChanged: (text) {
-                      setState(() {
-                        _messageError = '';
-                      });
-                    },
-                  ),
-                ],
-              ),
+      body: WillPopScope(
+        onWillPop: () async {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => BottomNavigationScreen(currentIndex: 4),
             ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (BuildContext context) {
-                        return Loader();
-                      },
-                    );
-                    // Delay for 2 seconds to show the loader
-                    await Future.delayed(Duration(seconds: 2));
-
-                    // Dismiss the loader and return to the previous page
-                    Navigator.pop(context);
-                    _handleSubmit();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
+          );
+          return false;
+        },
+        child: SafeArea(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Have suggestions to say? Please share with us below..',
+                      style: TextStyle(
+                          fontSize: 18, color: ThemeService.textColor),
                     ),
-                    backgroundColor: ThemeService.buttonBg,
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                  ),
-                  child: Text(
-                    'Submit',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
+                    SizedBox(height: 20.0),
+                    Row(
+                      children: [
+                        Text(
+                          'Message ',
+                          style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.w800,
+                              color: ThemeService.textColor),
+                        ),
+                        Text(
+                          '*',
+                          style: TextStyle(
+                              color: Colors.red,
+                              fontSize: 20,
+                              fontWeight: FontWeight.w500),
+                        ),
+                      ],
+                    ),
+                    TextField(
+                      controller: _messageController,
+                      maxLines: 5,
+                      style: TextStyle(color: ThemeService.textColor),
+                      decoration: InputDecoration(
+                        hintText: 'Type your message here',
+                        hintStyle: TextStyle(color: ThemeService.textColor),
+                        errorText:
+                            _messageError.isNotEmpty ? _messageError : null,
+                        border: OutlineInputBorder(),
+                      ),
+                      onChanged: (text) {
+                        setState(() {
+                          _messageError = '';
+                        });
+                      },
+                    ),
+                  ],
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          return Loader();
+                        },
+                      );
+                      // Delay for 2 seconds to show the loader
+                      await Future.delayed(Duration(seconds: 2));
+
+                      // Dismiss the loader and return to the previous page
+                      Navigator.pop(context);
+                      _handleSubmit();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      backgroundColor: ThemeService.buttonBg,
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                    ),
+                    child: Text(
+                      'Submit',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -206,219 +206,237 @@ class _WalletPageState extends State<WalletPage> {
         centerTitle: true,
       ),
       backgroundColor: ThemeService.background,
-      body: RefreshIndicator(
-        onRefresh: _refresh,
-        child: Stack(
-          children: [
-            Container(
-              padding: EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  Container(
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      body: WillPopScope(
+        onWillPop: () async {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => BottomNavigationScreen(currentIndex: 4),
+            ),
+          );
+          return false;
+        },
+        child: RefreshIndicator(
+          onRefresh: _refresh,
+          child: Stack(
+            children: [
+              Container(
+                padding: EdgeInsets.all(16.0),
+                child: Column(
+                  children: [
+                    Container(
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            '₹ $_balance',
+                            style: TextStyle(
+                                fontSize: 24,
+                                color: ThemeService.textColor,
+                                fontWeight: FontWeight.bold),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              shareApp();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8.0),
+                              ),
+                              backgroundColor: ThemeService.buttonBg,
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 3.0, horizontal: 15),
+                            ),
+                            child: Text(
+                              'Refer & Earn',
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                    SizedBox(height: 16),
+                    Row(
                       children: [
                         Text(
-                          '₹ $_balance',
+                          'Minimum withdrawal limit should be ',
                           style: TextStyle(
-                              fontSize: 24,
-                              color: ThemeService.textColor,
-                              fontWeight: FontWeight.bold),
-                        ),
-                        ElevatedButton(
-                          onPressed: () {
-                            shareApp();
-                          },
-                          style: ElevatedButton.styleFrom(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            backgroundColor: ThemeService.buttonBg,
-                            padding: EdgeInsets.symmetric(
-                                vertical: 3.0, horizontal: 15),
-                          ),
-                          child: Text(
-                            'Refer & Earn',
-                            style: TextStyle(
                               fontSize: 16,
-                              color: Colors.white,
-                            ),
-                          ),
+                              fontWeight: FontWeight.w500,
+                              color: ThemeService.textColor),
+                        ),
+                        Text(
+                          '₹50',
+                          style: TextStyle(
+                              fontSize: 19,
+                              fontWeight: FontWeight.w800,
+                              color: Colors.red),
                         ),
                       ],
                     ),
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    children: [
-                      Text(
-                        'Minimum withdrawal limit should be ',
-                        style: TextStyle(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                            color: ThemeService.textColor),
-                      ),
-                      Text(
-                        '₹50',
-                        style: TextStyle(
-                            fontSize: 19,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.red),
-                      ),
-                    ],
-                  ),
-                  SizedBox(height: 16),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        'Withdrawal History',
-                        style: TextStyle(
-                            fontSize: 22,
-                            color: ThemeService.textColor,
-                            fontWeight: FontWeight.bold),
-                      ),
-                      Icon(Icons.swap_vert,
-                          color: ThemeService.placeHolder, size: 26),
-                    ],
-                  ),
-                  SizedBox(height: 15.0),
-                  Expanded(
-                    child: _withdrawalHistory.isEmpty
-                        ? Center(
-                            child: NoDataFoundWidget(),
-                          )
-                        : ListView.builder(
-                            itemCount: _withdrawalHistory.length,
-                            itemBuilder: (context, index) {
-                              var transaction = _withdrawalHistory[index];
-                              return Stack(
-                                children: [
-                                  Card(
-                                    shape: RoundedRectangleBorder(
-                                      side: BorderSide(
-                                        color: ThemeService.primary,
-                                        width: 1.0,
-                                      ),
-                                      borderRadius: BorderRadius.circular(10.0),
-                                    ),
-                                    margin: EdgeInsets.symmetric(vertical: 8.0),
-                                    child: Padding(
-                                      padding: EdgeInsets.all(16.0),
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                'UPI ID: ${transaction['upiID']}',
-                                                style: TextStyle(
-                                                    fontSize: 16,
-                                                    fontWeight: FontWeight.w600,
-                                                    color:
-                                                        ThemeService.textColor),
-                                              ),
-                                              Text(
-                                                '₹${transaction['amount']}',
-                                                style: TextStyle(
-                                                    color: ThemeService.primary,
-                                                    fontSize: 16,
-                                                    fontWeight:
-                                                        FontWeight.bold),
-                                              ),
-                                            ],
-                                          ),
-                                          SizedBox(height: 8.0),
-                                          Row(
-                                            mainAxisAlignment:
-                                                MainAxisAlignment.spaceBetween,
-                                            children: [
-                                              Text(
-                                                'Requested on: ${transaction['createdAt'].split(" ")[0]}',
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w600,
-                                                    color:
-                                                        ThemeService.textColor),
-                                              ),
-                                              Text(
-                                                'Approved on: ${transaction['status'] == "Pending" ? "----" : transaction['updatedAt'].split(" ")[0]}',
-                                                style: TextStyle(
-                                                    fontSize: 14,
-                                                    fontWeight: FontWeight.w600,
-                                                    color:
-                                                        ThemeService.textColor),
-                                              ),
-                                            ],
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                  Positioned(
-                                    top: 0,
-                                    right: 4,
-                                    child: Container(
-                                      padding: EdgeInsets.symmetric(
-                                          vertical: 2.0, horizontal: 13.0),
-                                      decoration: BoxDecoration(
-                                        color:
-                                            transaction['status'] == "Pending"
-                                                ? Colors.orange
-                                                : Colors.green,
+                    SizedBox(height: 16),
+                    Row(
+                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                      children: [
+                        Text(
+                          'Withdrawal History',
+                          style: TextStyle(
+                              fontSize: 22,
+                              color: ThemeService.textColor,
+                              fontWeight: FontWeight.bold),
+                        ),
+                        Icon(Icons.swap_vert,
+                            color: ThemeService.placeHolder, size: 26),
+                      ],
+                    ),
+                    SizedBox(height: 15.0),
+                    Expanded(
+                      child: _withdrawalHistory.isEmpty
+                          ? Center(
+                              child: NoDataFoundWidget(),
+                            )
+                          : ListView.builder(
+                              itemCount: _withdrawalHistory.length,
+                              itemBuilder: (context, index) {
+                                var transaction = _withdrawalHistory[index];
+                                return Stack(
+                                  children: [
+                                    Card(
+                                      shape: RoundedRectangleBorder(
+                                        side: BorderSide(
+                                          color: ThemeService.primary,
+                                          width: 1.0,
+                                        ),
                                         borderRadius:
-                                            BorderRadius.circular(5.0),
+                                            BorderRadius.circular(10.0),
                                       ),
-                                      child: Center(
-                                        child: Text(
-                                          transaction['status'],
-                                          style: TextStyle(
-                                              color: Colors.white,
-                                              fontWeight: FontWeight.bold),
+                                      margin:
+                                          EdgeInsets.symmetric(vertical: 8.0),
+                                      child: Padding(
+                                        padding: EdgeInsets.all(16.0),
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  'UPI ID: ${transaction['upiID']}',
+                                                  style: TextStyle(
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: ThemeService
+                                                          .textColor),
+                                                ),
+                                                Text(
+                                                  '₹${transaction['amount']}',
+                                                  style: TextStyle(
+                                                      color:
+                                                          ThemeService.primary,
+                                                      fontSize: 16,
+                                                      fontWeight:
+                                                          FontWeight.bold),
+                                                ),
+                                              ],
+                                            ),
+                                            SizedBox(height: 8.0),
+                                            Row(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment
+                                                      .spaceBetween,
+                                              children: [
+                                                Text(
+                                                  'Requested on: ${transaction['createdAt'].split(" ")[0]}',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: ThemeService
+                                                          .textColor),
+                                                ),
+                                                Text(
+                                                  'Approved on: ${transaction['status'] == "Pending" ? "----" : transaction['updatedAt'].split(" ")[0]}',
+                                                  style: TextStyle(
+                                                      fontSize: 14,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: ThemeService
+                                                          .textColor),
+                                                ),
+                                              ],
+                                            ),
+                                          ],
                                         ),
                                       ),
                                     ),
-                                  ),
-                                ],
-                              );
-                            },
-                          ),
-                  ),
-                ],
-              ),
-            ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                padding: EdgeInsets.all(16.0),
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
+                                    Positioned(
+                                      top: 0,
+                                      right: 4,
+                                      child: Container(
+                                        padding: EdgeInsets.symmetric(
+                                            vertical: 2.0, horizontal: 13.0),
+                                        decoration: BoxDecoration(
+                                          color:
+                                              transaction['status'] == "Pending"
+                                                  ? Colors.orange
+                                                  : Colors.green,
+                                          borderRadius:
+                                              BorderRadius.circular(5.0),
+                                        ),
+                                        child: Center(
+                                          child: Text(
+                                            transaction['status'],
+                                            style: TextStyle(
+                                                color: Colors.white,
+                                                fontWeight: FontWeight.bold),
+                                          ),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                );
+                              },
+                            ),
                     ),
-                    backgroundColor: ThemeService.buttonBg,
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                  ),
-                  child: Text(
-                    'Withdraw',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
-                    ),
-                  ),
-                  onPressed: () => setState(() {
-                    _visible = true;
-                  }),
+                  ],
                 ),
               ),
-            ),
-            _buildModal(),
-          ],
+              Positioned(
+                bottom: 0,
+                left: 0,
+                right: 0,
+                child: Container(
+                  padding: EdgeInsets.all(16.0),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      backgroundColor: ThemeService.buttonBg,
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
+                    ),
+                    child: Text(
+                      'Withdraw',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
+                    ),
+                    onPressed: () => setState(() {
+                      _visible = true;
+                    }),
+                  ),
+                ),
+              ),
+              _buildModal(),
+            ],
+          ),
         ),
       ),
     );

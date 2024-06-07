@@ -148,83 +148,93 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
         centerTitle: true,
       ),
       backgroundColor: ThemeService.background,
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Did you face any issues in our services? Please let us know your thoughts. We’ll try to solve your concern as soon as possible!',
-                      style: TextStyle(
-                          fontSize: 16.0, color: ThemeService.textColor),
-                    ),
-                    SizedBox(height: 16.0),
-                    _buildInputField(
-                      label: 'Subject',
-                      controller: _subjectController,
-                      errorText: _subjectError,
-                    ),
-                    SizedBox(height: 16.0),
-                    _buildInputField(
-                      label: 'Message',
-                      controller: _messageController,
-                      errorText: _messageError,
-                      maxLines: 5,
-                    ),
-                    SizedBox(height: 16.0),
-                    Text('Have any Screenshots? (Optional)',
+      body: WillPopScope(
+        onWillPop: () async {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => BottomNavigationScreen(currentIndex: 4),
+            ),
+          );
+          return false;
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        'Did you face any issues in our services? Please let us know your thoughts. We’ll try to solve your concern as soon as possible!',
                         style: TextStyle(
-                            fontSize: 16.0, color: ThemeService.textColor)),
-                    SizedBox(height: 8.0),
-                    _buildImagePicker(),
-                    SizedBox(height: 24.0),
-                  ],
+                            fontSize: 16.0, color: ThemeService.textColor),
+                      ),
+                      SizedBox(height: 16.0),
+                      _buildInputField(
+                        label: 'Subject',
+                        controller: _subjectController,
+                        errorText: _subjectError,
+                      ),
+                      SizedBox(height: 16.0),
+                      _buildInputField(
+                        label: 'Message',
+                        controller: _messageController,
+                        errorText: _messageError,
+                        maxLines: 5,
+                      ),
+                      SizedBox(height: 16.0),
+                      Text('Have any Screenshots? (Optional)',
+                          style: TextStyle(
+                              fontSize: 16.0, color: ThemeService.textColor)),
+                      SizedBox(height: 8.0),
+                      _buildImagePicker(),
+                      SizedBox(height: 24.0),
+                    ],
+                  ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () async {
-                    showDialog(
-                      context: context,
-                      barrierDismissible: false,
-                      builder: (BuildContext context) {
-                        return Loader();
-                      },
-                    );
-                    // Delay for 2 seconds to show the loader
-                    await Future.delayed(Duration(seconds: 2));
+              Padding(
+                padding: const EdgeInsets.all(16.0),
+                child: SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      showDialog(
+                        context: context,
+                        barrierDismissible: false,
+                        builder: (BuildContext context) {
+                          return Loader();
+                        },
+                      );
+                      // Delay for 2 seconds to show the loader
+                      await Future.delayed(Duration(seconds: 2));
 
-                    // Dismiss the loader and return to the previous page
-                    Navigator.pop(context);
-                    _handleSubmit();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(8.0),
+                      // Dismiss the loader and return to the previous page
+                      Navigator.pop(context);
+                      _handleSubmit();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      backgroundColor: ThemeService.buttonBg,
+                      padding: EdgeInsets.symmetric(vertical: 8.0),
                     ),
-                    backgroundColor: ThemeService.buttonBg,
-                    padding: EdgeInsets.symmetric(vertical: 8.0),
-                  ),
-                  child: Text(
-                    'Submit',
-                    style: TextStyle(
-                      fontSize: 20,
-                      color: Colors.white,
+                    child: Text(
+                      'Submit',
+                      style: TextStyle(
+                        fontSize: 20,
+                        color: Colors.white,
+                      ),
                     ),
                   ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

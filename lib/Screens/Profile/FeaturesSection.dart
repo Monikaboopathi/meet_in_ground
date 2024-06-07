@@ -79,7 +79,6 @@ class _FeaturesSectionState extends State<FeaturesSection> {
             widget.referralDetails['registeredUserCount'].toString().isEmpty
                 ? "0"
                 : widget.referralDetails['registeredUserCount'].toString(),
-
         'navigate': ReferredUsers(),
         'onPress': null,
       },
@@ -130,7 +129,7 @@ class _FeaturesSectionState extends State<FeaturesSection> {
               ),
               onTap: () {
                 if (feature['navigate'] != "") {
-                  Navigator.of(context).pushReplacement(
+                  Navigator.of(context).push(
                     MaterialPageRoute(
                       builder: (context) => feature['navigate'],
                     ),

@@ -220,12 +220,18 @@ class _Post_WidgetState extends State<Post_Widget> {
               children: [
                 Container(
                   height: 300.0,
-                  decoration: BoxDecoration(
-                    image: DecorationImage(
-                      image: NetworkImage(widget.image),
-                      fit: BoxFit.fill,
-                    ),
-                  ),
+                  decoration: widget.image.isEmpty
+                      ? BoxDecoration(
+                          image: DecorationImage(
+                          image: AssetImage("assets/galleryImage.png"),
+                          fit: BoxFit.fill,
+                        ))
+                      : BoxDecoration(
+                          image: DecorationImage(
+                            image: NetworkImage(widget.image),
+                            fit: BoxFit.fill,
+                          ),
+                        ),
                 ),
                 if (widget.showStatus == true)
                   Positioned(

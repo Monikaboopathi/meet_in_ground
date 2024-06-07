@@ -342,81 +342,92 @@ class _MyPostsState extends State<MyPosts> {
           ),
         ),
       ),
-      body: RefreshIndicator(
-        onRefresh: () async {
-          setState(() {
-            futurePosts = fetchPosts();
-            _searchController.text = "";
-          });
+      body: WillPopScope(
+        onWillPop: () async {
+          Navigator.of(context).pushReplacement(
+            MaterialPageRoute(
+              builder: (context) => BottomNavigationScreen(currentIndex: 2),
+            ),
+          );
+          return false;
         },
-        child: FutureBuilder<List>(
-          future: futurePosts,
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return Center(child: Loader());
-            } else if (snapshot.hasError ||
-                !snapshot.hasData ||
-                snapshot.data == null ||
-                snapshot.data!.isEmpty) {
-              return Center(child: NoDataFoundWidget());
-            } else {
-              List<dynamic>? postData = snapshot.data;
-              return ListView.builder(
-                itemCount: postData!.length,
-                itemBuilder: (context, index) {
-                  var post = postData[index];
-
-                  bool isShowMore = showMoreMap[post['_id']] ?? false;
-
-                  return Post_Widget(
-                      userName: post['userName'] ?? "",
-                      placeOfMatch: post['placeOfMatch'] ?? "",
-                      likes: 0,
-                      comments: post['requests'].length ?? 0,
-                      betAmount: post['betAmount'] ?? "",
-                      id: post['_id'] ?? '',
-                      image: post['image'] ?? "",
-                      postOwnerImage: post['postOwnerImage'] ?? "",
-                      matchDate: post['matchDate'] ?? "",
-                      matchDetails: post['matchDetails'] ?? "",
-                      phoneNumber: post['phoneNumber'],
-                      sport: post['sport'] ?? "",
-                      status: post['status'],
-                      result: post['result'] == null ? "----" : post['result'],
-                      createdAt: post['createdAt'],
-                      isShowMore: isShowMore,
-                      onToggleShowMore: _toggleShowMore,
-                      isFavorite: false,
-                      onDeleteFav: () => {},
-                      onFavoriteToggle: () => {},
-                      isRequest: false,
-                      onDeleteRequest: () => {},
-                      onRequestToggle: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  RequestsScreen(postId: post['_id']),
-                            ),
-                          ),
-                      currentMobileNumber: "+91" + currentMobileNumber!,
-                      showLMSSection: false,
-                      showStatus: true,
-                      showRequests: true,
-                      onEditPost: () => {
-                            Navigator.of(context).push(
-                              MaterialPageRoute(
-                                  builder: (context) =>
-                                      EditPost(postId: post["_id"])),
-                            )
-                          },
-                      onDeletePost: () => showConfirmationDialog(
-                          context,
-                          () => deletePost(post['_id']),
-                          "Do you want delete this Post?",
-                          Colors.red.shade400));
-                },
-              );
-            }
+        child: RefreshIndicator(
+          onRefresh: () async {
+            setState(() {
+              futurePosts = fetchPosts();
+              _searchController.text = "";
+            });
           },
+          child: FutureBuilder<List>(
+            future: futurePosts,
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return Center(child: Loader());
+              } else if (snapshot.hasError ||
+                  !snapshot.hasData ||
+                  snapshot.data == null ||
+                  snapshot.data!.isEmpty) {
+                return Center(child: NoDataFoundWidget());
+              } else {
+                List<dynamic>? postData = snapshot.data;
+                return ListView.builder(
+                  itemCount: postData!.length,
+                  itemBuilder: (context, index) {
+                    var post = postData[index];
+
+                    bool isShowMore = showMoreMap[post['_id']] ?? false;
+
+                    return Post_Widget(
+                        userName: post['userName'] ?? "",
+                        placeOfMatch: post['placeOfMatch'] ?? "",
+                        likes: 0,
+                        comments: post['requests'].length ?? 0,
+                        betAmount: post['betAmount'] ?? "",
+                        id: post['_id'] ?? '',
+                        image: post['image'] ?? "",
+                        postOwnerImage: post['postOwnerImage'] ?? "",
+                        matchDate: post['matchDate'] ?? "",
+                        matchDetails: post['matchDetails'] ?? "",
+                        phoneNumber: post['phoneNumber'],
+                        sport: post['sport'] ?? "",
+                        status: post['status'],
+                        result:
+                            post['result'] == null ? "----" : post['result'],
+                        createdAt: post['createdAt'],
+                        isShowMore: isShowMore,
+                        onToggleShowMore: _toggleShowMore,
+                        isFavorite: false,
+                        onDeleteFav: () => {},
+                        onFavoriteToggle: () => {},
+                        isRequest: false,
+                        onDeleteRequest: () => {},
+                        onRequestToggle: () => Navigator.of(context).push(
+                              MaterialPageRoute(
+                                builder: (context) =>
+                                    RequestsScreen(postId: post['_id']),
+                              ),
+                            ),
+                        currentMobileNumber: "+91" + currentMobileNumber!,
+                        showLMSSection: false,
+                        showStatus: true,
+                        showRequests: true,
+                        onEditPost: () => {
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                    builder: (context) =>
+                                        EditPost(postId: post["_id"])),
+                              )
+                            },
+                        onDeletePost: () => showConfirmationDialog(
+                            context,
+                            () => deletePost(post['_id']),
+                            "Do you want delete this Post?",
+                            Colors.red.shade400));
+                  },
+                );
+              }
+            },
+          ),
         ),
       ),
     );
