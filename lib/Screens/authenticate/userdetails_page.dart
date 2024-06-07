@@ -480,7 +480,7 @@ class _UserOnBoardState extends State<UserOnBoard> {
                 height: 350,
               ),
             ),
-            SizedBox(height: 30),
+            SizedBox(height: 20),
             if (loadingLocation)
               CircularProgressIndicator()
             else if (userLocation != null)
@@ -494,25 +494,27 @@ class _UserOnBoardState extends State<UserOnBoard> {
                         color: ThemeService.textColor),
                   )),
             SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                loadingLocation ? null : handleAddLocation();
-              },
-              style: ElevatedButton.styleFrom(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                ),
-                backgroundColor:
-                    loadingLocation ? Colors.grey : ThemeService.buttonBg,
-              ),
-              child: const Text(
-                'Share Location',
-                style: TextStyle(
-                  fontSize: 18,
-                  color: Colors.white,
-                ),
-              ),
-            ),
+            userLocation != null
+                ? Container()
+                : ElevatedButton(
+                    onPressed: () {
+                      loadingLocation ? null : handleAddLocation();
+                    },
+                    style: ElevatedButton.styleFrom(
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(8.0),
+                      ),
+                      backgroundColor:
+                          loadingLocation ? Colors.grey : ThemeService.buttonBg,
+                    ),
+                    child: const Text(
+                      'Share Location',
+                      style: TextStyle(
+                        fontSize: 18,
+                        color: Colors.white,
+                      ),
+                    ),
+                  ),
             SizedBox(height: 20),
           ],
         ),
@@ -549,13 +551,14 @@ class _UserOnBoardState extends State<UserOnBoard> {
                 onboarded[index]['subtitle']!,
                 SizedBox(height: 20),
                 ElevatedButton(
-                  onPressed: handleIndexChange,
+                  onPressed: loadingLocation ? null : handleIndexChange,
                   style: ElevatedButton.styleFrom(
                     minimumSize: Size(double.infinity, 50),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(8.0),
                     ),
-                    backgroundColor: ThemeService.buttonBg,
+                    backgroundColor:
+                        loadingLocation ? Colors.grey : ThemeService.buttonBg,
                   ),
                   child: const Text(
                     'Continue',
