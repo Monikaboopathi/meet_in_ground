@@ -103,12 +103,12 @@ class _Post_WidgetState extends State<Post_Widget> {
                 ),
                 if (widget.showRequests == true)
                   GestureDetector(
-                    onTap: null,
+                    onTap: () => widget.onRequestToggle(),
                     child: Container(
                       decoration: BoxDecoration(
                         border: Border.all(
                           color: ThemeService.textColor,
-                          width: 1.0,
+                          width: 2.0,
                         ),
                         borderRadius: BorderRadius.circular(4.0),
                       ),
@@ -118,21 +118,19 @@ class _Post_WidgetState extends State<Post_Widget> {
                           Text(
                             widget.comments.toString(),
                             style: TextStyle(
-                                fontSize: 10.0,
+                                fontSize: 12.0,
                                 color: ThemeService.primary,
                                 fontWeight: FontWeight.bold),
                           ),
                           SizedBox(
                             width: 4,
                           ),
-                          GestureDetector(
-                            onTap: () => widget.onRequestToggle(),
-                            child: Text(
-                              widget.comments > 1 ? "Requests" : "Request",
-                              style: TextStyle(
-                                  fontSize: 10.0,
-                                  color: ThemeService.textColor),
-                            ),
+                          Text(
+                            widget.comments > 1 ? "Requests" : "Request",
+                            style: TextStyle(
+                                fontSize: 11.0,
+                                color: ThemeService.textColor,
+                                fontWeight: FontWeight.bold),
                           ),
                         ],
                       ),

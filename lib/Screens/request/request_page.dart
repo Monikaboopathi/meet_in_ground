@@ -87,14 +87,16 @@ class _RequestsScreenState extends State<RequestsScreen> {
     });
   }
 
-  handleAccept(String userId) async {
+  handleAccept(String userId, String mobileNo) async {
+    setState(() {
+      isLoading = true;
+    });
     String Base_url = dotenv.get("BASE_URL", fallback: null);
     final url = '$Base_url/post/updateMyPostRequest/${widget.postId}/$userId';
     try {
       final response = await http.patch(
         Uri.parse(url),
-        body: jsonEncode(
-            {'status': 'Requested', 'phoneNumber': '${currentMobileNumber!}'}),
+        body: jsonEncode({'status': 'Accepted', 'phoneNumber': '${mobileNo}'}),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -103,8 +105,9 @@ class _RequestsScreenState extends State<RequestsScreen> {
 
         fetchData();
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Request accepted')));
+            .showSnackBar(SnackBar(content: Text(data['message'])));
       } else {
+        fetchData();
         final error = jsonDecode(response.body);
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(error['error'])));
@@ -114,13 +117,16 @@ class _RequestsScreenState extends State<RequestsScreen> {
     }
   }
 
-  handleRequest(String userId) async {
+  handleDeleteAccept(String userId, String mobileNo) async {
+    setState(() {
+      isLoading = true;
+    });
     String Base_url = dotenv.get("BASE_URL", fallback: null);
     final url = '$Base_url/post/updateMyPostRequest/${widget.postId}/$userId';
     try {
       final response = await http.patch(
         Uri.parse(url),
-        body: jsonEncode({'status': 'Accepted'}),
+        body: jsonEncode({'status': 'Accept', 'phoneNumber': '${mobileNo}'}),
         headers: {'Content-Type': 'application/json'},
       );
 
@@ -129,9 +135,10 @@ class _RequestsScreenState extends State<RequestsScreen> {
 
         fetchData();
         ScaffoldMessenger.of(context)
-            .showSnackBar(SnackBar(content: Text('Request Removed')));
+            .showSnackBar(SnackBar(content: Text(data['message'])));
       } else {
         final error = jsonDecode(response.body);
+        fetchData();
         ScaffoldMessenger.of(context)
             .showSnackBar(SnackBar(content: Text(error['error'])));
       }
@@ -273,18 +280,23 @@ class _RequestsScreenState extends State<RequestsScreen> {
                                                   RoundedRectangleBorder(
                                                     borderRadius:
                                                         BorderRadius.circular(
-                                                            8), // Set border radius if you want rounded corners
+                                                            8),
                                                   ),
                                                 ),
                                               ),
                                               onPressed: () {
-                                                item['status'] != 'Requested'
-                                                    ? handleAccept(item['_id'])
-                                                    : handleRequest(
-                                                        item['_id']);
+                                                item['status'] != 'Accepted'
+                                                    ? handleAccept(
+                                                        item['_id'],
+                                                        item['phoneNumber']
+                                                            .toString())
+                                                    : handleDeleteAccept(
+                                                        item['_id'],
+                                                        item['phoneNumber']
+                                                            .toString());
                                               },
                                               child: Text(
-                                                item['status'] != 'Requested'
+                                                item['status'] != 'Accepted'
                                                     ? 'Accept'
                                                     : 'Accepted',
                                                 style: TextStyle(

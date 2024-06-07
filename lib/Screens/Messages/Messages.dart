@@ -50,7 +50,10 @@ class _MessagesState extends State<Messages> {
         centerTitle: true,
         actions: [
           IconButton(
-            icon: Icon(Icons.search),
+            icon: Icon(
+              Icons.search,
+              color: ThemeService.textColor,
+            ),
             onPressed: () {
               showSearch(
                 context: context,
