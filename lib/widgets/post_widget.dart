@@ -241,7 +241,7 @@ class _Post_WidgetState extends State<Post_Widget> {
                       color: ThemeService.postTransparent,
                       padding: EdgeInsets.all(8),
                       child: Text(
-                        widget.result ?? "----",
+                        widget.result != null ? widget.result : "----",
                         style: TextStyle(
                           color: ThemeService.third,
                           fontSize: 10,
