@@ -10,6 +10,7 @@ class Message {
   String senderName;
   String receiverName;
   final roomId;
+  final isRead;
 
   Message({
     required this.sender,
@@ -21,6 +22,7 @@ class Message {
     required this.senderImage,
     required this.senderName,
     this.roomId,
+    this.isRead,
   });
 
   Map<String, dynamic> toMap() {
@@ -33,6 +35,7 @@ class Message {
       'recieverImage': recieverImage,
       'senderImage': senderImage,
       'senderName': senderName,
+      'isRead': isRead
     };
   }
 
@@ -46,6 +49,7 @@ class Message {
       recieverImage: map['recieverImage'] ?? '',
       senderImage: map['senderImage'] ?? '',
       senderName: map['senderName'] ?? 'Unknown sender name',
+      isRead: map['isRead'] ?? false,
     );
   }
 }

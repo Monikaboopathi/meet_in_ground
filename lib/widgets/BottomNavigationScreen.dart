@@ -1,12 +1,14 @@
 // ignore_for_file: prefer_const_constructors
 
-import 'package:flutter/material.dart';
+import 'package:flutter/material.dart' hide Badge;
 import 'package:meet_in_ground/Screens/Favorites/Favorites.dart';
 import 'package:meet_in_ground/Screens/Home/home.dart';
 import 'package:meet_in_ground/Screens/Messages/Messages.dart';
 import 'package:meet_in_ground/Screens/Posts/AddPosts.dart';
 import 'package:meet_in_ground/Screens/Profile/Profile.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
+import 'package:meet_in_ground/util/Services/ChatService.dart';
+import 'package:badges/badges.dart';
 
 class BottomNavigationScreen extends StatefulWidget {
   final int currentIndex;
@@ -21,12 +23,15 @@ class BottomNavigationScreen extends StatefulWidget {
 class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
   late PageController pageController;
   late int _currentIndex;
+  int unreadMessagesCount = 0;
+  Chatservice _chatservice = Chatservice();
 
   @override
   void initState() {
     super.initState();
     _currentIndex = widget.currentIndex;
     pageController = PageController(initialPage: _currentIndex);
+    _updateUnreadMessagesCount();
   }
 
   @override
@@ -41,6 +46,13 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
     });
   }
 
+  Future<void> _updateUnreadMessagesCount() async {
+    int count = await _chatservice.getUnreadMessagesCount();
+    setState(() {
+      unreadMessagesCount = count;
+    });
+  }
+
   void navigationTapped(int page) {
     pageController.jumpToPage(page);
   }
@@ -52,11 +64,9 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
         height: 60,
         child: BottomAppBar(
           color: ThemeService.background,
-
           shape: CircularNotchedRectangle(),
           child: Container(
             height: kBottomNavigationBarHeight,
-
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceAround,
               children: [
@@ -67,9 +77,22 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
                   onPressed: () => navigationTapped(0),
                 ),
                 IconButton(
-                  icon: _currentIndex == 1
-                      ? Icon(Icons.message_sharp, color: ThemeService.textColor)
-                      : Icon(Icons.message_outlined, color: Colors.grey),
+                  icon: unreadMessagesCount > 0
+                      ? Badge(
+                          badgeContent: Text(
+                            unreadMessagesCount.toString(),
+                            style: TextStyle(color: Colors.white),
+                          ),
+                          child: _currentIndex == 1
+                              ? Icon(Icons.message_sharp,
+                                  color: ThemeService.textColor)
+                              : Icon(Icons.message_outlined,
+                                  color: Colors.grey),
+                        )
+                      : _currentIndex == 1
+                          ? Icon(Icons.message_sharp,
+                              color: ThemeService.textColor)
+                          : Icon(Icons.message_outlined, color: Colors.grey),
                   onPressed: () => navigationTapped(1),
                 ),
                 IconButton(
@@ -100,7 +123,7 @@ class _BottomNavigationScreenState extends State<BottomNavigationScreen> {
       body: PageView(
         controller: pageController,
         onPageChanged: onPageChanged,
-         physics: NeverScrollableScrollPhysics(),
+        physics: NeverScrollableScrollPhysics(),
         children: [
           HomeScreen(),
           Messages(),
