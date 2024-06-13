@@ -81,21 +81,19 @@ class Chatservice extends ChangeNotifier {
         recieverImage: receiverImage,
         senderImage: senderImage,
         senderName: senderName,
+        isRead: false,
         roomId: "+91" + currentUserId + "-" + receiverId);
 
     List<String> ids = ["+91" + currentUserId, receiverId];
     ids.sort();
     String chatRoomId = ids.join("-");
 
-    // Check if the 'rooms' collection exists, create it if not
     final roomsCollection = _firestore.collection('rooms');
     final roomDoc = roomsCollection.doc(chatRoomId);
     final roomExists = await roomDoc.get().then((doc) => doc.exists);
     if (!roomExists) {
       await _createRoom(chatRoomId);
     }
-
-    // Add the message to the 'messages' subcollection of the room
     final messagesCollection = roomDoc.collection('messages');
     await messagesCollection.add(newMessage.toMap());
   }
@@ -123,28 +121,22 @@ class Chatservice extends ChangeNotifier {
 
   Future<List<Map<String, dynamic>>> getAllMessagesAndRooms() async {
     List<Map<String, dynamic>> chatRooms = [];
-    print("print 1");
 
     final String currentUserId = await _getCurrentUserId();
 
     try {
       QuerySnapshot roomsSnapshot =
           await FirebaseFirestore.instance.collection('rooms').get();
-      print("print 2");
 
       for (var roomDoc in roomsSnapshot.docs) {
-        print("print 3");
         Map<String, dynamic> roomData = roomDoc.data() as Map<String, dynamic>;
-        print("print 4");
 
         try {
-          // Fetch the last message for this room
           QuerySnapshot messagesSnapshot = await roomDoc.reference
               .collection('messages')
               .orderBy('timestamp', descending: true)
               .limit(1)
               .get();
-          print("print 5");
 
           if (messagesSnapshot.docs.isNotEmpty) {
             final messageDoc = messagesSnapshot.docs.first;
@@ -156,6 +148,7 @@ class Chatservice extends ChangeNotifier {
             final senderImage = messageDoc['senderImage'];
             final receiver = messageDoc['receiver'];
             final sender = messageDoc['sender'];
+            final isRead = messageDoc['isRead'];
 
             if (sender == "+91" + currentUserId ||
                 receiver == "+91" + currentUserId) {
@@ -171,6 +164,7 @@ class Chatservice extends ChangeNotifier {
               roomData['sender'] = sender != null ? sender : '';
               roomData['currentUserId'] =
                   "+91" + currentUserId != null ? "+91" + currentUserId : "";
+              roomData['isRead'] = isRead ?? false;
               chatRooms.add(roomData);
             }
           } else {
@@ -187,19 +181,45 @@ class Chatservice extends ChangeNotifier {
     return chatRooms;
   }
 
-  void testFirestoreAccess() async {
+  Future<void> updateUnreadStatus(String receiverId) async {
+    final String currentUserId = await _getCurrentUserId();
+    List<String> ids = ["+91" + currentUserId, receiverId];
+    ids.sort();
+    String chatRoomId = ids.join("-");
+
     try {
-      DocumentSnapshot doc = await FirebaseFirestore.instance
-          .collection('rooms')
-          .doc('+917200645321-8072974576')
-          .get();
-      if (doc.exists) {
-        print('Test document data: ${doc.data().toString()}');
-      } else {
-        print('Test document does not exist');
+      final roomDoc = _firestore.collection('rooms').doc(chatRoomId);
+      final messagesCollection = roomDoc.collection('messages');
+
+      final messages = await messagesCollection.get();
+      for (var message in messages.docs) {
+        await message.reference.update({'isRead': true});
       }
     } catch (e) {
-      print('Error reading test document: $e');
+      print("Error updating unread status: $e");
     }
+  }
+
+  Future<int> getUnreadMessagesCount() async {
+    final String currentUserId = await _getCurrentUserId();
+    int count = 0;
+
+    try {
+      QuerySnapshot roomsSnapshot = await _firestore.collection('rooms').get();
+
+      for (var roomDoc in roomsSnapshot.docs) {
+        QuerySnapshot messagesSnapshot = await roomDoc.reference
+            .collection('messages')
+            .where('receiver', isEqualTo: currentUserId)
+            .where('isRead', isEqualTo: false)
+            .get();
+
+        count += messagesSnapshot.size;
+      }
+    } catch (e) {
+      print("Error fetching unread messages count: $e");
+    }
+
+    return count;
   }
 }

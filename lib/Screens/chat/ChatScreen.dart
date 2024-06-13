@@ -47,6 +47,13 @@ class _ChatScreenState extends State<ChatScreen> {
         });
       }
     });
+    _updateUnreadStatus();
+  }
+
+  Future<void> _updateUnreadStatus() async {
+    String receiverId = widget.receiverId;
+
+    await _chatservice.updateUnreadStatus(receiverId);
   }
 
   Future<String?> initializeData() async {
@@ -64,7 +71,7 @@ class _ChatScreenState extends State<ChatScreen> {
       await _chatservice.sendMessage(widget.receiverId, messageController.text,
           widget.recieverName, widget.recieverImage);
       messageController.clear();
-      scrollToBottom(); // Scroll to bottom after sending a message
+      scrollToBottom();
     } else {
       print("Enter Some Text");
     }

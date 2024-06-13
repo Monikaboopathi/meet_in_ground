@@ -90,7 +90,6 @@ class _MessagesState extends State<Messages> {
                 itemCount: chatRooms.length,
                 itemBuilder: (context, index) {
                   var chatRoom = chatRooms[index];
-                  bool isRead = chatRoom['isRead'] ?? true;
 
                   return ListTile(
                     onTap: () {
@@ -146,25 +145,43 @@ class _MessagesState extends State<Messages> {
                         style: TextStyle(color: ThemeService.placeHolder),
                       ),
                     ),
-                    leading: Container(
-                      width: 50.0,
-                      height: 50.0,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(
-                          color: ThemeService.primary,
-                          width: 1.0,
+                    leading: Stack(
+                      children: [
+                        Container(
+                          width: 50.0,
+                          height: 50.0,
+                          decoration: BoxDecoration(
+                            shape: BoxShape.circle,
+                            border: Border.all(
+                              color: ThemeService.primary,
+                              width: 1.0,
+                            ),
+                          ),
+                          child: CircleAvatar(
+                            backgroundImage: NetworkImage(
+                              chatRoom['sender'] == chatRoom['currentUserId']
+                                  ? chatRoom['receiverImage']
+                                  : chatRoom['senderImage'],
+                            ),
+                            backgroundColor: ThemeService.textColor,
+                            foregroundColor: ThemeService.textColor,
+                          ),
                         ),
-                      ),
-                      child: CircleAvatar(
-                        backgroundImage: NetworkImage(
-                          chatRoom['sender'] == chatRoom['currentUserId']
-                              ? chatRoom['receiverImage']
-                              : chatRoom['senderImage'],
-                        ),
-                        backgroundColor: ThemeService.textColor,
-                        foregroundColor: ThemeService.textColor,
-                      ),
+                        if (chatRoom['receiver'] == chatRoom['currentUserId'] &&
+                            !chatRoom['isRead'])
+                          Positioned(
+                            right: 5,
+                            top: 0,
+                            child: Container(
+                              width: 10,
+                              height: 10,
+                              decoration: BoxDecoration(
+                                shape: BoxShape.circle,
+                                color: Colors.red,
+                              ),
+                            ),
+                          ),
+                      ],
                     ),
                   );
                 },
