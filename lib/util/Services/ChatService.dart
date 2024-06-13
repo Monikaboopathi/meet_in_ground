@@ -210,7 +210,7 @@ class Chatservice extends ChangeNotifier {
       for (var roomDoc in roomsSnapshot.docs) {
         QuerySnapshot messagesSnapshot = await roomDoc.reference
             .collection('messages')
-            .where('receiver', isEqualTo: currentUserId)
+            .where('receiver', isEqualTo: "+91" + currentUserId)
             .where('isRead', isEqualTo: false)
             .get();
 
