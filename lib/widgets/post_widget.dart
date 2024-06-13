@@ -220,14 +220,16 @@ class _Post_WidgetState extends State<Post_Widget> {
                   height: 300.0,
                   decoration: widget.image.isEmpty
                       ? BoxDecoration(
+                          color: ThemeService.background,
                           image: DecorationImage(
-                          image: AssetImage("assets/galleryImage.png"),
-                          fit: BoxFit.fill,
-                        ))
+                            image: AssetImage("assets/galleryImage.png"),
+                            fit: BoxFit.contain,
+                          ))
                       : BoxDecoration(
+                          color: ThemeService.background,
                           image: DecorationImage(
                             image: NetworkImage(widget.image),
-                            fit: BoxFit.fill,
+                            fit: BoxFit.contain,
                           ),
                         ),
                 ),

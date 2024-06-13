@@ -83,12 +83,14 @@ class _MessagesState extends State<Messages> {
             }
 
             List<Map<String, dynamic>> chatRooms = snapshot.data!;
+            chatRooms.sort((a, b) => b['timestamp'].compareTo(a['timestamp']));
             return RefreshIndicator(
               onRefresh: _refreshChatRooms,
               child: ListView.builder(
                 itemCount: chatRooms.length,
                 itemBuilder: (context, index) {
                   var chatRoom = chatRooms[index];
+                  bool isRead = chatRoom['isRead'] ?? true;
 
                   return ListTile(
                     onTap: () {
