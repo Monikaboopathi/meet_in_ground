@@ -278,11 +278,31 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
     return Row(
       children: [
         _selectedImage != null
-            ? Image.file(
-                _selectedImage!,
-                width: 100,
-                height: 100,
-                fit: BoxFit.cover,
+            ? Stack(
+                children: [
+                  Container(
+                    height: 100,
+                    child: Image.file(
+                      _selectedImage!,
+                      width: 100,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                  Positioned(
+                    top: -15,
+                    right: 0,
+                    child: IconButton(
+                      icon: Icon(
+                        Icons.cancel,
+                        color: ThemeService.placeHolder,
+                        size: 20,
+                      ),
+                      onPressed: () => setState(() {
+                        _selectedImage = null;
+                      }),
+                    ),
+                  ),
+                ],
               )
             : SizedBox.shrink(),
         SizedBox(width: 16.0),
