@@ -297,7 +297,8 @@ class _AddpostsState extends State<Addposts> {
                               child: DropdownButton<String>(
                                 isExpanded: true,
                                 value: selectedValue,
-                                underline: Container(), // Remove the underline
+                                underline: Container(),
+                                dropdownColor: ThemeService.background,
                                 items: sportNames.map((sport) {
                                   return DropdownMenuItem<String>(
                                     value: sport,

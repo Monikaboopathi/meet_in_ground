@@ -220,13 +220,13 @@ class _Post_WidgetState extends State<Post_Widget> {
                   height: 300.0,
                   decoration: widget.image.isEmpty
                       ? BoxDecoration(
-                          color: ThemeService.background,
+                          color: ThemeService.textColor,
                           image: DecorationImage(
                             image: AssetImage("assets/galleryImage.png"),
                             fit: BoxFit.contain,
                           ))
                       : BoxDecoration(
-                          color: ThemeService.background,
+                          color: ThemeService.textColor,
                           image: DecorationImage(
                             image: NetworkImage(widget.image),
                             fit: BoxFit.contain,
@@ -237,18 +237,15 @@ class _Post_WidgetState extends State<Post_Widget> {
                   Positioned(
                     top: 0,
                     left: 0,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        color: Colors.black54,
-                        padding: EdgeInsets.all(8),
-                        child: Text(
-                          widget.result ?? "----",
-                          style: TextStyle(
-                            color: ThemeService.third,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
+                    child: Container(
+                      color: ThemeService.postTransparent,
+                      padding: EdgeInsets.all(8),
+                      child: Text(
+                        widget.result ?? "----",
+                        style: TextStyle(
+                          color: ThemeService.third,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
@@ -257,18 +254,15 @@ class _Post_WidgetState extends State<Post_Widget> {
                   Positioned(
                     top: 0,
                     right: 0,
-                    child: Padding(
-                      padding: const EdgeInsets.all(8.0),
-                      child: Container(
-                        color: Colors.black54,
-                        padding: EdgeInsets.all(8),
-                        child: Text(
-                          widget.status,
-                          style: TextStyle(
-                            color: ThemeService.third,
-                            fontSize: 10,
-                            fontWeight: FontWeight.bold,
-                          ),
+                    child: Container(
+                      color: ThemeService.postTransparent,
+                      padding: EdgeInsets.all(8),
+                      child: Text(
+                        widget.status,
+                        style: TextStyle(
+                          color: ThemeService.third,
+                          fontSize: 10,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),

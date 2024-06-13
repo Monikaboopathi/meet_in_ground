@@ -16,11 +16,15 @@ class ThemeService {
   static const Color warning = Color(0xFFFFC107);
   static const Color info = Color(0xFF17A2B8);
   static final Color background =
-      isDayTime() ? const Color(0xFFFFFFFF) : const Color(0xFF0A0030);
+      !isDayTime() ? const Color(0xFFFFFFFF) : const Color(0xFF0A0030);
   static final Color textColor =
-      isDayTime() ? const Color(0xFF0A0030) : const Color(0xFFFFFFFF);
+      !isDayTime() ? const Color(0xFF0A0030) : const Color(0xFFFFFFFF);
   static const Color buttonBg = Color(0xFF1576FB);
-  static final Color transparent = isDayTime()
+  static final Color transparent = !isDayTime()
+      ? const Color.fromRGBO(0, 0, 0, 0.2)
+      : const Color.fromRGBO(255, 255, 255, 0.2);
+
+  static final Color postTransparent = isDayTime()
       ? const Color.fromRGBO(0, 0, 0, 0.2)
       : const Color.fromRGBO(255, 255, 255, 0.2);
 }
