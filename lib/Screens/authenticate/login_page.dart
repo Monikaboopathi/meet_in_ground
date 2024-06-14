@@ -72,7 +72,6 @@ class _LoginPageState extends State<LoginPage> {
 
         await MobileNo.clearMobilenumber();
       } else {
-       
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(
             builder: (context) => FavouritePage(
@@ -96,127 +95,136 @@ class _LoginPageState extends State<LoginPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: ThemeService.background,
-      body: SingleChildScrollView(
-        child: Form(
-          key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(8.0, 100, 8, 50),
-                child: Image.asset(
-                  'assets/login.png',
-                  width: MediaQuery.of(context).size.width,
-                  height: 280,
-                  fit: BoxFit.fill,
-                ),
-              ),
-              SizedBox(height: 40),
-              Padding(
-                padding: const EdgeInsets.only(left: 25.0),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    "Let's Play...",
-                    style: TextStyle(
-                      fontSize: 28,
-                      fontWeight: FontWeight.w800,
-                      color: ThemeService.primary,
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 30),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 20),
+      body: isLoading
+          ? Loader()
+          : SingleChildScrollView(
+              child: Form(
+                key: _formKey,
                 child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.center,
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Container(
-                      width: double.infinity,
-                      child: IntlPhoneField(
-                        controller: mobileController,
-                        disableLengthCheck: false,
-                        decoration: InputDecoration(
-                          labelText: 'Mobile Number',
-                          labelStyle: TextStyle(color: ThemeService.textColor),
-                          border: OutlineInputBorder(
-                            borderRadius: BorderRadius.circular(10),
-                          ),
-                          counterText: "",
-                        ),
-                        initialCountryCode: 'IN',
-                        style: TextStyle(color: ThemeService.textColor),
-                        validator: (phone) {
-                          if (phone == null || phone.number.isEmpty) {
-                            return 'Please enter a valid mobile number';
-                          }
-                          return null;
-                        },
-                        onChanged: (phone) {
-                          print(phone.completeNumber);
-                        },
+                    Padding(
+                      padding: const EdgeInsets.fromLTRB(8.0, 100, 8, 50),
+                      child: Image.asset(
+                        'assets/login.png',
+                        width: MediaQuery.of(context).size.width,
+                        height: 280,
+                        fit: BoxFit.fill,
                       ),
                     ),
-                    SizedBox(height: 30),
-                    Container(
-                      width: double.infinity,
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            String phonenumber = mobileController.text;
-                            showDialog(
-                              context: context,
-                              barrierDismissible: false,
-                              builder: (BuildContext context) {
-                                return Loader();
-                              },
-                            );
-                            await loginUser(phonenumber);
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8.0),
-                          ),
-                          backgroundColor: ThemeService.buttonBg,
-                        ),
+                    SizedBox(height: 40),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 25.0),
+                      child: Align(
+                        alignment: Alignment.centerLeft,
                         child: Text(
-                          'Submit',
+                          "Let's Play...",
                           style: TextStyle(
-                            fontSize: 18,
-                            color: Colors.white,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w800,
+                            color: ThemeService.primary,
                           ),
                         ),
                       ),
                     ),
                     SizedBox(height: 30),
-                    // ignore: unnecessary_null_comparison
-                    RefferalService.getRefferal() != null
-                        ? Center(
-                            child: GestureDetector(
-                              onTap: () {
-                                _showDialogReferrel(context);
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Container(
+                            width: double.infinity,
+                            child: IntlPhoneField(
+                              controller: mobileController,
+                              disableLengthCheck: false,
+                              decoration: InputDecoration(
+                                labelText: 'Mobile Number',
+                                labelStyle:
+                                    TextStyle(color: ThemeService.textColor),
+                                border: OutlineInputBorder(
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                counterText: "",
+                              ),
+                              initialCountryCode: 'IN',
+                              style: TextStyle(color: ThemeService.textColor),
+                              validator: (phone) {
+                                if (phone == null || phone.number.isEmpty) {
+                                  return 'Please enter a valid mobile number';
+                                }
+                                return null;
                               },
+                              onChanged: (phone) {
+                                print(phone.completeNumber);
+                              },
+                            ),
+                          ),
+                          SizedBox(height: 30),
+                          Container(
+                            width: double.infinity,
+                            child: ElevatedButton(
+                              onPressed: () async {
+                                if (_formKey.currentState!.validate() &&
+                                    mobileController.text.isNotEmpty &&
+                                    mobileController.text.length >= 1 &&
+                                    10 >= mobileController.text.length) {
+                                  String phonenumber = mobileController.text;
+
+                                  await loginUser(phonenumber);
+                                } else {
+                                  Fluttertoast.showToast(
+                                    msg: 'Please enter a valid mobile number',
+                                    toastLength: Toast.LENGTH_SHORT,
+                                    gravity: ToastGravity.TOP,
+                                    timeInSecForIosWeb: 2,
+                                    backgroundColor: Colors.red,
+                                    textColor: Colors.white,
+                                  );
+                                }
+                              },
+                              style: ElevatedButton.styleFrom(
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(8.0),
+                                ),
+                                backgroundColor: ThemeService.buttonBg,
+                              ),
                               child: Text(
-                                "Have a referral?",
+                                'Submit',
                                 style: TextStyle(
-                                  fontSize: 20,
-                                  color: Colors.blue,
-                                  decoration: TextDecoration.underline,
+                                  fontSize: 18,
+                                  color: Colors.white,
                                 ),
                               ),
                             ),
-                          )
-                        : Container(),
+                          ),
+                          SizedBox(height: 30),
+                          // ignore: unnecessary_null_comparison
+                          RefferalService.getRefferal() != null
+                              ? Center(
+                                  child: GestureDetector(
+                                    onTap: () {
+                                      _showDialogReferrel(context);
+                                    },
+                                    child: Text(
+                                      "Have a referral?",
+                                      style: TextStyle(
+                                        fontSize: 20,
+                                        color: Colors.blue,
+                                        decoration: TextDecoration.underline,
+                                      ),
+                                    ),
+                                  ),
+                                )
+                              : Container(),
+                        ],
+                      ),
+                    ),
                   ],
                 ),
               ),
-            ],
-          ),
-        ),
-      ),
+            ),
     );
   }
 

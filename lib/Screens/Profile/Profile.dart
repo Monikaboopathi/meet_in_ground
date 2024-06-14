@@ -214,7 +214,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       ProfileDetails(userDetails: userDetails),
                       FeaturesSection(
                         balance: balance.toString(),
-                        notificationCount: notificationData.length,
+                        // notificationCount: notificationData.length,
                         referredPost: referredPost,
                         referralDetails: referralDetails,
                         onRateUs: () {

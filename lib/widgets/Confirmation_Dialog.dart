@@ -37,6 +37,7 @@ class _ConfirmationDialogState extends State<ConfirmationDialog> {
         Padding(
           padding: const EdgeInsets.all(15),
           child: AlertDialog(
+            backgroundColor: ThemeService.background,
             insetPadding: EdgeInsets.all(2),
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(4),

@@ -82,82 +82,77 @@ class _AddpostsState extends State<Addposts> {
       isLoading = true;
     });
     String Base_url = dotenv.get("BASE_URL", fallback: null);
-    if (_validateFields()) {
-      String? userMobileNumber = await MobileNo.getMobilenumber();
-      String? userName = await UsernameService.getUserName();
-      print(userMobileNumber);
-      print(userName);
 
-      Map<String, String> formData = {
-        "userName": userName ?? "",
-        "sport": selectedValue ?? "",
-        "matchDetails": postText ?? "",
-        "matchDate": DateFormat('dd/MM/yyyy').format(date),
-        "betAmount": price?.toString() ?? "",
-        "placeOfMatch": location ?? "",
-      };
+    String? userMobileNumber = await MobileNo.getMobilenumber();
+    String? userName = await UsernameService.getUserName();
+    print(userMobileNumber);
+    print(userName);
 
-      try {
-        var request = http.MultipartRequest(
-          'POST',
-          Uri.parse('$Base_url/post/addPost/$userMobileNumber'),
+    Map<String, String> formData = {
+      "userName": userName ?? "",
+      "sport": selectedValue ?? "",
+      "matchDetails": postText ?? "",
+      "matchDate": DateFormat('dd/MM/yyyy').format(date),
+      "betAmount": price?.toString() ?? "",
+      "placeOfMatch": location ?? "",
+    };
+
+    try {
+      var request = http.MultipartRequest(
+        'POST',
+        Uri.parse('$Base_url/post/addPost/$userMobileNumber'),
+      );
+
+      request.fields.addAll(formData);
+
+      if (selectedImage != null) {
+        final mimeTypeData =
+            lookupMimeType(selectedImage!.path, headerBytes: [0xFF, 0xD8])
+                ?.split('/');
+        final file = await http.MultipartFile.fromPath(
+          'image',
+          selectedImage!.path,
+          contentType: mimeTypeData != null
+              ? MediaType(mimeTypeData[0], mimeTypeData[1])
+              : MediaType('image', 'jpeg'),
+        );
+        print(file);
+        request.files.add(file);
+      }
+      final response = await request.send();
+      print(formData);
+      if (response.statusCode == 200) {
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => MyPosts()),
+        );
+        Fluttertoast.showToast(
+          msg: "Post Added Successfully",
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
         );
 
-        request.fields.addAll(formData);
-
-        if (selectedImage != null) {
-          final mimeTypeData =
-              lookupMimeType(selectedImage!.path, headerBytes: [0xFF, 0xD8])
-                  ?.split('/');
-          final file = await http.MultipartFile.fromPath(
-            'image',
-            selectedImage!.path,
-            contentType: mimeTypeData != null
-                ? MediaType(mimeTypeData[0], mimeTypeData[1])
-                : MediaType('image', 'jpeg'),
-          );
-          print(file);
-          request.files.add(file);
-        }
-        final response = await request.send();
-        print(formData);
-        if (response.statusCode == 200) {
-          Navigator.of(context).pushReplacement(
-            MaterialPageRoute(builder: (context) => MyPosts()),
-          );
-          Fluttertoast.showToast(
-            msg: "Post Added Successfully",
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 2,
-            backgroundColor: Colors.green,
-            textColor: Colors.white,
-          );
-
-          print('Post request successful');
-        } else {
-          Fluttertoast.showToast(
-            msg: response.request.toString().isEmpty
-                ? "Failed to submit post. Please try again later."
-                : response.request.toString(),
-            toastLength: Toast.LENGTH_SHORT,
-            gravity: ToastGravity.TOP,
-            timeInSecForIosWeb: 2,
-            backgroundColor: Colors.red,
-            textColor: Colors.white,
-          );
-        }
-      } catch (error) {
-        print('Error: $error');
-      } finally {
-        setState(() {
-          isLoading = false;
-        });
+        print('Post request successful');
+      } else {
+        Fluttertoast.showToast(
+          msg: response.request.toString().isEmpty
+              ? "Failed to submit post. Please try again later."
+              : response.request.toString(),
+          toastLength: Toast.LENGTH_SHORT,
+          gravity: ToastGravity.TOP,
+          timeInSecForIosWeb: 2,
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+        );
       }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
-        content: Text('Please fill all the required fields'),
-      ));
+    } catch (error) {
+      print('Error: $error');
+    } finally {
+      setState(() {
+        isLoading = false;
+      });
     }
   }
 
@@ -483,7 +478,9 @@ class _AddpostsState extends State<Addposts> {
                     width: double.infinity,
                     child: ElevatedButton(
                       onPressed: () async {
-                        _handleSubmit();
+                        if (_validateFields()) {
+                          await _handleSubmit();
+                        }
                       },
                       style: ElevatedButton.styleFrom(
                         shape: RoundedRectangleBorder(

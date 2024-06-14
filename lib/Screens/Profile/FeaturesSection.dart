@@ -12,7 +12,7 @@ import 'package:url_launcher/url_launcher.dart';
 
 class FeaturesSection extends StatefulWidget {
   final String balance;
-  final int notificationCount;
+  // final int notificationCount;
   final int referredPost;
   final Map<String, dynamic> referralDetails;
   final VoidCallback onRateUs;
@@ -20,7 +20,7 @@ class FeaturesSection extends StatefulWidget {
 
   FeaturesSection({
     required this.balance,
-    required this.notificationCount,
+    // required this.notificationCount,
     required this.referredPost,
     required this.referralDetails,
     required this.onRateUs,
@@ -47,13 +47,6 @@ class _FeaturesSectionState extends State<FeaturesSection> {
         'onPress': null,
       },
       {
-        'icon': Icons.notifications_active,
-        'featureName': 'Notifications',
-        'leadText': '${widget.notificationCount}',
-        'navigate': Notificationspage(),
-        'onPress': null,
-      },
-      {
         'icon': Icons.note,
         'featureName': 'Requested Posts',
         'leadText': widget.referredPost.toString(),
@@ -68,6 +61,13 @@ class _FeaturesSectionState extends State<FeaturesSection> {
                 ? "0"
                 : widget.referralDetails['registeredUserCount'].toString(),
         'navigate': ReferredUsers(),
+        'onPress': null,
+      },
+      {
+        'icon': Icons.notifications_active,
+        'featureName': 'Notifications',
+        'leadText': '',
+        'navigate': Notificationspage(),
         'onPress': null,
       },
       {

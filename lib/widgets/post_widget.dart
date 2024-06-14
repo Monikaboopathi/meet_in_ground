@@ -244,7 +244,7 @@ class _Post_WidgetState extends State<Post_Widget> {
                         widget.result != null ? widget.result : "----",
                         style: TextStyle(
                           color: ThemeService.third,
-                          fontSize: 10,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -261,7 +261,7 @@ class _Post_WidgetState extends State<Post_Widget> {
                         widget.status,
                         style: TextStyle(
                           color: ThemeService.third,
-                          fontSize: 10,
+                          fontSize: 14,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
