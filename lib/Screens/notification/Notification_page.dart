@@ -70,7 +70,7 @@ class _NotificationspageState extends State<Notificationspage> {
   }
 
   String formatTimestamp(DateTime timestamp) {
-    if (timestamp == null) return ""; // Handling null or undefined timestamp
+    if (timestamp == null) return "";
     if (isToday(timestamp)) {
       Duration difference = DateTime.now().difference(timestamp);
       String timeDifference = formatDuration(difference);

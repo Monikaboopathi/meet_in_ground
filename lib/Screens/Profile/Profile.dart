@@ -4,8 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:clipboard/clipboard.dart';
-import 'package:meet_in_ground/Ads/BannerAd.dart';
-import 'package:meet_in_ground/Ads/RewardAds.dart';
 import 'package:meet_in_ground/Screens/Profile/EditProfilePage.dart';
 import 'package:geocoding/geocoding.dart';
 import 'package:meet_in_ground/Screens/Profile/FeaturesSection.dart';
@@ -226,8 +224,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         },
                       ),
                       SizedBox(height: 20),
-                      AdMobBanner(),
-                      AdMobReward(),
+                      // AdMobBanner(),
+                      // AdMobReward(),
                       Padding(
                         padding: const EdgeInsets.symmetric(horizontal: 20),
                         child: Container(

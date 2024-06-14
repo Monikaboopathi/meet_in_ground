@@ -3,8 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:meet_in_ground/Ads/BannerAd.dart';
-import 'package:meet_in_ground/Ads/RewardAds.dart';
+// import 'package:meet_in_ground/Ads/BannerAd.dart';
+// import 'package:meet_in_ground/Ads/RewardAds.dart';
 import 'package:meet_in_ground/Screens/Posts/MyPosts.dart';
 import 'package:meet_in_ground/constant/sports_names.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
@@ -500,8 +500,8 @@ class _AddpostsState extends State<Addposts> {
                       ),
                     ),
                   ),
-                  AdMobBanner(),
-                  AdMobReward(),
+                  // AdMobBanner(),
+                  // AdMobReward(),
                 ],
               ),
             ),

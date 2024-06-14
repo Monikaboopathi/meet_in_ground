@@ -3,8 +3,8 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:image_picker/image_picker.dart';
-import 'package:meet_in_ground/Ads/BannerAd.dart';
-import 'package:meet_in_ground/Ads/RewardAds.dart';
+// import 'package:meet_in_ground/Ads/BannerAd.dart';
+// import 'package:meet_in_ground/Ads/RewardAds.dart';
 import 'package:meet_in_ground/Screens/Posts/MyPosts.dart';
 import 'package:meet_in_ground/constant/results.dart';
 import 'package:meet_in_ground/constant/sports_names.dart';
@@ -137,7 +137,7 @@ class _EditPostState extends State<EditPost> {
       String? userMobileNumber = await MobileNo.getMobilenumber();
       print(userMobileNumber);
       print(price);
-      String formattedDate = _formatDate(date); // Format the date
+      String formattedDate = _formatDate(date);
 
       Map<String, String> postData = {
         "sport": selectedValue ?? "",
@@ -224,7 +224,6 @@ class _EditPostState extends State<EditPost> {
           );
         }
       } catch (error) {
-        // Handle any exceptions that might occur during the request
         print('Error: $error');
       }
     } else {
@@ -595,8 +594,8 @@ class _EditPostState extends State<EditPost> {
                     ),
                   ),
                 ),
-                AdMobBanner(),
-                AdMobReward(),
+                // AdMobBanner(),
+                // AdMobReward(),
               ],
             ),
           ),

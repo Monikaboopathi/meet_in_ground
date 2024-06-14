@@ -71,13 +71,6 @@ class _ReportIssuesPageState extends State<ReportIssuesPage> {
                 ? MediaType(mimeTypeData[0], mimeTypeData[1])
                 : MediaType('image', 'jpeg'),
           );
-
-          // Debug prints
-          print('--------------------------------------------------------');
-          print('File path: ${_selectedImage!.path}');
-          print('File size: ${await _selectedImage!.length()}');
-          print('MIME type: ${file.contentType}');
-
           request.files.add(file);
         }
 

@@ -423,11 +423,11 @@ class _EditProfileState extends State<EditProfile> {
                                           (context, error, stackTrace) {
                                         return Container(
                                           color: Colors.grey[
-                                              300], // Placeholder color in case of error
+                                              300],
                                           child: Icon(
                                             Icons.error,
                                             color:
-                                                Colors.red, // Error icon color
+                                                Colors.red,
                                           ),
                                         );
                                       },
