@@ -55,6 +55,7 @@ class _ReferEarnState extends State<ReferEarn> with TickerProviderStateMixin {
       resizeToAvoidBottomInset: false,
       appBar: AppBar(
         backgroundColor: ThemeService.background,
+        notificationPredicate: (notification) => false,
         elevation: 0,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -233,7 +234,7 @@ class _ReferEarnState extends State<ReferEarn> with TickerProviderStateMixin {
                 SizedBox(
                   height: 15,
                 ),
-                // Button for "Invite Now"
+
                 ElevatedButton(
                   onPressed: () {
                     shareApp();

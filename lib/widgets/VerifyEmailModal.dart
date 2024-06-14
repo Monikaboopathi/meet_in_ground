@@ -134,8 +134,8 @@ void sendVerificationEmail(String email, BuildContext context) async {
   String Base_url = dotenv.get("BASE_URL", fallback: null);
   String? storedMobile = await MobileNo.getMobilenumber();
 
-  final apiUrl = '${Base_url}/verifyEmail/$storedMobile';
-  final requestBody = jsonEncode({'email': email});
+  final apiUrl = '${Base_url}/user/sendVerificationEmail';
+  final requestBody = jsonEncode({"phoneNumber": storedMobile, 'email': email});
   print('Request Body: $requestBody');
   try {
     final response = await http.post(
@@ -145,12 +145,12 @@ void sendVerificationEmail(String email, BuildContext context) async {
       },
       body: requestBody,
     );
-
-    if (response.statusCode != 200) {
+    final Map<String, dynamic> responseData = json.decode(response.body);
+    if (response.statusCode == 200) {
       Navigator.pop(context);
       openOtpModal(context, email);
       Fluttertoast.showToast(
-        msg: 'OTP Send to Email',
+        msg: responseData['message'] ?? 'OTP Send to Email',
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.TOP,
         timeInSecForIosWeb: 2,
@@ -159,7 +159,7 @@ void sendVerificationEmail(String email, BuildContext context) async {
       );
     } else {
       Fluttertoast.showToast(
-        msg: 'Failed to verify email',
+        msg: responseData['error'] ?? 'Failed to verify email',
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 2,

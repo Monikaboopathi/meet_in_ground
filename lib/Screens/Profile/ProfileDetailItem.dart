@@ -7,12 +7,14 @@ class ProfileDetailItem extends StatelessWidget {
   final IconData icon;
   final String text;
   final bool copy;
+  final bool verify;
   final String tailText;
   final tailTextFuction;
 
   ProfileDetailItem(
       {required this.icon,
       required this.text,
+      required this.verify,
       required this.copy,
       required this.tailText,
       this.tailTextFuction});
@@ -66,7 +68,7 @@ class ProfileDetailItem extends StatelessWidget {
                             overflow: TextOverflow.ellipsis,
                           ),
                         ),
-                        tailText.isNotEmpty
+                        verify == true
                             ? GestureDetector(
                                 onTap: () => tailTextFuction(),
                                 child: Text(

@@ -85,6 +85,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             'profileImg': data['userDetails']['profileImg'],
             'userName': data['userDetails']['userName'],
             'phoneNumber': data['userDetails']['phoneNumber'],
+            'email': data['userDetails']['email'],
             'location': location,
             'sport': data['userDetails']['sport'],
             'referralId': data['userDetails']['referralId']

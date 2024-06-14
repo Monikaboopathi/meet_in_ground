@@ -11,6 +11,7 @@ class TermsandCondition extends StatelessWidget {
       backgroundColor: ThemeService.background,
       appBar: AppBar(
           backgroundColor: ThemeService.background,
+          notificationPredicate: (notification) => false,
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: ThemeService.textColor),
             onPressed: () {
@@ -68,7 +69,9 @@ class TermsandCondition extends StatelessWidget {
                   ],
                 ),
               ),
-              Divider(),
+              Divider(
+                color: ThemeService.transparent,
+              ),
               Text(
                 "Meet In Ground - Wallet  (Terms & Conditions)",
                 style: TextStyle(

@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:http/http.dart' as http;
@@ -79,7 +80,7 @@ class _OtpModalState extends State<OtpModal> {
                     PinCodeTextField(
                       appContext: context,
                       controller: _otpController,
-                      length: 6,
+                      length: 4,
                       keyboardType: TextInputType.number,
                       enablePinAutofill: true,
                       onChanged: (value) {},
@@ -141,9 +142,11 @@ Future<void> verifyEmailWithOTP(String email, String otp, context) async {
   String Base_url = dotenv.get("BASE_URL", fallback: null);
   String? storedMobile = await MobileNo.getMobilenumber();
 
-  final apiUrl = '${Base_url}/verifyEmail/$storedMobile';
-  final requestBody = jsonEncode({'email': email});
+  final apiUrl = '${Base_url}/user/verifyEmail';
+  final requestBody = jsonEncode(
+      {"phoneNumber": storedMobile, 'email': email, "verificationCode": otp});
   print('Request Body: $requestBody');
+
   try {
     final response = await http.post(
       Uri.parse(apiUrl),
@@ -152,11 +155,15 @@ Future<void> verifyEmailWithOTP(String email, String otp, context) async {
       },
       body: requestBody,
     );
-
+    final Map<String, dynamic> responseData = json.decode(response.body);
     if (response.statusCode == 200) {
       Navigator.pop(context);
+      Navigator.of(context).push(
+        MaterialPageRoute(
+            builder: (context) => BottomNavigationScreen(currentIndex: 4)),
+      );
       Fluttertoast.showToast(
-        msg: 'Email verified successfull',
+        msg: responseData['message'] ?? 'Email verified successfull',
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.TOP,
         timeInSecForIosWeb: 2,
@@ -165,7 +172,7 @@ Future<void> verifyEmailWithOTP(String email, String otp, context) async {
       );
     } else {
       Fluttertoast.showToast(
-        msg: 'Entered Wrong OTP',
+        msg: responseData['error'] ?? 'Entered Wrong OTP',
         toastLength: Toast.LENGTH_SHORT,
         gravity: ToastGravity.BOTTOM,
         timeInSecForIosWeb: 2,
