@@ -9,7 +9,7 @@ import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:http/http.dart' as http;
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/NoDataFoundWidget.dart';
-import 'package:meet_in_ground/widgets/ShareMethods.dart';
+import 'package:meet_in_ground/widgets/Refer&Earn.dart';
 
 class WalletPage extends StatefulWidget {
   @override
@@ -72,7 +72,6 @@ class _WalletPageState extends State<WalletPage> {
       return;
     }
 
-    // Define regular expression pattern for UPI ID
     RegExp upiRegex = RegExp(r'^[a-zA-Z0-9\.\-_]+@[a-zA-Z]+$');
     if (!upiRegex.hasMatch(trimmedText)) {
       setState(() {
@@ -112,7 +111,6 @@ class _WalletPageState extends State<WalletPage> {
       print(responseData);
 
       if (response.statusCode == 200) {
-        // Handle success
         setState(() {
           _visible = false;
           _textController.clear();
@@ -130,7 +128,6 @@ class _WalletPageState extends State<WalletPage> {
           textColor: Colors.white,
         );
       } else {
-        // Handle error
         Fluttertoast.showToast(
           msg: responseData['error'],
           toastLength: Toast.LENGTH_SHORT,
@@ -245,7 +242,11 @@ class _WalletPageState extends State<WalletPage> {
                           ),
                           ElevatedButton(
                             onPressed: () {
-                              shareApp();
+                              Navigator.of(context).push(
+                                MaterialPageRoute(
+                                  builder: (context) => ReferEarn(),
+                                ),
+                              );
                             },
                             style: ElevatedButton.styleFrom(
                               shape: RoundedRectangleBorder(

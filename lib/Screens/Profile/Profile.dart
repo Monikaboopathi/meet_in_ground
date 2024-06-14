@@ -15,6 +15,7 @@ import 'package:http/http.dart' as http;
 import 'package:meet_in_ground/util/Services/Auth_service.dart';
 import 'package:meet_in_ground/util/Services/PreferencesService.dart';
 import 'package:meet_in_ground/util/Services/mobileNo_service.dart';
+import 'package:meet_in_ground/util/Services/refferral_service.dart';
 import 'package:meet_in_ground/widgets/BottomNavigationScreen.dart';
 import 'package:meet_in_ground/widgets/Loader.dart';
 import 'package:meet_in_ground/widgets/ShareMethods.dart';
@@ -140,6 +141,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     await PreferencesService.clearValue("password");
     await PreferencesService.clearValue("confirmPassword");
     await PreferencesService.clearValue("login");
+    await RefferalService.clearRefferal();
     await Navigator.of(context).pushReplacement(
       MaterialPageRoute(builder: (context) => LoginPage()),
     );

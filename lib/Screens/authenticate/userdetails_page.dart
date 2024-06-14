@@ -23,7 +23,6 @@ import 'package:mime/mime.dart';
 import 'package:http_parser/http_parser.dart';
 
 String fcmToken = "";
-String referralId = "";
 
 class UserOnBoard extends StatefulWidget {
   final String mobile;
@@ -82,7 +81,6 @@ class _UserOnBoardState extends State<UserOnBoard> {
     // Get FCM token
     setState(() async {
       fcmToken = await FirebaseApi().getFcmToken();
-      referralId = (await RefferalService.getRefferal()) ?? "";
     });
 
     // Use fcmToken here
@@ -205,11 +203,15 @@ class _UserOnBoardState extends State<UserOnBoard> {
     String? favHero = await PreferencesService.getValue("hero");
     String? password = await PreferencesService.getValue("password");
     String? cpassword = await PreferencesService.getValue("confirmPassword");
+    String? referralId = (await RefferalService.getRefferal()) ?? "";
+
     print(mobileNo);
     print(favColor);
     print(favHero);
     print(password);
     print(cpassword);
+    print(referralId);
+    print(fcmToken);
 
     if (userLocation == null) {
       print("User location is null");

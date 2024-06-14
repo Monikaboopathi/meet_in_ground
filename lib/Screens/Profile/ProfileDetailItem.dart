@@ -7,9 +7,15 @@ class ProfileDetailItem extends StatelessWidget {
   final IconData icon;
   final String text;
   final bool copy;
+  final String tailText;
+  final tailTextFuction;
 
   ProfileDetailItem(
-      {required this.icon, required this.text, required this.copy});
+      {required this.icon,
+      required this.text,
+      required this.copy,
+      required this.tailText,
+      this.tailTextFuction});
 
   @override
   Widget build(BuildContext context) {
@@ -20,43 +26,61 @@ class ProfileDetailItem extends StatelessWidget {
           copy ? Container() : Icon(icon, color: ThemeService.textColor),
           SizedBox(width: copy ? 0 : 10),
           Expanded(
-            child: copy
-                ? GestureDetector(
-                    onTap: () {
-                      FlutterClipboard.copy(text).then((_) {
-                        Fluttertoast.showToast(
-                            msg: "Referral copied to clipboard!",
-                            toastLength: Toast.LENGTH_SHORT,
-                            gravity: ToastGravity.BOTTOM,
-                            timeInSecForIosWeb: 1,
-                            backgroundColor: Colors.grey,
-                            textColor: Colors.white,
-                            fontSize: 16.0);
-                      });
-                    },
-                    child: Row(
+              child: copy
+                  ? GestureDetector(
+                      onTap: () {
+                        FlutterClipboard.copy(text).then((_) {
+                          Fluttertoast.showToast(
+                              msg: "Referral copied to clipboard!",
+                              toastLength: Toast.LENGTH_SHORT,
+                              gravity: ToastGravity.BOTTOM,
+                              timeInSecForIosWeb: 1,
+                              backgroundColor: Colors.grey,
+                              textColor: Colors.white,
+                              fontSize: 16.0);
+                        });
+                      },
+                      child: Row(
+                        children: [
+                          Icon(Icons.copy, color: ThemeService.textColor),
+                          SizedBox(width: 5),
+                          Text(
+                            text,
+                            style: TextStyle(
+                              color: ThemeService.textColor,
+                              fontSize: 12,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Row(
                       children: [
-                        Icon(Icons.copy, color: ThemeService.textColor),
-                        SizedBox(width: 5),
-                        Text(
-                          text,
-                          style: TextStyle(
-                            color: ThemeService.textColor,
-                            fontSize: 12,
+                        Expanded(
+                          child: Text(
+                            text,
+                            style: TextStyle(
+                              color: ThemeService.textColor,
+                              fontSize: 12,
+                            ),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                        tailText.isNotEmpty
+                            ? GestureDetector(
+                                onTap: () => tailTextFuction(),
+                                child: Text(
+                                  tailText,
+                                  style: TextStyle(
+                                    color: ThemeService.danger,
+                                    fontSize: 12,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              )
+                            : Container()
                       ],
-                    ),
-                  )
-                : Text(
-                    text,
-                    style: TextStyle(
-                      color: ThemeService.textColor,
-                      fontSize: 12,
-                    ),
-                    overflow: TextOverflow.ellipsis,
-                  ),
-          ),
+                    )),
         ],
       ),
     );

@@ -7,6 +7,8 @@ import 'package:meet_in_ground/Screens/requestedPosts/RequestedPosts.dart';
 import 'package:meet_in_ground/Screens/wallet/Wallet_page.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
 import 'package:meet_in_ground/widgets/RateUs.dart';
+import 'package:meet_in_ground/widgets/Refer&Earn.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class FeaturesSection extends StatefulWidget {
   final String balance;
@@ -59,6 +61,23 @@ class _FeaturesSectionState extends State<FeaturesSection> {
         'onPress': null,
       },
       {
+        'icon': Icons.group,
+        'featureName': 'Referred Users',
+        'leadText':
+            widget.referralDetails['registeredUserCount'].toString().isEmpty
+                ? "0"
+                : widget.referralDetails['registeredUserCount'].toString(),
+        'navigate': ReferredUsers(),
+        'onPress': null,
+      },
+      {
+        'icon': Icons.currency_exchange,
+        'featureName': 'Refer & Earn',
+        'leadText': '',
+        'navigate': ReferEarn(),
+        'onPress': null,
+      },
+      {
         'icon': Icons.feedback,
         'featureName': 'Feedback',
         'leadText': '',
@@ -73,14 +92,24 @@ class _FeaturesSectionState extends State<FeaturesSection> {
         'onPress': null,
       },
       {
-        'icon': Icons.group,
-        'featureName': 'Referred Users',
-        'leadText':
-            widget.referralDetails['registeredUserCount'].toString().isEmpty
-                ? "0"
-                : widget.referralDetails['registeredUserCount'].toString(),
-        'navigate': ReferredUsers(),
-        'onPress': null,
+        'icon': Icons.security,
+        'featureName': 'Privacy Policy',
+        'leadText': '',
+        'navigate': '',
+        'onPress': () {
+          const url = 'https://bet-app-eight.vercel.app/privacy-policy';
+          launch(url);
+        }
+      },
+      {
+        'icon': Icons.question_answer,
+        'featureName': 'FAQ',
+        'leadText': '',
+        'navigate': '',
+        'onPress': () {
+          const url = 'https://bet-app-eight.vercel.app/faq';
+          launch(url);
+        }
       },
       {
         'icon': Icons.star,

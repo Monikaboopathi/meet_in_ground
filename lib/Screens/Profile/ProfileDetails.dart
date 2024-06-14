@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:meet_in_ground/Screens/Profile/ProfileDetailItem.dart';
 import 'package:meet_in_ground/constant/themes_service.dart';
+import 'package:meet_in_ground/widgets/VerifyEmailModal.dart';
 
 class ProfileDetails extends StatelessWidget {
   final Map<String, dynamic> userDetails;
@@ -29,23 +30,34 @@ class ProfileDetails extends StatelessWidget {
         children: [
           ProfileDetailItem(
             icon: Icons.location_on,
-            text:userDetails['location'] ?? 'Unknown location',
+            text: userDetails['location'] ?? 'Unknown location',
             copy: false,
+            tailText: '',
           ),
           ProfileDetailItem(
             icon: Icons.phone,
             text: userDetails['phoneNumber'] ?? 'Unknown phone number',
             copy: false,
+            tailText: '',
+          ),
+          ProfileDetailItem(
+            icon: Icons.mail,
+            text: userDetails['email'] ?? 'Email verification Pending',
+            copy: false,
+            tailText: "Verify",
+            tailTextFuction: () => openVerifyEmailModal(context),
           ),
           ProfileDetailItem(
             icon: Icons.sports_esports,
             text: userDetails['sport'] ?? 'Unknown sport',
             copy: false,
+            tailText: '',
           ),
           ProfileDetailItem(
             icon: Icons.content_copy,
             text: userDetails['referralId'] ?? 'No referral ID',
             copy: true,
+            tailText: '',
           ),
         ],
       ),
