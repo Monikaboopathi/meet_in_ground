@@ -51,7 +51,7 @@ class ChatSearchDelegate extends SearchDelegate {
             return Loader();
           }
           if (!snapshot.hasData || snapshot.data!.isEmpty) {
-            return NoDataFoundWidget();
+            return NoDataFoundWidget(errorText: "NO MESSAGES FOUND",);
           }
 
           List<Map<String, dynamic>> chatRooms = snapshot.data!;
@@ -63,7 +63,7 @@ class ChatSearchDelegate extends SearchDelegate {
           }).toList();
 
           if (filteredChatRooms.isEmpty) {
-            return NoDataFoundWidget();
+            return NoDataFoundWidget(errorText: "No Messages yet",);
           }
 
           return ListView.builder(

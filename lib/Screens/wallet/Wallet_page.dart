@@ -305,7 +305,7 @@ class _WalletPageState extends State<WalletPage> {
                     Expanded(
                       child: _withdrawalHistory.isEmpty
                           ? Center(
-                              child: NoDataFoundWidget(),
+                              child: NoDataFoundWidget(errorText: "No transactions yet",),
                             )
                           : ListView.builder(
                               itemCount: _withdrawalHistory.length,

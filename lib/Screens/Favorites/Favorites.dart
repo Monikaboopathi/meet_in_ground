@@ -485,7 +485,10 @@ class _FavoritesState extends State<Favorites> {
               } else if (snapshot.hasError ||
                   !snapshot.hasData ||
                   snapshot.data!.isEmpty) {
-                return Center(child: NoDataFoundWidget());
+                return Center(
+                    child: NoDataFoundWidget(
+                  errorText:"No Favorites yet",
+                ));
               } else {
                 return ListView.builder(
                   itemCount: snapshot.data!.length,

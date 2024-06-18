@@ -139,7 +139,7 @@ class _ReferredUsersState extends State<ReferredUsers> {
                     ),
                   ),
                 )
-              : NoDataFoundWidget(),
+              : NoDataFoundWidget(errorText: "No Refered users yet",),
     );
   }
 }

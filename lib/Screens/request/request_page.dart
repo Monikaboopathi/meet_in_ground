@@ -222,7 +222,7 @@ class _RequestsScreenState extends State<RequestsScreen> {
               child: isLoading
                   ? Loader()
                   : requests.isEmpty
-                      ? NoDataFoundWidget()
+                      ? NoDataFoundWidget(errorText: "No Requests yet",)
                       : ListView.builder(
                           itemCount: requests.length,
                           itemBuilder: (context, index) {

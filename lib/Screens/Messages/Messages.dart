@@ -79,7 +79,7 @@ class _MessagesState extends State<Messages> {
               return Loader();
             }
             if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return NoDataFoundWidget();
+              return NoDataFoundWidget(errorText: "No Messages yet",);
             }
 
             List<Map<String, dynamic>> chatRooms = snapshot.data!;

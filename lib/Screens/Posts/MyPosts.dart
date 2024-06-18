@@ -365,7 +365,7 @@ class _MyPostsState extends State<MyPosts> {
                   !snapshot.hasData ||
                   snapshot.data == null ||
                   snapshot.data!.isEmpty) {
-                return Center(child: NoDataFoundWidget());
+                return Center(child: NoDataFoundWidget(errorText: "No Posts yet",));
               } else {
                 List<dynamic>? postData = snapshot.data;
                 return ListView.builder(

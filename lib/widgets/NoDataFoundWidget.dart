@@ -6,13 +6,15 @@ class NoDataFoundWidget extends StatelessWidget {
   final String imagePath;
   final double width;
   final double height;
+  final String errorText;
 
-  const NoDataFoundWidget({
-    Key? key,
-    this.imagePath = 'assets/noData.png',
-    this.width = 200.0,
-    this.height = 200.0,
-  }) : super(key: key);
+  const NoDataFoundWidget(
+      {Key? key,
+      this.imagePath = 'assets/noData.png',
+      this.width = 200.0,
+      this.height = 200.0,
+      required this.errorText})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -30,7 +32,7 @@ class NoDataFoundWidget extends StatelessWidget {
               height: height,
             ),
             Text(
-              "NO DATA FOUND",
+              errorText,
               style: TextStyle(
                   color: ThemeService.primary,
                   fontSize: 20,

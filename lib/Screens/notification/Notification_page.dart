@@ -245,7 +245,7 @@ class _NotificationspageState extends State<Notificationspage> {
                         );
                       },
                     )
-                  : NoDataFoundWidget(),
+                  : NoDataFoundWidget(errorText: "No Notifications yet",),
         ),
       ),
     );

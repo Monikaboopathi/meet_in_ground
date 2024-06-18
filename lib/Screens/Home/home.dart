@@ -491,7 +491,10 @@ class _HomeScreenState extends State<HomeScreen> {
               } else if (snapshot.hasError ||
                   !snapshot.hasData ||
                   snapshot.data!.isEmpty) {
-                return Center(child: NoDataFoundWidget());
+                return Center(
+                    child: NoDataFoundWidget(
+                  errorText: "No Posts yet",
+                ));
               } else {
                 return ListView.builder(
                   itemCount: snapshot.data!.length,
